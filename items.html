@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Kaleo — Items</title><meta content="The established item system and its role in Kaleo." name="description"/><style>
+
+:root{--bg:#071018;--panel:#0d1a25;--panel2:#112536;--text:#edf7fb;--muted:#9fb5c2;--accent:#63d8ff;--accent2:#b58cff;--border:rgba(255,255,255,.11)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0%,rgba(99,216,255,.10),transparent 28rem),radial-gradient(circle at 90% 10%,rgba(181,140,255,.10),transparent 30rem),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}
+a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1450px;margin:auto;padding:13px 22px;display:flex;align-items:center;gap:28px}.brand{font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.search{flex:1}.search input{width:100%;max-width:680px;padding:11px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.06);color:var(--text);font-size:1rem;outline:none}.search input:focus{border-color:rgba(99,216,255,.7)}
+.page{max-width:1450px;margin:auto;padding:42px 22px 80px}.hero{padding:70px 58px;border:1px solid var(--border);border-radius:26px;background:linear-gradient(135deg,rgba(99,216,255,.13),rgba(181,140,255,.09)),var(--panel);box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.kicker{color:var(--accent);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem}h1{font-size:clamp(3.5rem,8vw,7rem);line-height:.9;margin:15px 0 22px}.hero h2{font-size:1.5rem;color:#cbeef8;margin:0 0 18px}.hero p{max-width:850px;color:var(--muted);font-size:1.12rem}
+.section{margin-top:34px}.section h2{font-size:2rem;margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{display:block;text-decoration:none;padding:24px;border:1px solid var(--border);border-radius:18px;background:rgba(13,26,37,.8);transition:.18s ease;min-height:155px}.card:hover{transform:translateY(-3px);border-color:rgba(99,216,255,.45);background:var(--panel2)}
+.card-title{font-size:1.18rem;font-weight:800;margin-bottom:8px}.card-desc{color:var(--muted);font-size:.94rem}.card-arrow{display:block;color:var(--accent);font-size:.86rem;font-weight:700;margin-top:18px}
+.species-box{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.species-box a{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03);text-decoration:none;color:#cfe9f2}.species-box a:hover{border-color:rgba(99,216,255,.45);color:white}
+.footer{margin-top:45px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}.sidebar-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:26px}.sidebar{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto}
+.sidebar a{display:block;text-decoration:none;padding:9px 11px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted)}.sidebar a:hover{color:white;background:rgba(255,255,255,.04);border-left-color:var(--accent)}.sidebar small{display:block;font-size:.72rem;line-height:1.35;margin-top:2px}
+.reference{padding:35px 42px;border:1px solid var(--border);border-radius:20px;background:rgba(13,26,37,.75)}.reference h1{font-size:2.1rem;line-height:1.15;margin-top:2em;border-bottom:1px solid var(--border);padding-bottom:.35em}.reference h2{font-size:1.55rem;color:#dff7ff;margin-top:2em}.reference h3{color:#bfefff}
+.reference table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}.reference th,.reference td{border:1px solid var(--border);padding:9px 11px;text-align:left}.reference th{background:rgba(255,255,255,.05)}.reference blockquote{border-left:3px solid var(--accent);padding:10px 17px;background:rgba(99,216,255,.05)}.reference pre{overflow:auto;background:#050b10;padding:15px;border-radius:10px}.reference img{max-width:100%;border-radius:12px}.hidden{display:none!important}
+@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.species-box{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.sidebar-layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;max-height:300px}.grid{grid-template-columns:1fr}.species-box{grid-template-columns:repeat(2,1fr)}.hero{padding:45px 28px}.reference{padding:25px 20px}}
+
+
+.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:26px;align-items:start}
+.reader-nav{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto;padding-right:4px}
+.reader-nav a{display:block;text-decoration:none;padding:10px 12px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted);margin-bottom:3px}
+.reader-nav a:hover{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.05)}
+.reader-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.07)}
+.reader-nav small{display:block;color:var(--muted);font-size:.72rem;line-height:1.35;margin-top:3px}
+.reader-main{min-width:0}
+.reference{max-width:100%;}
+.reader-meta{color:var(--muted);font-size:.86rem;margin:-8px 0 26px}
+.reader-footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.reader-footer a{color:var(--accent);text-decoration:none;font-weight:700}
+@media(max-width:900px){.reader-layout{grid-template-columns:1fr}.reader-nav{position:relative;top:auto;height:auto;display:flex;gap:5px;overflow-x:auto;padding-bottom:8px}.reader-nav a{min-width:max-content}.reader-nav small{display:none}}
+</style></head><body><header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">KALEO · ENTHEON</a><div class="search"><input aria-label="Search the reference" id="search" placeholder="Search this section…" type="search"/></div></div></header><div class="page"><div class="reader-layout"><aside class="reader-nav"><a href="index.html"><strong>← Home</strong><small>Return to the Kaleo homepage.</small></a><a data-page="creature-systems.html" href="creature-systems.html"><span>Creature Systems</span><small>Combat categories, statistics and battle fundamentals.</small></a><a data-page="move-database.html" href="move-database.html"><span>Move Database</span><small>The canonical move pools, move fields and move design rules.</small></a><a data-page="special-abilities.html" href="special-abilities.html"><span>Special Moves &amp; Abilities</span><small>Special acquisition, innate abilities and special move rules.</small></a><a data-page="nature-personality.html" href="nature-personality.html"><span>Nature &amp; Personality</span><small>Nature, temperament and personality rules.</small></a><a data-page="species-moves.html" href="species-moves.html"><span>Species-Specific Moves</span><small>Species-specific learnsets and move compatibility.</small></a><a data-page="growth-evolution.html" href="growth-evolution.html"><span>Growth &amp; Evolution</span><small>Leveling, experience, evolution and progression rules.</small></a><a class="active" data-page="items.html" href="items.html"><span>Items</span><small>The established item system and its role in Kaleo.</small></a><a data-page="trainers-battles.html" href="trainers-battles.html"><span>Trainers &amp; Battles</span><small>Trainer, capture and battle systems.</small></a><a data-page="world.html" href="world.html"><span>The World</span><small>Kaleo’s geography, regions and broad world structure.</small></a><a data-page="human-entheon.html" href="human-entheon.html"><span>Human–Entheon Relationship</span><small>The relationship between people and Entheon.</small></a><a data-page="affinities.html" href="affinities.html"><span>Affinities</span><small>The established Affinities and their place in the world.</small></a><a data-page="technology.html" href="technology.html"><span>Technology</span><small>Kaleo’s technological development.</small></a><a data-page="settlements-regions.html" href="settlements-regions.html"><span>Settlements &amp; Regions</span><small>Settlements and regional structure.</small></a><a data-page="wild-habitats.html" href="wild-habitats.html"><span>Wild Habitats</span><small>Where Entheon live and how habitats shape the world.</small></a><a data-page="research.html" href="research.html"><span>Research &amp; Starter Distribution</span><small>Research institutions, Entheon study and starter distribution.</small></a><a data-page="trainers-leagues.html" href="trainers-leagues.html"><span>Trainers, Leagues &amp; Gyms</span><small>Trainer organizations and the seven Gyms.</small></a><a data-page="economy.html" href="economy.html"><span>Economy &amp; Vale</span><small>Economy and the established Vale currency.</small></a><a data-page="shops-services.html" href="shops-services.html"><span>Shops &amp; Services</span><small>Everyday services and commerce.</small></a><a data-page="travel.html" href="travel.html"><span>Travel &amp; Transportation</span><small>Established travel and transportation.</small></a><a data-page="education.html" href="education.html"><span>Education &amp; Everyday Life</span><small>Education and ordinary life in Kaleo.</small></a><a data-page="law-safety.html" href="law-safety.html"><span>Law &amp; Public Safety</span><small>Law, safety and public rules.</small></a><a data-page="compendium.html" href="compendium.html"><span>Entheon Species Compendium</span><small>The canonical species compendium, evolution lines and physical scale.</small></a></aside><main class="reader-main"><article class="reference"><h1 id="item-system">Item System</h1><h2 id="purpose-5">1. Purpose</h2><p>The Item System defines the physical items that exist within the
+creature world. Items are part of the world’s established setting and
+may be referenced by the creature encyclopedia, story events, trainers,
+shops, laboratories, researchers and other world elements. This document
+defines <strong>what items exist and what they do</strong>.</p><h2 id="item-categories">2. Item Categories</h2><p>The world uses the following major item categories: 1. Capture
+Devices 2. Evolution Items 3. Healing and Recovery Items 4. Status
+Recovery Items 5. Battle Items 6. Training Items 7. Held Items 8. Key
+Items and Special Artifacts Not every category needs hundreds of
+individual items. Items should have clear, distinct purposes so that the
+world remains understandable and manageable.</p><h2 id="capture-devices">3. Capture Devices</h2><p>Capture devices are small crystalline devices used to contain and
+transport creatures. They replace the traditional “Capture Crystal”
+concept while functioning similarly at a mechanical level. A Capture
+Crystal temporarily converts a creature into a contained energy state
+and stores that creature within the crystal. When released, the creature
+returns to its physical form.</p><h2 id="canonical-physical-design">3.1 Canonical Physical Design</h2><p>All Capture Crystals share the same fundamental physical design. A
+Capture Crystal is a <strong>slender, elongated, faceted
+crystal</strong>, resembling a polished gemstone shard with a
+distinctive tapered silhouette. The basic silhouette remains consistent
+across all grades of Capture Crystal. Higher-grade crystals are not
+fundamentally different objects; they are smaller, more refined versions
+of the same design. The crystal itself is the recognizable visual
+identity of the capture system.</p><h3 id="size-by-grade">Size by Grade</h3><table>
+<colgroup>
+<col style="width: 19%"/>
+<col style="width: 50%"/>
+<col style="width: 29%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Device</strong></th>
+<th><strong>Approximate Crystal Size</strong></th>
+<th><strong>Typical Configuration</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Capture Crystal</strong></td>
+<td>Approximately the length of an adult male middle finger</td>
+<td>Necklace</td>
+</tr>
+<tr class="even">
+<td><strong>Refined Crystal</strong></td>
+<td>Noticeably smaller than a standard Capture Crystal</td>
+<td>Necklace, bracelet or compact mount</td>
+</tr>
+<tr class="odd">
+<td><strong>Primal Crystal</strong></td>
+<td>Small enough for discreet personal mounting</td>
+<td>Bracelet, necklace or equipment mount</td>
+</tr>
+<tr class="even">
+<td><strong>Sovereign Crystal</strong></td>
+<td>Approximately one-third the length of a standard Capture
+Crystal</td>
+<td>Bracelet, pendant or specialized mount</td>
+</tr>
+</tbody>
+</table><p>These dimensions are approximate rather than exact measurements. The
+important distinction is that <strong>higher-grade Capture Crystals are
+progressively smaller while retaining the same fundamental
+shape</strong>.</p><h2 id="mounting-and-wearing">3.2 Mounting and Wearing</h2><p>The standard and most common way to carry a Capture Crystal is as a
+<strong>necklace or pendant</strong>. A standard Capture Crystal is
+relatively large, making it impractical or cumbersome for most bracelet
+configurations. Smaller, higher-grade crystals allow for greater freedom
+in how they are carried. Common configurations include: - Necklace or
+pendant. - Bracelet-mounted crystal. - Belt-mounted crystal. -
+Equipment-mounted crystal. - Specialized custom mounting. The mounting
+itself does not affect capture performance. The choice of mounting is
+primarily determined by: - Personal preference. - Comfort. - Fashion. -
+Profession. - Equipment requirements. - Available craftsmanship. -
+Crystal size. A trainer who specifically wants a bracelet-mounted
+Capture Crystal will generally need to invest in a smaller, higher-grade
+crystal or a specialized mounting solution. The <strong>necklace
+configuration remains the ordinary and most widespread
+form</strong>.</p><h2 id="visual-consistency">3.3 Visual Consistency</h2><p>Despite differences in size, craftsmanship and mounting, all Capture
+Crystals should remain immediately recognizable as the same type of
+device. Manufacturers and individuals may vary: - The exact crystal cut.
+- Facet arrangement. - Mounting hardware. - Decorative elements. -
+Chain, cord or bracelet design. - Minor casing details. - Subtle color
+accents. However, the underlying <strong>slender, elongated, faceted
+crystal silhouette must remain consistent</strong>. The device should
+never resemble a spherical capsule or another unrelated containment
+device.</p><h2 id="capture-device-grades">4. Capture Device Grades</h2><h2 id="capture-crystal">4.1 Capture Crystal</h2><p><strong>Purpose:</strong> Standard capture device. The basic and most
+commonly available capture device. A standard Capture Crystal is
+approximately the length of an adult male middle finger and is most
+commonly worn as a necklace or pendant. Suitable for ordinary wild
+creatures and routine trainer use.</p><h2 id="refined-crystal">4.2 Refined Crystal</h2><p><strong>Purpose:</strong> Improved capture device. A more
+sophisticated and smaller version of the standard Capture Crystal,
+featuring a stronger containment field and more refined crystal
+construction. It provides a higher capture probability than a standard
+Capture Crystal, particularly against stronger or more resistant
+creatures. Its reduced size makes bracelet-mounted and other compact
+configurations more practical.</p><h2 id="primal-crystal">4.3 Primal Crystal</h2><p><strong>Purpose:</strong> High-grade capture device. A powerful and
+comparatively expensive Capture Crystal designed for difficult captures.
+Its highly refined crystal structure allows it to maintain a stronger
+containment field while remaining small enough for discreet personal
+mounting. Primal Crystals are uncommon compared with ordinary Capture
+Crystals.</p><h2 id="sovereign-crystal">4.4 Sovereign Crystal</h2><p><strong>Purpose:</strong> Exceptional capture device. An extremely
+rare and highly refined Capture Crystal. A Sovereign Crystal is
+approximately one-third the length of a standard Capture Crystal while
+retaining the same fundamental elongated, faceted design. Its compact
+size makes it particularly suitable for bracelet-mounted, pendant or
+other specialized configurations. A Sovereign Crystal is capable of
+attempting containment against creatures that would normally resist
+lesser devices. Sovereign Crystals are not ordinary equipment. Their
+rarity and cost make them unsuitable for routine use. A Sovereign
+Crystal does not guarantee successful capture.</p><h2 id="capture-rules">5. Capture Rules</h2><p>Capture devices do not automatically make a captured creature
+obedient. Successful capture establishes a containment and ownership
+relationship, but the creature’s: - Nature - Personality - Trust - Bond
+- Previous experiences - Individual temperament still influence its
+relationship with its trainer. A captured creature may therefore be: -
+Cooperative. - Cautious. - Distrustful. - Excited. - Resistant. - Deeply
+loyal. Capture is the beginning of a trainer-creature relationship, not
+a replacement for that relationship.</p><h2 id="capture-difficulty">6. Capture Difficulty</h2><p>Capture probability can be influenced by: - The creature’s current
+condition. - Its Level. - Its relative strength. - Its rarity. - Its
+temperament. - Whether it is willing to be captured. - The quality of
+the capture device. - Special circumstances surrounding the encounter. A
+weakened creature is generally easier to contain than a healthy creature
+at full strength. Extremely powerful or exceptionally rare creatures may
+resist even high-grade capture devices. Legendary creatures are not
+automatically capturable merely because a sufficiently powerful device
+exists.</p><h2 id="evolution-items">7. Evolution Items</h2><p>Evolution items are specialized objects that can trigger or enable
+specific evolutionary transformations. They are not generic power-up
+items. Each evolution item has a defined purpose and should only trigger
+an evolution when the appropriate species and conditions are
+present.</p><h2 id="storm-shard">7.1 Storm Shard</h2><p><strong>Associated Evolution:</strong> Tivvi → Tivarra</p><h2 id="requirement-9">Requirement:</h2><blockquote>
+<p>Storm Shard The Storm Shard is a crystalline fragment charged with
+concentrated Volt energy. When used on an eligible Tivvi, it resonates
+with Tivvi’s natural Volt affinity and enables its evolution into
+Tivarra.</p>
+</blockquote><h2 id="emberstone">7.2 Emberstone</h2><p><strong>Associated Evolution:</strong> Veyli → Veylith</p><h2 id="requirement-10">Requirement:</h2><blockquote>
+<p>Level 28 + Emberstone An Emberstone is a warm, fire-charged
+evolutionary stone. It resonates with Flame-affinity energy and directs
+Veyli’s branching evolution toward Veylith.</p>
+</blockquote><h2 id="tide-pearl">7.3 Tide Pearl</h2><p><strong>Associated Evolution:</strong> Veyli → Veyrune</p><h2 id="requirement-11">Requirement:</h2><blockquote>
+<p>Level 28 + Tide Pearl A Tide Pearl is a naturally formed pearl
+containing concentrated Tide energy. It directs Veyli’s branching
+evolution toward Veyrune.</p>
+</blockquote><h2 id="mystic-crystal">7.4 Mystic Crystal</h2><p><strong>Associated Evolution:</strong> Veyli → Veyvara</p><h2 id="requirement-12">Requirement:</h2><blockquote>
+<p>Level 28 + Mystic Crystal A Mystic Crystal contains concentrated
+Mystic energy. It directs Veyli’s branching evolution toward
+Veyvara.</p>
+</blockquote><h2 id="ancient-relic">7.5 Ancient Relic</h2><p><strong>Associated Evolution:</strong> Orli → Orlith</p><h2 id="requirement-13">Requirement:</h2><blockquote>
+<p>Level 30 + Ancient Relic The Ancient Relic is an old artifact
+containing residual energy from a previous age. Its resonance is
+specifically compatible with Orli’s artifact-like nature and enables its
+evolution into Orlith.</p>
+</blockquote><h2 id="evolution-items-are-species-specific">8. Evolution Items Are
+Species-Specific</h2><p>Evolution items do not function as universal evolution triggers. For
+example: &gt; An Emberstone does not cause every Flame-affinity creature
+to evolve. The species database determines which Entheon, if any, can
+evolve through a particular item. The item system never introduces an
+additional species-item relationship unless it has been explicitly
+established.</p><h2 id="healing-and-recovery-items">9. Healing and Recovery Items</h2><p>Healing items restore a creature’s physical condition. The item
+system uses a small number of clearly differentiated recovery items
+rather than dozens of nearly identical products.</p><h2 id="basic-restore">9.1 Basic Restore</h2><p>A basic restorative item used to treat minor injuries and restore a
+limited amount of physical stamina. Suitable for routine field use.</p><h2 id="greater-restore">9.2 Greater Restore</h2><p>A stronger restorative item capable of treating more serious injuries
+and restoring significantly more stamina. More expensive than Basic
+Restore.</p><h2 id="full-restore">9.3 Full Restore</h2><p>A high-grade restorative capable of restoring a creature to excellent
+physical condition after severe injury. Expensive and generally reserved
+for important situations.</p><h2 id="status-recovery-items">10. Status Recovery Items</h2><p>Status conditions can be treated using specialized restorative
+items.</p><h2 id="purity-tonic">10.1 Purity Tonic</h2><p>A general-purpose treatment for common harmful status conditions.</p><h2 id="cleansing-elixir">10.2 Cleansing Elixir</h2><p>A stronger treatment capable of removing more persistent or severe
+status effects.</p><h2 id="revitalizing-elixir">10.3 Revitalizing Elixir</h2><p>A specialized restorative used when a creature is exhausted or
+suffering from a debilitating condition. These items are intended as a
+separate category from ordinary healing.</p><h2 id="battle-items">11. Battle Items</h2><p>Battle items temporarily influence combat performance. They may
+improve attributes such as: - Attack - Defense - Speed - Accuracy -
+Resistance - Affinity output Battle items provide temporary effects and
+do not permanently increase a creature’s underlying progression. They
+should be used sparingly during ordinary battles.</p><h2 id="training-items">12. Training Items</h2><p>Training items assist with development outside ordinary combat.
+Examples include: - Resistance-training equipment. - Affinity-control
+focuses. - Targeting devices. - Practice constructs. - Specialized
+training aids. Training equipment can make training more effective but
+does not bypass the ordinary progression system.</p><h2 id="held-items">13. Held Items</h2><p>Some items can be carried or worn by a creature and provide a
+persistent passive effect while equipped. Held items should be
+relatively uncommon and meaningful. Examples may include:</p><table>
+<colgroup>
+<col style="width: 17%"/>
+<col style="width: 82%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Item</strong></th>
+<th><strong>General Effect</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Affinity Charm</td>
+<td>Slightly improves control of the user’s primary Affinity.</td>
+</tr>
+<tr class="even">
+<td>Vitality Band</td>
+<td>Improves stamina during prolonged activity.</td>
+</tr>
+<tr class="odd">
+<td>Focus Lens</td>
+<td>Improves precision when using techniques requiring
+concentration.</td>
+</tr>
+<tr class="even">
+<td>Guard Charm</td>
+<td>Provides a minor defensive benefit.</td>
+</tr>
+<tr class="odd">
+<td>Swift Band</td>
+<td>Provides a minor mobility benefit.</td>
+</tr>
+</tbody>
+</table><p>These are examples of the intended category and may be expanded
+later. Held items do not automatically replace a creature’s Special
+Move/Ability.</p><h2 id="key-items-and-special-artifacts">14. Key Items and Special
+Artifacts</h2><p>Key Items are unique or limited objects associated with important
+locations, events, quests or creatures. Unlike ordinary consumables,
+they may exist primarily to: - Unlock locations. - Enable special
+interactions. - Trigger evolution. - Reveal information. - Resolve story
+situations. - Interact with ancient technology. - Interact with Affinity
+phenomena. Key Items should generally have a specific narrative
+purpose.</p><h2 id="bond-crystal">15. Bond Crystal</h2><p>The <strong>Bond Crystal</strong> is a special item associated with
+the relationship between a trainer and their creature. It is <strong>not
+a capture device</strong>. A Bond Crystal is a personal crystal that
+represents the relationship between trainer and creature. It may be worn
+as: - A necklace. - A bracelet. - A belt-mounted crystal. - Another
+personal carrying arrangement. The Bond Crystal reacts to the emotional
+connection between trainer and creature. Its appearance and resonance
+may subtly change as the relationship develops. The Bond Crystal does
+not replace capture devices and cannot be used to capture creatures.</p><h2 id="item-rarity">16. Item Rarity</h2><p>Items may have different availability levels.</p><h3 id="common">Common</h3><p>Widely available everyday items. Examples: - Capture Crystals. -
+Basic healing items. - Basic training equipment.</p><h3 id="uncommon">Uncommon</h3><p>More expensive or specialized items. Examples: - Refined Crystals. -
+Greater Restores. - Specialized training equipment.</p><h3 id="rare">Rare</h3><p>Items that require significant resources, specialized knowledge or
+fortunate circumstances. Examples: - Primal Crystals. - Evolution items.
+- Advanced restorative items.</p><h3 id="extremely-rare">Extremely Rare</h3><p>Items that are difficult to obtain and may be associated with major
+events. Examples: - Sovereign Crystals. - Unique ancient artifacts.</p><h3 id="unique">Unique</h3><p>One-of-a-kind or extremely limited story objects. These should only
+exist when specifically established.</p><h2 id="item-acquisition">17. Item Acquisition</h2><p>Items can be obtained through ordinary world activities such as: -
+Purchasing them from shops. - Receiving them from researchers or
+organizations. - Finding them in the wild. - Discovering them in ruins.
+- Receiving them as rewards. - Crafting them where appropriate. -
+Completing important tasks. - Trading with other people. Rare and unique
+items should generally require a meaningful reason or opportunity to
+obtain them.</p><h2 id="item-economy">18. Item Economy</h2><p>Kaleo has an understandable item economy. Ordinary trainers should
+have reasonable access to: - Basic Capture Crystals. - Basic healing
+items. - Common training equipment. High-grade capture devices,
+evolution items and rare artifacts should be substantially more
+difficult to obtain. The existence of an item in the database does not
+mean every trainer automatically possesses one.</p><h2 id="item-naming-principle">19. Item Naming Principle</h2><p>The setting should use its own terminology. The following terms
+should <strong>not</strong> be used as canonical world terminology: -
+Poké Ball - Great Ball - Ultra Ball - Master Ball - Pokémon Center -
+Pokédex Kaleo uses setting-specific terminology for these concepts.</p><h2 id="canonical-creature-term-entheon">Canonical creature term:**
+**Entheon</h2><p><strong>Singular:</strong> Entheon   <strong>Plural:</strong>
+Entheon   <strong>Individual:</strong> an Entheon  
+<strong>Species:</strong> Entheon species The current canonical
+capture-device terminology is: &gt; <strong>Capture Crystal → Refined
+Crystal → Primal Crystal → Sovereign Crystal</strong> The creature
+species themselves use <strong>Entheon</strong> as the established
+canonical term throughout the setting.</p><h2 id="expansion-rules">20. Expansion Rules</h2><p>Additional items may be added to the database later. New items
+should: 1. Have a clearly defined purpose. 2. Belong to an established
+item category or justify a new category. 3. Have a distinct mechanical
+or narrative function. 4. Avoid duplicating an existing item’s role
+without a meaningful reason. 5. Be compatible with the established
+creature, Affinity, evolution and progression systems. 6. Not create new
+evolution paths unless those paths are explicitly added to the species
+database. The item database is intended to remain coherent and
+manageable rather than becoming an exhaustive catalogue of minor
+variations.</p><h2 id="current-evolution-item-reference">21. Current Evolution-Item
+Reference</h2><table>
+<thead>
+<tr class="header">
+<th><strong>Item</strong></th>
+<th><strong>Associated Creature</strong></th>
+<th><strong>Evolution</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Storm Shard</td>
+<td>Tivvi</td>
+<td>Tivarra</td>
+</tr>
+<tr class="even">
+<td>Emberstone</td>
+<td>Veyli</td>
+<td>Veylith</td>
+</tr>
+<tr class="odd">
+<td>Tide Pearl</td>
+<td>Veyli</td>
+<td>Veyrune</td>
+</tr>
+<tr class="even">
+<td>Mystic Crystal</td>
+<td>Veyli</td>
+<td>Veyvara</td>
+</tr>
+<tr class="odd">
+<td>Ancient Relic</td>
+<td>Orli</td>
+<td>Orlith</td>
+</tr>
+</tbody>
+</table><p>Additional evolution items can be added when new evolution mechanics
+are deliberately established.</p></article><div class="reader-footer"><a href="index.html">← Back to Kaleo</a><a href="reference.html">Open Complete Reference →</a></div></main></div></div><script>
+const input=document.getElementById('search'),article=document.querySelector('.reference'),blocks=[...article.children];
+function filter(q){q=q.toLowerCase().trim();blocks.forEach(function(el){el.classList.toggle('hidden',!!q && !el.textContent.toLowerCase().includes(q));});}
+input.addEventListener('input',function(){filter(input.value);});
+const params=new URLSearchParams(location.search);
+if(params.get('search')){input.value=params.get('search');filter(input.value);}
+</script></body></html>

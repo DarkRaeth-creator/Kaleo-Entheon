@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Kaleo — Creature Systems</title><meta content="Combat categories, statistics and battle fundamentals." name="description"/><style>
+
+:root{--bg:#071018;--panel:#0d1a25;--panel2:#112536;--text:#edf7fb;--muted:#9fb5c2;--accent:#63d8ff;--accent2:#b58cff;--border:rgba(255,255,255,.11)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0%,rgba(99,216,255,.10),transparent 28rem),radial-gradient(circle at 90% 10%,rgba(181,140,255,.10),transparent 30rem),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}
+a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1450px;margin:auto;padding:13px 22px;display:flex;align-items:center;gap:28px}.brand{font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.search{flex:1}.search input{width:100%;max-width:680px;padding:11px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.06);color:var(--text);font-size:1rem;outline:none}.search input:focus{border-color:rgba(99,216,255,.7)}
+.page{max-width:1450px;margin:auto;padding:42px 22px 80px}.hero{padding:70px 58px;border:1px solid var(--border);border-radius:26px;background:linear-gradient(135deg,rgba(99,216,255,.13),rgba(181,140,255,.09)),var(--panel);box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.kicker{color:var(--accent);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem}h1{font-size:clamp(3.5rem,8vw,7rem);line-height:.9;margin:15px 0 22px}.hero h2{font-size:1.5rem;color:#cbeef8;margin:0 0 18px}.hero p{max-width:850px;color:var(--muted);font-size:1.12rem}
+.section{margin-top:34px}.section h2{font-size:2rem;margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{display:block;text-decoration:none;padding:24px;border:1px solid var(--border);border-radius:18px;background:rgba(13,26,37,.8);transition:.18s ease;min-height:155px}.card:hover{transform:translateY(-3px);border-color:rgba(99,216,255,.45);background:var(--panel2)}
+.card-title{font-size:1.18rem;font-weight:800;margin-bottom:8px}.card-desc{color:var(--muted);font-size:.94rem}.card-arrow{display:block;color:var(--accent);font-size:.86rem;font-weight:700;margin-top:18px}
+.species-box{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.species-box a{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03);text-decoration:none;color:#cfe9f2}.species-box a:hover{border-color:rgba(99,216,255,.45);color:white}
+.footer{margin-top:45px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}.sidebar-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:26px}.sidebar{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto}
+.sidebar a{display:block;text-decoration:none;padding:9px 11px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted)}.sidebar a:hover{color:white;background:rgba(255,255,255,.04);border-left-color:var(--accent)}.sidebar small{display:block;font-size:.72rem;line-height:1.35;margin-top:2px}
+.reference{padding:35px 42px;border:1px solid var(--border);border-radius:20px;background:rgba(13,26,37,.75)}.reference h1{font-size:2.1rem;line-height:1.15;margin-top:2em;border-bottom:1px solid var(--border);padding-bottom:.35em}.reference h2{font-size:1.55rem;color:#dff7ff;margin-top:2em}.reference h3{color:#bfefff}
+.reference table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}.reference th,.reference td{border:1px solid var(--border);padding:9px 11px;text-align:left}.reference th{background:rgba(255,255,255,.05)}.reference blockquote{border-left:3px solid var(--accent);padding:10px 17px;background:rgba(99,216,255,.05)}.reference pre{overflow:auto;background:#050b10;padding:15px;border-radius:10px}.reference img{max-width:100%;border-radius:12px}.hidden{display:none!important}
+@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.species-box{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.sidebar-layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;max-height:300px}.grid{grid-template-columns:1fr}.species-box{grid-template-columns:repeat(2,1fr)}.hero{padding:45px 28px}.reference{padding:25px 20px}}
+
+
+.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:26px;align-items:start}
+.reader-nav{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto;padding-right:4px}
+.reader-nav a{display:block;text-decoration:none;padding:10px 12px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted);margin-bottom:3px}
+.reader-nav a:hover{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.05)}
+.reader-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.07)}
+.reader-nav small{display:block;color:var(--muted);font-size:.72rem;line-height:1.35;margin-top:3px}
+.reader-main{min-width:0}
+.reference{max-width:100%;}
+.reader-meta{color:var(--muted);font-size:.86rem;margin:-8px 0 26px}
+.reader-footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.reader-footer a{color:var(--accent);text-decoration:none;font-weight:700}
+@media(max-width:900px){.reader-layout{grid-template-columns:1fr}.reader-nav{position:relative;top:auto;height:auto;display:flex;gap:5px;overflow-x:auto;padding-bottom:8px}.reader-nav a{min-width:max-content}.reader-nav small{display:none}}
+</style></head><body><header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">KALEO · ENTHEON</a><div class="search"><input aria-label="Search the reference" id="search" placeholder="Search this section…" type="search"/></div></div></header><div class="page"><div class="reader-layout"><aside class="reader-nav"><a href="index.html"><strong>← Home</strong><small>Return to the Kaleo homepage.</small></a><a class="active" data-page="creature-systems.html" href="creature-systems.html"><span>Creature Systems</span><small>Combat categories, statistics and battle fundamentals.</small></a><a data-page="move-database.html" href="move-database.html"><span>Move Database</span><small>The canonical move pools, move fields and move design rules.</small></a><a data-page="special-abilities.html" href="special-abilities.html"><span>Special Moves &amp; Abilities</span><small>Special acquisition, innate abilities and special move rules.</small></a><a data-page="nature-personality.html" href="nature-personality.html"><span>Nature &amp; Personality</span><small>Nature, temperament and personality rules.</small></a><a data-page="species-moves.html" href="species-moves.html"><span>Species-Specific Moves</span><small>Species-specific learnsets and move compatibility.</small></a><a data-page="growth-evolution.html" href="growth-evolution.html"><span>Growth &amp; Evolution</span><small>Leveling, experience, evolution and progression rules.</small></a><a data-page="items.html" href="items.html"><span>Items</span><small>The established item system and its role in Kaleo.</small></a><a data-page="trainers-battles.html" href="trainers-battles.html"><span>Trainers &amp; Battles</span><small>Trainer, capture and battle systems.</small></a><a data-page="world.html" href="world.html"><span>The World</span><small>Kaleo’s geography, regions and broad world structure.</small></a><a data-page="human-entheon.html" href="human-entheon.html"><span>Human–Entheon Relationship</span><small>The relationship between people and Entheon.</small></a><a data-page="affinities.html" href="affinities.html"><span>Affinities</span><small>The established Affinities and their place in the world.</small></a><a data-page="technology.html" href="technology.html"><span>Technology</span><small>Kaleo’s technological development.</small></a><a data-page="settlements-regions.html" href="settlements-regions.html"><span>Settlements &amp; Regions</span><small>Settlements and regional structure.</small></a><a data-page="wild-habitats.html" href="wild-habitats.html"><span>Wild Habitats</span><small>Where Entheon live and how habitats shape the world.</small></a><a data-page="research.html" href="research.html"><span>Research &amp; Starter Distribution</span><small>Research institutions, Entheon study and starter distribution.</small></a><a data-page="trainers-leagues.html" href="trainers-leagues.html"><span>Trainers, Leagues &amp; Gyms</span><small>Trainer organizations and the seven Gyms.</small></a><a data-page="economy.html" href="economy.html"><span>Economy &amp; Vale</span><small>Economy and the established Vale currency.</small></a><a data-page="shops-services.html" href="shops-services.html"><span>Shops &amp; Services</span><small>Everyday services and commerce.</small></a><a data-page="travel.html" href="travel.html"><span>Travel &amp; Transportation</span><small>Established travel and transportation.</small></a><a data-page="education.html" href="education.html"><span>Education &amp; Everyday Life</span><small>Education and ordinary life in Kaleo.</small></a><a data-page="law-safety.html" href="law-safety.html"><span>Law &amp; Public Safety</span><small>Law, safety and public rules.</small></a><a data-page="compendium.html" href="compendium.html"><span>Entheon Species Compendium</span><small>The canonical species compendium, evolution lines and physical scale.</small></a></aside><main class="reader-main"><article class="reference"><h1 id="creature-combat-system">Creature Combat System</h1><h3 id="purpose">1. Purpose</h3><p>The Creature Combat System defines how creatures battle, develop,
+learn techniques, use innate abilities, and interact with Affinities.
+The system is intentionally structured similarly to established
+creature-battling RPG systems. It uses familiar concepts such as
+creature statistics, elemental affinities, Physical/Special/Status
+techniques, abilities, learnsets, type effectiveness, status conditions,
+and evolutionary progression.</p><h2 id="creature-data">2. Creature Data</h2><p>Every creature species has the following core combat information: -
+Species Name - Affinity - Rarity - Evolution Stage - Evolution Line -
+Base Statistics - Innate Abilities - Signature Moves - Level-Up Moves -
+Technique/TM Compatibility - Move Compatibility Restrictions -
+Evolution-Related Moves or Abilities A creature’s combat capabilities
+should be derived from its established species design, Affinity,
+anatomy, evolution and documented abilities. A creature cannot use
+abilities, moves or powers that contradict its established species
+data.</p><h2 id="creature-statistics">3. Creature Statistics</h2><p>Every creature possesses six primary combat statistics:</p><h3 id="hp-health-points">HP — Health Points</h3><p>Determines how much damage a creature can sustain before it is unable
+to continue battling.</p><h3 id="attack">Attack</h3><p>Determines the effectiveness of primarily Physical attacks.</p><h3 id="defense">Defense</h3><p>Determines the creature’s ability to withstand primarily Physical
+attacks.</p><h3 id="special-attack">Special Attack</h3><p>Determines the effectiveness of primarily Special attacks.</p><h3 id="special-defense">Special Defense</h3><p>Determines the creature’s ability to withstand primarily Special
+attacks.</p><h3 id="speed">Speed</h3><p>Determines how quickly the creature can act in battle and influences
+turn order.</p><h2 id="combat-categories">4. Combat Categories</h2><p>Every damaging technique belongs to one of two primary damage
+categories.</p><h2 id="physical">Physical</h2><p>Physical techniques represent attacks relying primarily on the
+creature’s physical body, strength, claws, teeth, limbs, wings, weapons,
+or other direct physical mechanisms. Physical damage is primarily
+determined by:</p><h2 id="attackers-attack-defenders-defense">Attacker’s Attack →
+Defender’s Defense</h2><p>Examples include: - Bites - Claw attacks - Tackles - Wing strikes -
+Tail strikes - Physical Flame attacks - Physical Volt attacks</p><h2 id="special">Special</h2><p>Special techniques represent attacks relying primarily on Affinity
+energy, ranged projection, supernatural abilities, elemental
+manipulation, psychic effects, or other non-physical mechanisms. Special
+damage is primarily determined by:</p><h2 id="attackers-special-attack-defenders-special-defense">Attacker’s
+Special Attack → Defender’s Special Defense</h2><p>Examples include: - Flame projectiles - Lightning attacks - Water
+techniques - Psychic/Mystic techniques - Radiant beams - Umbral energy
+attacks A technique’s Affinity does not determine whether it is Physical
+or Special. Both Physical and Special techniques can exist within the
+same Affinity.</p><h2 id="status-techniques">5. Status Techniques</h2><p>Status techniques do not primarily deal direct damage. Instead, they
+alter the battle through effects such as: - Increasing or decreasing
+statistics - Inflicting status conditions - Healing - Protecting the
+user - Altering the battlefield - Altering weather - Creating
+Affinity-based fields - Applying temporary advantages or disadvantages -
+Manipulating turn order - Restricting or disrupting opposing creatures
+Status techniques may belong to an Affinity or may be Neutral/General
+techniques.</p><h2 id="technique-data">6. Technique Data</h2><p>Every technique has a defined data entry containing: -
+<strong>Name</strong> - <strong>Affinity</strong> -
+<strong>Category</strong> - <strong>Power</strong> -
+<strong>Accuracy</strong> - <strong>PP</strong> -
+<strong>Priority</strong> - <strong>Effect</strong> -
+<strong>Target</strong> - <strong>Learn Method</strong> -
+<strong>Species Compatibility</strong>, where applicable</p><h3 id="power">Power</h3><p>Determines the base strength of a damaging technique. Status
+techniques normally have no Power value.</p><h3 id="accuracy">Accuracy</h3><p>Determines the probability that a technique successfully affects its
+intended target. Certain techniques may intentionally have imperfect
+accuracy in exchange for greater power or stronger effects.</p><h3 id="pp">PP</h3><p>Determines how many times a technique can normally be used before
+requiring recovery or restoration.</p><h3 id="priority">Priority</h3><p>Determines whether a technique can act before or after normal turn
+order. Most techniques have normal priority. Certain techniques may have
+increased or decreased priority as part of their design.</p><h2 id="affinities">7. Affinities</h2><p>Every creature possesses one or two Affinities. The established
+Affinities are: 1. Flame 2. Tide 3. Verdant 4. Gale 5. Volt 6. Frost 7.
+Stone 8. Metal 9. Mystic 10. Radiant 11. Umbral 12. Wild 13. Dragon A
+creature’s Affinity represents an inherent aspect of its biology,
+energy, abilities and combat identity. A creature’s Affinity should
+influence its available techniques and abilities, but should not
+completely determine its visual appearance, personality or combat
+style.</p><h2 id="single-affinity-creatures">8. Single-Affinity Creatures</h2><p>A single-Affinity creature possesses one Affinity. Example:</p><h2 id="quiblet">Quiblet</h2><blockquote>
+<p>Affinity: Flame Quiblet receives the benefits associated with Flame
+and has access to appropriate Flame techniques. Its anatomy and
+established species design determine which Physical, Status and General
+techniques it can additionally learn.</p>
+</blockquote><h2 id="dual-affinity-creatures">9. Dual-Affinity Creatures</h2><p>A dual-Affinity creature possesses two Affinities. Example:</p><h2 id="quivane">Quivane</h2><blockquote>
+<p>Affinity: Flame / Volt A dual-Affinity creature may use techniques
+associated with either of its Affinities and receives the same-affinity
+benefit when using an appropriate technique. Dual-Affinity creatures do
+not automatically gain every technique belonging to either Affinity.
+Technique compatibility remains dependent upon species, anatomy and
+established learnsets.</p>
+</blockquote><h2 id="same-affinity-technique-bonus">10. Same-Affinity Technique
+Bonus</h2><p>A creature receives a Same-Affinity Bonus when using a technique that
+matches one of its own Affinities. For a single-Affinity creature: &gt;
+Creature: Flame &gt;  Technique: Flame &gt;  Result: Same-Affinity Bonus
+For a dual-Affinity creature: &gt; Creature: Flame / Volt &gt; 
+Technique: Flame &gt;  Result: Same-Affinity Bonus &gt; Creature: Flame
+/ Volt &gt;  Technique: Volt &gt;  Result: Same-Affinity Bonus &gt;
+Creature: Flame / Volt &gt;  Technique: Tide &gt;  Result: No
+Same-Affinity Bonus The exact numerical value of the Same-Affinity Bonus
+will be established separately.</p><h2 id="affinity-effectiveness">11. Affinity Effectiveness</h2><p>Affinities interact with one another during combat. Every Affinity
+matchup will eventually be assigned an effectiveness value. The planned
+categories are: - <strong>Super Effective</strong> -
+<strong>Effective</strong> - <strong>Neutral</strong> -
+<strong>Resisted</strong> - <strong>Highly Resisted</strong> -
+<strong>Immune</strong>, where appropriate The complete Affinity
+interaction chart will be established separately. Battles use the
+documented Affinity interaction rules rather than inventing
+effectiveness relationships during individual battles.</p><h2 id="abilities">12. Abilities</h2><p>Abilities represent innate characteristics that affect how a creature
+behaves or performs in battle. An ability may be: - Passive - Triggered
+by a specific condition - Triggered when entering battle - Triggered
+when the creature’s HP reaches a threshold - Triggered by a particular
+Affinity interaction - Triggered by a specific battlefield condition -
+Activated through a specific combat event Each species should normally
+possess <strong>one or two standard abilities</strong>. Some species may
+additionally possess a <strong>Hidden Ability</strong>. Abilities should
+reinforce the established species identity rather than function as
+arbitrary additional powers.</p><h2 id="signature-moves">13. Signature Moves</h2><p>Every species may possess <strong>one to three Signature
+Moves</strong>. Signature Moves are techniques strongly associated with
+a particular species and are not intended to be interchangeable with
+generic Affinity techniques. A Signature Move should reflect at least
+one of the following: - The creature’s anatomy - Its Affinity - Its
+personality - Its ecological behaviour - Its evolutionary identity - Its
+distinctive combat style Example:</p><h2 id="sindra">Sindra</h2><blockquote>
+<p>Signature Move: Shadowflame Rush   Affinity: Flame / Umbral  
+Category: Physical The exact mechanics of individual Signature Moves
+will be established within the species’ own data entry.</p>
+</blockquote><h2 id="general-affinity-move-pools">14. General Affinity Move
+Pools</h2><p>Each Affinity possesses a shared pool of General Techniques. These
+techniques represent commonly occurring techniques associated with that
+Affinity. For example, the Flame Move Pool may contain: - Basic Flame
+techniques - Physical Flame techniques - Special Flame techniques -
+Flame Status techniques - Defensive Flame techniques - Utility Flame
+techniques Species may learn appropriate techniques from their Affinity
+pools according to their anatomy, evolution, rarity and individual
+learnset. Possessing an Affinity does <strong>not</strong> automatically
+grant access to every technique within that Affinity’s move pool.</p><h2 id="generalneutral-move-pool">15. General/Neutral Move Pool</h2><p>A separate General Move Pool exists for techniques that are not
+intrinsically tied to a specific Affinity. Examples may include: - Basic
+physical attacks - Defensive techniques - Movement techniques - Recovery
+techniques - Focus techniques - Utility techniques Compatibility depends
+on species anatomy and established learnsets. For example, an avian
+creature may learn appropriate Wing-based techniques, while a creature
+without wings cannot.</p><h2 id="anatomical-compatibility">16. Anatomical Compatibility</h2><p>A creature’s physical anatomy determines which techniques it can
+reasonably learn. Examples: - Creatures with wings may learn appropriate
+wing or aerial techniques. - Creatures with claws may learn claw-based
+techniques. - Creatures with fangs may learn bite-based techniques. -
+Serpentine creatures may learn constriction or coil-based techniques. -
+Aquatic creatures may possess techniques requiring water-based movement.
+- Creatures without limbs cannot arbitrarily learn techniques requiring
+conventional limbs. An Entheon cannot use an anatomically impossible
+technique unless its species documentation explicitly establishes the
+necessary ability.</p><h2 id="evolution-and-techniques">17. Evolution and Techniques</h2><p>Evolution represents progression rather than replacement. When a
+creature evolves, it normally retains previously learned techniques
+unless an established species mechanic specifically states otherwise. An
+evolved creature may: - Retain previous techniques - Learn stronger
+versions of existing techniques - Gain new techniques - Gain access to
+additional Affinity techniques - Gain new Signature Moves - Develop new
+abilities - Replace or modify certain abilities where explicitly
+documented Evolution should produce a recognizable progression from the
+previous stage rather than creating an unrelated moveset.</p><h2 id="evolution-affinity-rules">18. Evolution Affinity Rules</h2><p>For standard three-stage evolutionary lines, the established Affinity
+progression must be respected. A creature may acquire a second Affinity
+during evolution. Once a second Affinity has been acquired, it remains
+consistent through subsequent stages unless the species is explicitly
+documented as having a special branching or replacement evolution
+mechanic. Example: &gt; Stage 1: Flame &gt;  Stage 2: Flame / Volt &gt; 
+Stage 3: Flame / Volt The Stage 3 creature does <strong>not</strong>
+arbitrarily change to a different Affinity. Special evolutionary lines
+may intentionally use different rules when explicitly documented.</p><h2 id="branching-evolution">19. Branching Evolution</h2><p>Certain species may possess multiple possible evolutionary forms. A
+branching evolutionary species may replace or alter its original
+Affinity depending on the evolutionary path. This is an intentional
+exception to the standard evolutionary Affinity rule. The individual
+branch must explicitly document: - Evolution condition - Resulting
+species - Resulting Affinity - New abilities - New Signature Moves -
+Changes to the learnset The Eevee-style concept established for one
+two-stage line is an example of a species where the base Affinity may be
+replaced by the chosen evolution.</p><h2 id="move-acquisition">20. Move Acquisition</h2><p>Techniques may be acquired through several methods.</p><h3 id="starting-moves">Starting Moves</h3><p>Techniques available when a creature first becomes battle-ready.</p><h3 id="level-up-moves">Level-Up Moves</h3><p>Techniques learned naturally as the creature grows stronger.</p><h3 id="evolution-moves">Evolution Moves</h3><p>Techniques gained upon reaching a new evolutionary stage.</p><h3 id="signature-moves-1">Signature Moves</h3><p>Species-specific techniques associated with the creature’s unique
+identity.</p><h3 id="techniquetm-compatibility">Technique/TM Compatibility</h3><p>Techniques that can be deliberately taught to compatible
+creatures.</p><h3 id="special-techniques">Special Techniques</h3><p>Techniques obtained through unusual circumstances, training, story
+events or other documented methods.</p><h2 id="learnset-philosophy">21. Learnset Philosophy</h2><p>A creature’s complete learnset should reflect its identity. The
+learnset should consider: - Affinity - Anatomy - Evolution - Rarity -
+Personality - Ecological role - Established combat identity A creature
+should not receive a technique solely because that technique exists
+within one of its Affinities. Likewise, two creatures sharing an
+Affinity should not necessarily have identical movesets. Their Signature
+Moves and learnsets should provide meaningful differentiation.</p><h2 id="status-conditions">22. Status Conditions</h2><p>The system supports major and minor combat conditions.</p><h3 id="major-conditions">Major Conditions</h3><ul>
+<li>Burn</li>
+<li>Poison</li>
+<li>Paralysis</li>
+<li>Sleep</li>
+<li>Freeze</li>
+</ul><h3 id="secondary-conditions-and-effects">Secondary Conditions and
+Effects</h3><ul>
+<li>Confusion</li>
+<li>Flinching</li>
+<li>Accuracy reduction</li>
+<li>Evasion reduction</li>
+<li>Attack reduction</li>
+<li>Defense reduction</li>
+<li>Special Attack reduction</li>
+<li>Special Defense reduction</li>
+<li>Speed reduction</li>
+<li>Other temporary combat effects The exact rules and durations for
+each condition will be defined separately.</li>
+</ul><h2 id="battlefield-effects">23. Battlefield Effects</h2><p>Certain techniques and abilities may alter the battlefield. Possible
+battlefield mechanics include:</p><h3 id="weather">Weather</h3><p>Examples: - Rain - Sun - Snow - Storm</p><h3 id="affinity-fields">Affinity Fields</h3><p>Examples: - Radiant Field - Umbral Field - Verdant Field - Mystic
+Field Battlefield effects may: - Strengthen specific Affinity techniques
+- Weaken specific Affinity techniques - Alter creature abilities - Alter
+move effects - Apply environmental conditions - Change strategic
+priorities The complete battlefield system will be defined
+separately.</p></article><div class="reader-footer"><a href="index.html">← Back to Kaleo</a><a href="reference.html">Open Complete Reference →</a></div></main></div></div><script>
+const input=document.getElementById('search'),article=document.querySelector('.reference'),blocks=[...article.children];
+function filter(q){q=q.toLowerCase().trim();blocks.forEach(function(el){el.classList.toggle('hidden',!!q && !el.textContent.toLowerCase().includes(q));});}
+input.addEventListener('input',function(){filter(input.value);});
+const params=new URLSearchParams(location.search);
+if(params.get('search')){input.value=params.get('search');filter(input.value);}
+</script></body></html>

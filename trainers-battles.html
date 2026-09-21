@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Kaleo — Trainers &amp; Battles</title><meta content="Trainer, capture and battle systems." name="description"/><style>
+
+:root{--bg:#071018;--panel:#0d1a25;--panel2:#112536;--text:#edf7fb;--muted:#9fb5c2;--accent:#63d8ff;--accent2:#b58cff;--border:rgba(255,255,255,.11)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0%,rgba(99,216,255,.10),transparent 28rem),radial-gradient(circle at 90% 10%,rgba(181,140,255,.10),transparent 30rem),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}
+a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1450px;margin:auto;padding:13px 22px;display:flex;align-items:center;gap:28px}.brand{font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.search{flex:1}.search input{width:100%;max-width:680px;padding:11px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.06);color:var(--text);font-size:1rem;outline:none}.search input:focus{border-color:rgba(99,216,255,.7)}
+.page{max-width:1450px;margin:auto;padding:42px 22px 80px}.hero{padding:70px 58px;border:1px solid var(--border);border-radius:26px;background:linear-gradient(135deg,rgba(99,216,255,.13),rgba(181,140,255,.09)),var(--panel);box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.kicker{color:var(--accent);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem}h1{font-size:clamp(3.5rem,8vw,7rem);line-height:.9;margin:15px 0 22px}.hero h2{font-size:1.5rem;color:#cbeef8;margin:0 0 18px}.hero p{max-width:850px;color:var(--muted);font-size:1.12rem}
+.section{margin-top:34px}.section h2{font-size:2rem;margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{display:block;text-decoration:none;padding:24px;border:1px solid var(--border);border-radius:18px;background:rgba(13,26,37,.8);transition:.18s ease;min-height:155px}.card:hover{transform:translateY(-3px);border-color:rgba(99,216,255,.45);background:var(--panel2)}
+.card-title{font-size:1.18rem;font-weight:800;margin-bottom:8px}.card-desc{color:var(--muted);font-size:.94rem}.card-arrow{display:block;color:var(--accent);font-size:.86rem;font-weight:700;margin-top:18px}
+.species-box{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.species-box a{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03);text-decoration:none;color:#cfe9f2}.species-box a:hover{border-color:rgba(99,216,255,.45);color:white}
+.footer{margin-top:45px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}.sidebar-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:26px}.sidebar{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto}
+.sidebar a{display:block;text-decoration:none;padding:9px 11px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted)}.sidebar a:hover{color:white;background:rgba(255,255,255,.04);border-left-color:var(--accent)}.sidebar small{display:block;font-size:.72rem;line-height:1.35;margin-top:2px}
+.reference{padding:35px 42px;border:1px solid var(--border);border-radius:20px;background:rgba(13,26,37,.75)}.reference h1{font-size:2.1rem;line-height:1.15;margin-top:2em;border-bottom:1px solid var(--border);padding-bottom:.35em}.reference h2{font-size:1.55rem;color:#dff7ff;margin-top:2em}.reference h3{color:#bfefff}
+.reference table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}.reference th,.reference td{border:1px solid var(--border);padding:9px 11px;text-align:left}.reference th{background:rgba(255,255,255,.05)}.reference blockquote{border-left:3px solid var(--accent);padding:10px 17px;background:rgba(99,216,255,.05)}.reference pre{overflow:auto;background:#050b10;padding:15px;border-radius:10px}.reference img{max-width:100%;border-radius:12px}.hidden{display:none!important}
+@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.species-box{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.sidebar-layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;max-height:300px}.grid{grid-template-columns:1fr}.species-box{grid-template-columns:repeat(2,1fr)}.hero{padding:45px 28px}.reference{padding:25px 20px}}
+
+
+.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:26px;align-items:start}
+.reader-nav{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto;padding-right:4px}
+.reader-nav a{display:block;text-decoration:none;padding:10px 12px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted);margin-bottom:3px}
+.reader-nav a:hover{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.05)}
+.reader-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.07)}
+.reader-nav small{display:block;color:var(--muted);font-size:.72rem;line-height:1.35;margin-top:3px}
+.reader-main{min-width:0}
+.reference{max-width:100%;}
+.reader-meta{color:var(--muted);font-size:.86rem;margin:-8px 0 26px}
+.reader-footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.reader-footer a{color:var(--accent);text-decoration:none;font-weight:700}
+@media(max-width:900px){.reader-layout{grid-template-columns:1fr}.reader-nav{position:relative;top:auto;height:auto;display:flex;gap:5px;overflow-x:auto;padding-bottom:8px}.reader-nav a{min-width:max-content}.reader-nav small{display:none}}
+</style></head><body><header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">KALEO · ENTHEON</a><div class="search"><input aria-label="Search the reference" id="search" placeholder="Search this section…" type="search"/></div></div></header><div class="page"><div class="reader-layout"><aside class="reader-nav"><a href="index.html"><strong>← Home</strong><small>Return to the Kaleo homepage.</small></a><a data-page="creature-systems.html" href="creature-systems.html"><span>Creature Systems</span><small>Combat categories, statistics and battle fundamentals.</small></a><a data-page="move-database.html" href="move-database.html"><span>Move Database</span><small>The canonical move pools, move fields and move design rules.</small></a><a data-page="special-abilities.html" href="special-abilities.html"><span>Special Moves &amp; Abilities</span><small>Special acquisition, innate abilities and special move rules.</small></a><a data-page="nature-personality.html" href="nature-personality.html"><span>Nature &amp; Personality</span><small>Nature, temperament and personality rules.</small></a><a data-page="species-moves.html" href="species-moves.html"><span>Species-Specific Moves</span><small>Species-specific learnsets and move compatibility.</small></a><a data-page="growth-evolution.html" href="growth-evolution.html"><span>Growth &amp; Evolution</span><small>Leveling, experience, evolution and progression rules.</small></a><a data-page="items.html" href="items.html"><span>Items</span><small>The established item system and its role in Kaleo.</small></a><a class="active" data-page="trainers-battles.html" href="trainers-battles.html"><span>Trainers &amp; Battles</span><small>Trainer, capture and battle systems.</small></a><a data-page="world.html" href="world.html"><span>The World</span><small>Kaleo’s geography, regions and broad world structure.</small></a><a data-page="human-entheon.html" href="human-entheon.html"><span>Human–Entheon Relationship</span><small>The relationship between people and Entheon.</small></a><a data-page="affinities.html" href="affinities.html"><span>Affinities</span><small>The established Affinities and their place in the world.</small></a><a data-page="technology.html" href="technology.html"><span>Technology</span><small>Kaleo’s technological development.</small></a><a data-page="settlements-regions.html" href="settlements-regions.html"><span>Settlements &amp; Regions</span><small>Settlements and regional structure.</small></a><a data-page="wild-habitats.html" href="wild-habitats.html"><span>Wild Habitats</span><small>Where Entheon live and how habitats shape the world.</small></a><a data-page="research.html" href="research.html"><span>Research &amp; Starter Distribution</span><small>Research institutions, Entheon study and starter distribution.</small></a><a data-page="trainers-leagues.html" href="trainers-leagues.html"><span>Trainers, Leagues &amp; Gyms</span><small>Trainer organizations and the seven Gyms.</small></a><a data-page="economy.html" href="economy.html"><span>Economy &amp; Vale</span><small>Economy and the established Vale currency.</small></a><a data-page="shops-services.html" href="shops-services.html"><span>Shops &amp; Services</span><small>Everyday services and commerce.</small></a><a data-page="travel.html" href="travel.html"><span>Travel &amp; Transportation</span><small>Established travel and transportation.</small></a><a data-page="education.html" href="education.html"><span>Education &amp; Everyday Life</span><small>Education and ordinary life in Kaleo.</small></a><a data-page="law-safety.html" href="law-safety.html"><span>Law &amp; Public Safety</span><small>Law, safety and public rules.</small></a><a data-page="compendium.html" href="compendium.html"><span>Entheon Species Compendium</span><small>The canonical species compendium, evolution lines and physical scale.</small></a></aside><main class="reader-main"><article class="reference"><h1 id="trainer-capture-battle-systems">Trainer, Capture &amp; Battle
+Systems</h1><h2 id="trainer-status">Trainer Status</h2><p>Anyone can become a Trainer. There is no special aptitude, bloodline,
+profession, or other inherent requirement needed to become one. Being a
+Trainer is a normal and common part of society. Most people have at
+least one Entheon, although being a Trainer does not necessarily mean
+that someone is a competitive or professional battler. A Trainer may
+have Entheon for companionship, work, recreation, battling, research,
+protection, transportation, or other practical purposes.</p><h2 id="age-requirement">Age Requirement</h2><p>The minimum age for independent Trainer status is
+<strong>15</strong>. At age 15, a person may:</p><ul>
+<li>Register as a Trainer.</li>
+<li>Receive a TraID.</li>
+<li>Legally own Entheon.</li>
+<li>Purchase and register Capture Crystals.</li>
+<li>Capture Entheon independently.</li>
+<li>Participate in official Trainer battles.</li>
+<li>Challenge Gyms.</li>
+<li>Enter tournaments and other Trainer competitions.</li>
+</ul><p>People under 15 may still live with Entheon, care for them, train
+alongside them, and form bonds with them under the responsibility of a
+parent, guardian, or other legally responsible adult. There is no
+separate junior TraID or junior Trainer licensing system.</p><blockquote>
+<p><strong>15 is the age of full independent Trainer
+status.</strong></p>
+</blockquote><h2 id="trainer-registration">Trainer Registration</h2><p>Anyone who captures their first Entheon must legally register as a
+Trainer. Registration is completed through an authorized Trainer
+registration facility. Upon registration, the Trainer receives a
+<strong>TraID</strong>, which serves as their official Trainer
+identification. Registration is straightforward and widely accessible.
+There is no restrictive licensing process or test determining whether
+someone is considered worthy of becoming a Trainer.</p><h2 id="capture-crystal-registration">Capture Crystal Registration</h2><p>Capture Crystals are individually identifiable and are linked to
+their legal owner. When a Trainer purchases a new Capture Crystal, they
+present their TraID. The crystal is then automatically registered and
+linked to that Trainer, even while it remains empty. When an Entheon is
+captured into a registered Capture Crystal, the crystal automatically
+identifies the Entheon’s unique biological signature. The Entheon is
+then associated with that Capture Crystal and the Trainer’s TraID. No
+separate ownership filing is required for each individual capture. The
+basic process is:</p><blockquote>
+<p><strong>Purchase Crystal → Present TraID → Crystal linked to Trainer
+→ Capture Entheon → Biological signature recognized → Entheon registered
+to Trainer</strong></p>
+</blockquote><p>This registration system also provides the foundation for ownership
+transfers, trading, stolen Entheon, and illegal captures.</p><h2 id="battle-culture">Battle Culture</h2><p>Entheon battles are a common and socially accepted part of everyday
+life. Battles occur in many different contexts, including:</p><ul>
+<li>Roadside Trainer battles.</li>
+<li>Friendly and practice battles.</li>
+<li>Gym challenges.</li>
+<li>Local events.</li>
+<li>Tournaments.</li>
+<li>Professional competitions.</li>
+<li>Occupational and practical training.</li>
+</ul><p>Battling is not restricted to professional Trainers. Ordinary
+Trainers may battle for recreation, practice, social interaction,
+reputation, or income.</p><h2 id="roadside-trainer-battles">Roadside Trainer Battles</h2><p>Registered Trainers may challenge one another while travelling.
+Roadside battles can provide legitimate income, making travelling and
+battling a viable lifestyle for some Trainers. Depending on the
+circumstances, battles may involve agreed rewards such as money, items,
+services, or other forms of compensation. A Trainer is not required to
+accept every challenge. Declining a battle is not inherently suspicious
+or dishonorable. Because Entheon ownership and battling are so common,
+encountering Trainers battling in appropriate public areas is a normal
+part of everyday life.</p><h2 id="battle-safety">Battle Safety</h2><p>A fundamental rule of Entheon combat is:</p><blockquote>
+<p><strong>An Entheon cannot kill another Entheon through direct
+combat.</strong></p>
+</blockquote><p>Entheon battles can still result in:</p><ul>
+<li>A knockout.</li>
+<li>Exhaustion.</li>
+<li>Temporary injuries.</li>
+<li>Serious but non-lethal injuries.</li>
+<li>The need for medical treatment or recovery.</li>
+</ul><p>However, direct Entheon-on-Entheon combat cannot result in the death
+of an Entheon. This is an inherent rule of Entheon combat rather than
+merely a regulation imposed by competitive organizations. This does
+<strong>not</strong> mean that Entheon are immortal. Entheon can still
+die from natural causes, illness, accidents, environmental hazards, or
+other circumstances unrelated to direct Entheon combat. The rule also
+reinforces the individual agency of Entheon. A Trainer cannot simply
+command an Entheon to kill another Entheon.</p><h2 id="gyms">Gyms</h2><p>There are <strong>seven recognized Gyms</strong>. Each Gym:</p><ul>
+<li>Specializes in a fixed Affinity.</li>
+<li>Has a designated Gym Leader.</li>
+<li>Can be challenged in any order.</li>
+<li>Has an informal recommended progression based on expected
+difficulty.</li>
+<li>Does not require previous Gyms to be completed before it can be
+challenged.</li>
+</ul><p>The recommended order is guidance rather than a mandatory progression
+system. A sufficiently experienced Trainer may challenge a later or more
+difficult Gym without first completing the others.</p><h2 id="gym-crests">Gym Crests</h2><p>Defeating a Gym Leader awards the Trainer that Gym’s
+<strong>Crest</strong>. There are seven Gym Crests corresponding to the
+seven recognized Gyms. Crests are physical achievements and insignia
+representing a Trainer’s successful Gym challenges. They may be
+collected in any order. The exact significance of possessing all seven
+Gym Crests, including what competitions or opportunities they qualify a
+Trainer for, will be established as part of the wider League and
+tournament structure.</p><h2 id="professional-and-competitive-battling">Professional and
+Competitive Battling</h2><p>Battling exists across a broad spectrum. A Trainer may battle
+casually with friends, challenge other Trainers while travelling,
+participate in local events, pursue Gym challenges, or eventually
+compete at a professional level. Professional battling can therefore
+become a legitimate career, although the exact structure of professional
+competition, rankings, sponsorships, tournaments, and leagues is defined
+separately.</p><h2 id="rogue-trainers">Rogue Trainers</h2><p>Because Trainer registration is legally required after capturing an
+Entheon, unregistered Trainers can exist outside the established system.
+A <strong>rogue Trainer</strong> is an individual who possesses or
+trains captured Entheon without maintaining the legally required Trainer
+registration. Being a rogue Trainer does not automatically mean that the
+individual is a criminal. However, registration is straightforward,
+accessible, and extremely common, meaning that most people who
+deliberately remain unregistered are expected to have a reason for
+avoiding the legal system. Rogue Trainers may be associated with
+activities such as:</p><ul>
+<li>Stolen Entheon.</li>
+<li>Illegal Entheon trafficking.</li>
+<li>Underground battling.</li>
+<li>Concealing their identity.</li>
+<li>Criminal organizations.</li>
+<li>Deliberately avoiding legal restrictions or oversight.</li>
+</ul><p><strong>Rogue Trainer</strong> is primarily a common social term
+rather than necessarily a formal legal classification. The exact
+enforcement mechanisms and legal consequences surrounding rogue Trainers
+will be established alongside the broader rules for Entheon ownership,
+capture, transfer, and theft.</p><h2 id="entheon-ownership-capture">3. Entheon Ownership &amp;
+Capture</h2><h2 id="legal-ownership">Legal Ownership</h2><p>An Entheon becomes legally associated with a Trainer when it is
+successfully captured into a Capture Crystal registered to that Trainer.
+Capture therefore establishes both the <strong>physical
+containment</strong> of the Entheon and its <strong>legal ownership
+record</strong>. The Capture Crystal’s registration system automatically
+links the captured Entheon to the Trainer’s TraID.</p><h2 id="capturing-wild-entheon">Capturing Wild Entheon</h2><p>Wild Entheon can be captured using Capture Crystals. A successful
+capture places the Entheon within the Capture Crystal and registers its
+unique biological signature to the crystal and its Trainer. Capture does
+not automatically determine an Entheon’s personality, Nature, or Bond
+with its Trainer. An Entheon remains an individual being with its own
+personality, preferences, memories, and agency after capture. A newly
+captured Entheon may therefore require time and interaction to become
+comfortable with its new Trainer.</p><h2 id="capture-crystal-habitats">Capture Crystal Habitats</h2><p>A Capture Crystal is more than a container. When an Entheon is
+captured, the crystal creates and maintains a <strong>self-contained
+miniature habitat</strong> suited to that individual Entheon’s needs.
+The habitat automatically adapts to the Entheon’s biological and
+environmental requirements. An Entheon’s habitat is influenced by
+factors such as:</p><ul>
+<li>Species.</li>
+<li>Affinity.</li>
+<li>Biological requirements.</li>
+<li>Environmental preferences.</li>
+<li>Individual characteristics.</li>
+</ul><p>Affinity alone does not determine the habitat. Two Entheon with the
+same Affinity may therefore have completely different environments
+within their Capture Crystals. For example, one Fire-affinity Entheon
+may thrive in a volcanic environment containing heated rock and magma,
+while another Fire-affinity Entheon may prefer a warm, densely vegetated
+forest environment. The Capture Crystal provides a safe, self-sustaining
+environment in which the Entheon can rest, sleep, eat, and otherwise
+live comfortably while contained.</p><h3 id="habitat-adaptation">Habitat Adaptation</h3><p>A Capture Crystal’s internal habitat can change as its Entheon
+changes. Evolution, changes in Affinity, maturation, or changing
+biological requirements may cause the habitat to adapt accordingly. The
+habitat therefore represents the <strong>individual Entheon</strong>,
+rather than simply providing a generic environment based on its species
+or Affinity.</p><h2 id="capture-does-not-equal-obedience">Capture Does Not Equal
+Obedience</h2><p>Capturing an Entheon establishes legal ownership and provides a safe
+habitat, but it does <strong>not</strong> erase the Entheon’s
+individuality or automatically create complete obedience. An Entheon
+retains:</p><ul>
+<li>Its Nature.</li>
+<li>Its Personality.</li>
+<li>Its memories.</li>
+<li>Its preferences.</li>
+<li>Its individual agency.</li>
+<li>Its existing relationships and experiences.</li>
+</ul><p>The quality of the relationship between Trainer and Entheon is
+instead influenced by their interactions and <strong>Bond</strong>. A
+newly captured Entheon may therefore be cooperative, uncertain,
+resistant, enthusiastic, frightened, curious, or otherwise behave
+according to its individual Personality and circumstances.</p><blockquote>
+<p><strong>Capture establishes ownership. It does not manufacture
+loyalty.</strong></p>
+</blockquote><h2 id="transfer-of-ownership">Transfer of Ownership</h2><p>Entheon can be legally transferred between Trainers through
+mechanisms such as trading or gifting. When an Entheon is transferred,
+its registration is updated to reflect the new Trainer and Capture
+Crystal ownership. A transfer does not erase the Entheon’s:</p><ul>
+<li>Memories.</li>
+<li>Nature.</li>
+<li>Personality.</li>
+<li>Previous experiences.</li>
+<li>Existing Bond history.</li>
+</ul><p>Legal ownership and emotional attachment are therefore separate
+concepts. An Entheon may legally belong to a new Trainer while still
+remembering and caring about its previous Trainer.</p><h2 id="stolen-entheon">Stolen Entheon</h2><p>Taking another Trainer’s Entheon or Capture Crystal without
+authorization is illegal. Because Capture Crystals are individually
+registered, simply taking a crystal does not automatically transfer
+ownership. The existing registration remains associated with the
+original Trainer until a legitimate ownership transfer is completed. The
+exact legal procedures surrounding stolen Entheon, ownership disputes,
+illegal captures, and rogue Trainers will be established as part of the
+wider ownership and enforcement system.</p><h2 id="entheon-storage">4. Entheon Storage</h2><h2 id="active-entheon-limit">Active Entheon Limit</h2><p>A Trainer may have <strong>up to six Entheon in their active
+group</strong> at any given time. Six is the maximum number of Entheon
+that a Trainer normally carries with them while travelling, battling, or
+participating in activities. There is <strong>no limit to the total
+number of Entheon a Trainer may legally own</strong>. A Trainer may
+therefore capture and own additional Entheon beyond their six active
+Entheon.</p><h3 id="automatic-storage">Automatic Storage</h3><p>When a Trainer captures an Entheon while already having six active
+Entheon, the newly captured Entheon is automatically transferred to the
+Trainer’s registered remote storage. The Trainer does not lose ownership
+of the Entheon. It simply becomes part of their stored collection rather
+than their active group. The basic process is:</p><blockquote>
+<p><strong>Fewer than six active Entheon → newly captured Entheon joins
+the active group.</strong></p>
+</blockquote><blockquote>
+<p><strong>Six active Entheon → newly captured Entheon is automatically
+transferred to registered storage.</strong></p>
+</blockquote><p>A Trainer may later exchange an active Entheon with one held in
+storage. Storage transfers automatically update the Trainer’s registered
+Entheon roster.</p><h2 id="remote-storage">Remote Storage</h2><p>Entheon that are not part of a Trainer’s active group are maintained
+in <strong>secure remote storage</strong>. Stored Entheon continue to
+live within their Capture Crystals’ individual habitats and remain
+legally associated with their Trainer. A Trainer can retrieve an Entheon
+from storage and exchange it with one of their active Entheon. The exact
+technical infrastructure used to access and operate the remote storage
+network will be established as part of the world’s broader technology
+rules.</p><h2 id="entheon-activity-requirement">Entheon Activity Requirement</h2><p>Entheon are living beings rather than permanent collectibles. A
+Trainer is expected to maintain an ongoing relationship with their
+Entheon, including those held in storage. If a Trainer has <strong>no
+meaningful interaction with an Entheon for more than one month</strong>,
+the storage system flags that Entheon as inactive. The Trainer receives
+a notification or warning before the inactivity period expires. If the
+Trainer does not meaningfully interact with the Entheon before the
+period expires, the Entheon is <strong>automatically released into the
+wild</strong>. When this occurs:</p><ul>
+<li>The Entheon’s ownership registration is terminated.</li>
+<li>The Entheon is no longer associated with the Trainer’s TraID.</li>
+<li>The Capture Crystal is returned to the Trainer as an empty,
+unregistered crystal.</li>
+<li>The released Entheon becomes independent and is free to establish
+its own life in the wild.</li>
+</ul><h3 id="meaningful-interaction">Meaningful Interaction</h3><p>Meaningful interaction can include:</p><ul>
+<li>Taking the Entheon out of storage.</li>
+<li>Spending time with the Entheon.</li>
+<li>Training with it.</li>
+<li>Battling with it.</li>
+<li>Travelling with it.</li>
+<li>Caring for it.</li>
+<li>Personally checking on or interacting with it through an approved
+storage system.</li>
+<li>Other direct interaction that demonstrates an ongoing
+relationship.</li>
+</ul><p>Simply owning the Entheon, keeping its Capture Crystal registered, or
+viewing its record does <strong>not</strong> reset the inactivity
+period.</p><h3 id="long-term-inactive-status">Long-Term Inactive Status</h3><p>A Trainer may place an Entheon into an approved <strong>long-term
+inactive status</strong> when there is a legitimate reason for extended
+separation. While in this status, the normal one-month inactivity
+release does not apply. This allows Trainers to maintain ownership of
+Entheon that temporarily cannot travel with them or receive regular
+interaction without risking automatic release.</p><blockquote>
+<p><strong>Ownership of an Entheon carries an ongoing responsibility
+toward that individual.</strong></p>
+</blockquote><h2 id="active-group-storage">Active Group &amp; Storage</h2><p>The six-Entheon active limit is a <strong>travel and activity limit,
+not an ownership limit</strong>. A Trainer may therefore maintain a
+larger collection of Entheon while only travelling with six at a time.
+This allows Trainers to rotate their active Entheon, develop
+relationships with different individuals, and select teams appropriate
+to different situations without treating additional Entheon as
+disposable possessions.</p><h2 id="entheon-battles">5. Entheon Battles</h2><h2 id="general-battle-culture">General Battle Culture</h2><p>Entheon battles are a common and socially accepted part of everyday
+life. Battles can take place in many different contexts, including:</p><ul>
+<li>Casual battles between friends or acquaintances.</li>
+<li>Roadside Trainer battles.</li>
+<li>Gym challenges.</li>
+<li>Local events and festivals.</li>
+<li>Exhibition and mock battles.</li>
+<li>Tournaments.</li>
+<li>Professional competitions.</li>
+<li>Training and practical exercises.</li>
+</ul><p>The number of Entheon used in an ordinary battle is not universally
+fixed. Trainers may agree on an appropriate battle format before the
+battle begins. Common formats can include:</p><ul>
+<li>1v1</li>
+<li>2v2</li>
+<li>3v3</li>
+<li>4v4</li>
+<li>6v6</li>
+</ul><p>Official competitions and Gyms may use their own established
+formats.</p><h2 id="battle-commands-entheon-agency">Battle Commands &amp; Entheon
+Agency</h2><p>Trainers issue commands to their active Entheon during battle.
+Commands are instructions rather than absolute control. Entheon retain
+their individual agency and interpret commands according to their:</p><ul>
+<li>Nature.</li>
+<li>Personality.</li>
+<li>Training.</li>
+<li>Experience.</li>
+<li>Bond with their Trainer.</li>
+<li>Current physical and emotional condition.</li>
+</ul><p>An Entheon may therefore refuse, ignore, reinterpret, or otherwise
+react differently to a command when circumstances warrant it. A strong
+Trainer is not necessarily one whose Entheon obeys every command without
+question. Effective battling depends on the ability of a Trainer and
+their Entheon to understand and coordinate with one another.</p><h2 id="battle-termination">Battle Termination</h2><p>A battle normally ends when:</p><ul>
+<li>All participating Entheon on one side have been knocked out.</li>
+<li>A Trainer forfeits the battle.</li>
+<li>An official or referee stops the battle for safety.</li>
+<li>Another agreed victory condition is reached.</li>
+</ul><p>A knocked-out Entheon cannot continue fighting until it has recovered
+sufficiently. The exact recovery time depends on the Entheon, the
+severity of the battle, and the circumstances.</p><h2 id="switching-entheon">Switching Entheon</h2><p>Trainers may switch their active Entheon during battle unless a
+particular battle format or event establishes different rules. Switching
+allows Trainers to adapt their strategy to changing battle conditions
+and make use of different Entheon within their active group. An Entheon
+that is switched out remains part of the battle unless it has been
+knocked out or otherwise removed from participation.</p><h2 id="move-usage-stamina">Move Usage &amp; Stamina</h2><p>Entheon do not have an artificial limit on how many times a
+particular move or ability can be used. Instead, repeated use is
+naturally limited by factors such as:</p><ul>
+<li>Stamina.</li>
+<li>Physical strain.</li>
+<li>Energy expenditure.</li>
+<li>Concentration.</li>
+<li>The nature of the move or ability.</li>
+<li>The Entheon’s physical condition.</li>
+<li>The surrounding environment where relevant.</li>
+</ul><p>A powerful move may therefore be technically usable multiple times,
+but repeatedly using it can exhaust or otherwise strain the Entheon.
+Battle performance is consequently influenced by <strong>resource
+management and tactical decision-making</strong>, rather than an
+arbitrary number of permitted uses.</p><h2 id="battle-safety-1">Battle Safety</h2><p>A fundamental rule of Entheon combat is:</p><blockquote>
+<p><strong>An Entheon cannot kill another Entheon through direct
+combat.</strong></p>
+</blockquote><p>Entheon battles can still result in:</p><ul>
+<li>Knockouts.</li>
+<li>Exhaustion.</li>
+<li>Temporary injuries.</li>
+<li>Serious but non-lethal injuries.</li>
+<li>The need for medical treatment or recovery.</li>
+</ul><p>However, direct Entheon-on-Entheon combat cannot result in the death
+of an Entheon. This is an inherent rule of Entheon combat rather than
+merely a regulation imposed by competitive organizations. Entheon can
+still die from natural causes, illness, accidents, environmental
+hazards, or other circumstances unrelated to direct Entheon combat.</p><h2 id="gym-battles">Gym Battles</h2><p>There are seven recognized Gyms, each specializing in a fixed
+Affinity. Gym battles use established formats based on the Gym’s
+recommended difficulty.</p><table>
+<thead>
+<tr class="header">
+<th><strong>Gym</strong></th>
+<th><strong>Recommended Difficulty</strong></th>
+<th><strong>Battle Format</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gym 1</td>
+<td>Introductory</td>
+<td>3v3</td>
+</tr>
+<tr class="even">
+<td>Gym 2</td>
+<td>Beginner</td>
+<td>3v3</td>
+</tr>
+<tr class="odd">
+<td>Gym 3</td>
+<td>Intermediate</td>
+<td>3v3</td>
+</tr>
+<tr class="even">
+<td>Gym 4</td>
+<td>Intermediate/Advanced</td>
+<td>4v4</td>
+</tr>
+<tr class="odd">
+<td>Gym 5</td>
+<td>Advanced</td>
+<td>4v4</td>
+</tr>
+<tr class="even">
+<td>Gym 6</td>
+<td>Expert</td>
+<td>6v6</td>
+</tr>
+<tr class="odd">
+<td>Gym 7</td>
+<td>Master</td>
+<td>6v6</td>
+</tr>
+</tbody>
+</table><p>The Gyms may be challenged in <strong>any order</strong>. The
+recommended progression represents increasing expected difficulty rather
+than a mandatory sequence. A Trainer who chooses to challenge a more
+difficult Gym early must participate in that Gym’s established battle
+format.</p><h2 id="gym-leader-rosters">Gym Leader Rosters</h2><p>Every Gym Leader has a defined roster of <strong>six
+Entheon</strong>. The six-member roster represents the Gym Leader’s
+established team, battle philosophy, and Affinity specialization. The
+roster remains fixed unless the story or setting establishes that the
+Gym Leader has changed their team.</p><h3 id="gyms-15">Gyms 1–5</h3><p>For Gyms using fewer than six Entheon, the Gym Leader selects the
+required number of Entheon from their established six-member roster. Gym
+battle rosters are selected for an individual challenger based on
+relevant circumstances, including:</p><ul>
+<li>The challenger’s experience.</li>
+<li>The challenger’s demonstrated strategy.</li>
+<li>The Entheon’s strengths and weaknesses.</li>
+<li>Battle compatibility.</li>
+<li>The intended difficulty of the challenge.</li>
+<li>The Gym Leader’s personality and battle philosophy.</li>
+</ul><p>The Gym Leader’s selection is not revealed to the challenger
+beforehand.</p><h3 id="gyms-67">Gyms 6–7</h3><p>Gyms 6 and 7 use the Gym Leader’s <strong>complete six-Entheon
+roster</strong>.</p><h2 id="local-battle-events">Local Battle Events</h2><p>Entheon battles are also incorporated into local culture and
+community celebrations. Towns and cities may feature:</p><ul>
+<li>Festival battles.</li>
+<li>Exhibition matches.</li>
+<li>Mock Trainer battles.</li>
+<li>Demonstrations.</li>
+<li>Community tournaments.</li>
+<li>Charity battles.</li>
+<li>Seasonal competitions.</li>
+</ul><p>These events may take place during celebrations such as lunar
+festivals, harvest festivals, city anniversaries, or other local
+traditions. Not every battle at such an event is intended as serious
+competition. Some are primarily entertainment, allowing spectators to
+enjoy skilled Trainers and Entheon performing in a festive setting.
+Entheon battling is therefore naturally integrated into everyday culture
+rather than existing solely as a professional competitive activity.</p><h2 id="types-of-battles">Types of Battles</h2><p>The world contains several broad forms of Entheon battling:</p><h3 id="casual-battles">Casual Battles</h3><p>Informal battles between Trainers for recreation, practice, social
+interaction, or friendly competition.</p><h3 id="roadside-battles">Roadside Battles</h3><p>Trainer challenges encountered while travelling. These may involve
+agreed rewards or wagers and can provide legitimate income for
+travelling Trainers.</p><h3 id="gym-battles-1">Gym Battles</h3><p>Formal challenges against recognized Gym Leaders, using the
+established format of each Gym and awarding a Gym Crest upon
+victory.</p><h3 id="local-events">Local Events</h3><p>Community-focused battles, exhibitions, demonstrations, and
+competitions associated with festivals and other local celebrations.</p><h3 id="tournaments">Tournaments</h3><p>Organized competitive events in which Trainers compete against one
+another under established rules.</p><h3 id="professional-battles">Professional Battles</h3><p>High-level competitive battling that can form part or all of a
+Trainer’s career. The exact structure of professional leagues, rankings,
+sponsorships, and major tournaments is established separately as part of
+the wider competitive system.</p></article><div class="reader-footer"><a href="index.html">← Back to Kaleo</a><a href="reference.html">Open Complete Reference →</a></div></main></div></div><script>
+const input=document.getElementById('search'),article=document.querySelector('.reference'),blocks=[...article.children];
+function filter(q){q=q.toLowerCase().trim();blocks.forEach(function(el){el.classList.toggle('hidden',!!q && !el.textContent.toLowerCase().includes(q));});}
+input.addEventListener('input',function(){filter(input.value);});
+const params=new URLSearchParams(location.search);
+if(params.get('search')){input.value=params.get('search');filter(input.value);}
+</script></body></html>

@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Kaleo — The World</title><meta content="Kaleo’s geography, regions and broad world structure." name="description"/><style>
+
+:root{--bg:#071018;--panel:#0d1a25;--panel2:#112536;--text:#edf7fb;--muted:#9fb5c2;--accent:#63d8ff;--accent2:#b58cff;--border:rgba(255,255,255,.11)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0%,rgba(99,216,255,.10),transparent 28rem),radial-gradient(circle at 90% 10%,rgba(181,140,255,.10),transparent 30rem),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}
+a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1450px;margin:auto;padding:13px 22px;display:flex;align-items:center;gap:28px}.brand{font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.search{flex:1}.search input{width:100%;max-width:680px;padding:11px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.06);color:var(--text);font-size:1rem;outline:none}.search input:focus{border-color:rgba(99,216,255,.7)}
+.page{max-width:1450px;margin:auto;padding:42px 22px 80px}.hero{padding:70px 58px;border:1px solid var(--border);border-radius:26px;background:linear-gradient(135deg,rgba(99,216,255,.13),rgba(181,140,255,.09)),var(--panel);box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.kicker{color:var(--accent);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem}h1{font-size:clamp(3.5rem,8vw,7rem);line-height:.9;margin:15px 0 22px}.hero h2{font-size:1.5rem;color:#cbeef8;margin:0 0 18px}.hero p{max-width:850px;color:var(--muted);font-size:1.12rem}
+.section{margin-top:34px}.section h2{font-size:2rem;margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{display:block;text-decoration:none;padding:24px;border:1px solid var(--border);border-radius:18px;background:rgba(13,26,37,.8);transition:.18s ease;min-height:155px}.card:hover{transform:translateY(-3px);border-color:rgba(99,216,255,.45);background:var(--panel2)}
+.card-title{font-size:1.18rem;font-weight:800;margin-bottom:8px}.card-desc{color:var(--muted);font-size:.94rem}.card-arrow{display:block;color:var(--accent);font-size:.86rem;font-weight:700;margin-top:18px}
+.species-box{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.species-box a{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03);text-decoration:none;color:#cfe9f2}.species-box a:hover{border-color:rgba(99,216,255,.45);color:white}
+.footer{margin-top:45px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}.sidebar-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:26px}.sidebar{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto}
+.sidebar a{display:block;text-decoration:none;padding:9px 11px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted)}.sidebar a:hover{color:white;background:rgba(255,255,255,.04);border-left-color:var(--accent)}.sidebar small{display:block;font-size:.72rem;line-height:1.35;margin-top:2px}
+.reference{padding:35px 42px;border:1px solid var(--border);border-radius:20px;background:rgba(13,26,37,.75)}.reference h1{font-size:2.1rem;line-height:1.15;margin-top:2em;border-bottom:1px solid var(--border);padding-bottom:.35em}.reference h2{font-size:1.55rem;color:#dff7ff;margin-top:2em}.reference h3{color:#bfefff}
+.reference table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}.reference th,.reference td{border:1px solid var(--border);padding:9px 11px;text-align:left}.reference th{background:rgba(255,255,255,.05)}.reference blockquote{border-left:3px solid var(--accent);padding:10px 17px;background:rgba(99,216,255,.05)}.reference pre{overflow:auto;background:#050b10;padding:15px;border-radius:10px}.reference img{max-width:100%;border-radius:12px}.hidden{display:none!important}
+@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.species-box{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.sidebar-layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;max-height:300px}.grid{grid-template-columns:1fr}.species-box{grid-template-columns:repeat(2,1fr)}.hero{padding:45px 28px}.reference{padding:25px 20px}}
+
+
+.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:26px;align-items:start}
+.reader-nav{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto;padding-right:4px}
+.reader-nav a{display:block;text-decoration:none;padding:10px 12px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted);margin-bottom:3px}
+.reader-nav a:hover{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.05)}
+.reader-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.07)}
+.reader-nav small{display:block;color:var(--muted);font-size:.72rem;line-height:1.35;margin-top:3px}
+.reader-main{min-width:0}
+.reference{max-width:100%;}
+.reader-meta{color:var(--muted);font-size:.86rem;margin:-8px 0 26px}
+.reader-footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.reader-footer a{color:var(--accent);text-decoration:none;font-weight:700}
+@media(max-width:900px){.reader-layout{grid-template-columns:1fr}.reader-nav{position:relative;top:auto;height:auto;display:flex;gap:5px;overflow-x:auto;padding-bottom:8px}.reader-nav a{min-width:max-content}.reader-nav small{display:none}}
+</style></head><body><header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">KALEO · ENTHEON</a><div class="search"><input aria-label="Search the reference" id="search" placeholder="Search this section…" type="search"/></div></div></header><div class="page"><div class="reader-layout"><aside class="reader-nav"><a href="index.html"><strong>← Home</strong><small>Return to the Kaleo homepage.</small></a><a data-page="creature-systems.html" href="creature-systems.html"><span>Creature Systems</span><small>Combat categories, statistics and battle fundamentals.</small></a><a data-page="move-database.html" href="move-database.html"><span>Move Database</span><small>The canonical move pools, move fields and move design rules.</small></a><a data-page="special-abilities.html" href="special-abilities.html"><span>Special Moves &amp; Abilities</span><small>Special acquisition, innate abilities and special move rules.</small></a><a data-page="nature-personality.html" href="nature-personality.html"><span>Nature &amp; Personality</span><small>Nature, temperament and personality rules.</small></a><a data-page="species-moves.html" href="species-moves.html"><span>Species-Specific Moves</span><small>Species-specific learnsets and move compatibility.</small></a><a data-page="growth-evolution.html" href="growth-evolution.html"><span>Growth &amp; Evolution</span><small>Leveling, experience, evolution and progression rules.</small></a><a data-page="items.html" href="items.html"><span>Items</span><small>The established item system and its role in Kaleo.</small></a><a data-page="trainers-battles.html" href="trainers-battles.html"><span>Trainers &amp; Battles</span><small>Trainer, capture and battle systems.</small></a><a class="active" data-page="world.html" href="world.html"><span>The World</span><small>Kaleo’s geography, regions and broad world structure.</small></a><a data-page="human-entheon.html" href="human-entheon.html"><span>Human–Entheon Relationship</span><small>The relationship between people and Entheon.</small></a><a data-page="affinities.html" href="affinities.html"><span>Affinities</span><small>The established Affinities and their place in the world.</small></a><a data-page="technology.html" href="technology.html"><span>Technology</span><small>Kaleo’s technological development.</small></a><a data-page="settlements-regions.html" href="settlements-regions.html"><span>Settlements &amp; Regions</span><small>Settlements and regional structure.</small></a><a data-page="wild-habitats.html" href="wild-habitats.html"><span>Wild Habitats</span><small>Where Entheon live and how habitats shape the world.</small></a><a data-page="research.html" href="research.html"><span>Research &amp; Starter Distribution</span><small>Research institutions, Entheon study and starter distribution.</small></a><a data-page="trainers-leagues.html" href="trainers-leagues.html"><span>Trainers, Leagues &amp; Gyms</span><small>Trainer organizations and the seven Gyms.</small></a><a data-page="economy.html" href="economy.html"><span>Economy &amp; Vale</span><small>Economy and the established Vale currency.</small></a><a data-page="shops-services.html" href="shops-services.html"><span>Shops &amp; Services</span><small>Everyday services and commerce.</small></a><a data-page="travel.html" href="travel.html"><span>Travel &amp; Transportation</span><small>Established travel and transportation.</small></a><a data-page="education.html" href="education.html"><span>Education &amp; Everyday Life</span><small>Education and ordinary life in Kaleo.</small></a><a data-page="law-safety.html" href="law-safety.html"><span>Law &amp; Public Safety</span><small>Law, safety and public rules.</small></a><a data-page="compendium.html" href="compendium.html"><span>Entheon Species Compendium</span><small>The canonical species compendium, evolution lines and physical scale.</small></a></aside><main class="reader-main"><article class="reference"><h1 id="kaleo-geography-regions-travel">5. Kaleo: Geography, Regions
+&amp; Travel</h1><h2 id="overview">Overview</h2><p><strong>Kaleo</strong> is divided into ten distinct regions, each
+with its own terrain, climate, settlements, wildlife habitats, and local
+character. The regions are not uniform in size or terrain. A single
+region may contain several different environments, and the presence of a
+particular Entheon affinity does not mean every region containing that
+affinity has the same landscape. Kaleo’s geography is interconnected
+through <strong>Main Trails, Secondary Trails, and established ferry
+routes</strong>, allowing travel between settlements, cities, landmarks,
+and different regions without requiring a fixed Gym-by-Gym
+progression.</p><h2 id="the-ten-regions">The Ten Regions</h2><h3 id="westmere">Westmere</h3><p>Westmere is a temperate region of dense forests, wooded hills, open
+meadows, and scattered farmland. The forests become particularly dense
+toward the western and northern portions of the region, while the more
+settled areas contain fields, small streams, and gently rolling
+countryside. The region’s most famous natural feature is the
+<strong>Great Tree</strong>, an enormous ancient tree standing within a
+broad clearing surrounded by forest. Westmere is one of Kaleo’s more
+settled regions, with established Trails connecting its villages and
+<strong>Everhope City</strong>, while large stretches of woodland remain
+relatively wild. <strong>Major City:</strong> Everhope City
+<strong>Gym:</strong> Everhope Gym — Gale <strong>Settlements:</strong>
+Valehaven, Briarwood, Oakridge <strong>Landmark:</strong> The Great
+Tree</p><h3 id="dunridge">Dunridge</h3><p>Dunridge is a rugged mountainous region dominated by rocky ridges,
+steep valleys, cliffs, caves, and narrow mountain passages. Elevation
+varies considerably, with relatively temperate valleys giving way to
+harsher terrain at higher elevations. The region forms part of the
+larger mountain geography separating the western and northern portions
+of Kaleo. Travelling through Dunridge often means following valleys,
+crossing rocky passes, or winding around mountain slopes rather than
+travelling in straight lines. The higher elevations become increasingly
+cold and eventually transition toward the mountainous environments of
+Highreach and the colder northern regions. <strong>Major City:</strong>
+Stonehaven <strong>Gym:</strong> None <strong>Settlements:</strong>
+Pinewatch, Stonebrook <strong>Landmark:</strong> None; the mountainous
+landscape itself defines the region.</p><h3 id="seawick">Seawick</h3><p>Seawick is a <strong>long, narrow coastal region</strong>, stretching
+considerably farther north-to-south than it does inland. Its geography
+is dominated by coastline: beaches, rocky shores, coastal cliffs, small
+bays, sea caves, and scattered coastal wetlands. The interior is
+comparatively narrow, meaning that many settlements and much of the
+region’s transportation infrastructure naturally follow the coastline.
+The region has a strong maritime character. Fishing, shipping, coastal
+trade, and travel along the Main Trail are important parts of everyday
+life. Because of its elongated geography, travelling through Seawick can
+mean following the coast for considerable distances before reaching the
+next major settlement or regional connection. <strong>Major
+City:</strong> Gullhaven <strong>Gym:</strong> Gullhaven Gym — Tide
+<strong>Settlements:</strong> Tidewatch, Driftwood
+<strong>Landmark:</strong> None; Seawick’s distinctive coastline defines
+the region.</p><h3 id="highreach">Highreach</h3><p>Highreach is a mountainous northern region characterized by steep
+peaks, alpine valleys, glaciers, snow-covered slopes, and high-altitude
+wilderness. The southern portions of the region are comparatively
+accessible, but the terrain becomes progressively colder and more
+difficult toward the north. Mountain passes and valleys provide the
+principal natural travel corridors. Near the northern meeting point of
+<strong>Highreach, Dunridge, and Northvale</strong> lies a geothermal
+area containing the famous <strong>Highreach Hot Springs</strong>. The
+springs remain warm despite the surrounding mountainous and snowy
+environment. <strong>Major City:</strong> Thermalis
+<strong>Gym:</strong> Thermalis Gym — Fire/Stone
+<strong>Settlements:</strong> Frostmere, Snowfall
+<strong>Landmark:</strong> Highreach Hot Springs</p><h3 id="greenvale">Greenvale</h3><p>Greenvale is Kaleo’s major agricultural heartland. It consists
+primarily of broad fertile plains, gently rolling farmland, grasslands,
+cultivated fields, streams, and small wooded areas. Much of Greenvale
+has relatively open sightlines, with settlements and farms spread
+throughout the countryside. The region’s most recognizable structure is
+the <strong>Great Windmill</strong>, an enormous functioning
+agricultural processing facility. Its size makes it visible from
+considerable distances across the surrounding farmland. <strong>Major
+City:</strong> Harveston <strong>Gym:</strong> Harveston Gym — Verdant
+<strong>Settlements:</strong> Millbrook, Meadowfield, Sunvale
+<strong>Landmark:</strong> The Great Windmill</p><h3 id="lume">Lume</h3><p>Lume is a relatively small island positioned within the central
+maritime passage between the major eastern and western portions of
+Kaleo. The island contains a mixture of coastal terrain, forest, rocky
+areas, beaches, and undeveloped wilderness. Much of Lume remains natural
+Entheon habitat rather than being densely developed by humans.
+<strong>Lume Port</strong>, the island’s major city, is the primary
+human population centre and is built around a naturally useful harbor.
+Lume’s importance comes less from its size and more from its
+<strong>strategic position</strong>. Established ferry connections make
+it an important stopping point for travellers, merchants, and cargo
+moving between distant parts of Kaleo. <strong>Major City:</strong> Lume
+Port <strong>Gym:</strong> None <strong>Settlements:</strong> None
+beyond Lume Port <strong>Landmark:</strong> Lume Port and the
+surrounding island environment</p><h3 id="hawthorne">Hawthorne</h3><p>Hawthorne is dominated by the enormous <strong>Great Hawthorne
+Lake</strong>, which forms a major geographic feature of the region. The
+surrounding landscape consists of forests, freshwater wetlands, rolling
+hills, streams, and fertile areas influenced by the lake. Rivers and
+waterways branch away from the lake, creating numerous smaller aquatic
+habitats. <strong>Lakecrest City</strong> sits directly adjacent to the
+lake and has developed around the opportunities provided by its
+freshwater access. The lake also influences travel through the region:
+Trails naturally follow its shoreline or pass around sections of the
+water rather than simply cutting directly across it. <strong>Major
+City:</strong> Lakecrest City <strong>Gym:</strong> Lakecrest Gym — Volt
+<strong>Settlements:</strong> Stillwater, Brookmere, Riverside
+<strong>Landmark:</strong> Great Hawthorne Lake</p><h3 id="northvale">Northvale</h3><p>Northvale is a cool northern region of rocky terrain, coniferous
+forests, hills, river valleys, and increasingly cold landscapes toward
+its northern edges. One of its defining geographical features is the
+<strong>Cascading River</strong>, where water travels through a series
+of rocky drops, pools, and smaller waterfalls, creating a natural
+staircase through part of the region. The southern portions of Northvale
+remain relatively accessible, while the northern terrain becomes colder
+and more rugged as it approaches the harsher environments around Isen.
+Northvale therefore acts as an environmental transition between the
+temperate regions farther south and Kaleo’s genuinely frozen northern
+wilderness. <strong>Major City:</strong> Northreach
+<strong>Gym:</strong> Northreach Gym — Metal/Frost
+<strong>Settlements:</strong> Stonefall, Rivermarch, Frostbridge
+<strong>Landmark:</strong> The Cascading River</p><h3 id="eastmere">Eastmere</h3><p>Eastmere is a broad eastern region with a mixture of coastal plains,
+forests, grasslands, rolling countryside, rivers, and sheltered bays.
+The eastern coastline provides numerous natural harbors and coastal
+environments, while the interior becomes more varied and wooded.
+<strong>Fairhaven</strong> is the region’s major urban centre and is
+connected to the surrounding settlements by established Trails. Eastmere
+is relatively accessible compared with the mountainous north and west,
+although its more remote forests and coastal wilderness contain areas
+that remain largely undeveloped. <strong>Major City:</strong> Fairhaven
+<strong>Gym:</strong> Fairhaven Gym — Mystic
+<strong>Settlements:</strong> Seabrook, Windmere
+<strong>Landmark:</strong> None; the region’s varied eastern landscape
+defines it.</p><h3 id="isen">Isen</h3><p>Isen is Kaleo’s most extreme northern environment: a vast frozen
+tundra characterized by permafrost, snowfields, frozen lakes and rivers,
+barren plains, ice-covered terrain, and long stretches of wilderness.
+Vegetation is sparse compared with the southern regions, and permanent
+human settlement is extremely limited. <strong>Winterhold</strong> is
+the region’s major city, with no smaller settlements currently
+established. Weather and terrain make travel considerably more difficult
+than in most of Kaleo. Established Trails connect the inhabited areas,
+but large portions of Isen remain wild and sparsely explored. Isen is
+not simply a colder version of Highreach: <strong>Highreach is
+mountainous and alpine, while Isen is dominated by expansive frozen
+tundra.</strong> <strong>Major City:</strong> Winterhold
+<strong>Gym:</strong> None <strong>Settlements:</strong> None
+<strong>Landmark:</strong> The Frozen Expanse</p><h2 id="major-landmarks">Major Landmarks</h2><h3 id="the-great-tree-westmere">The Great Tree — Westmere</h3><p>Deep within one of Westmere’s largest forests stands an enormous
+ancient tree surrounded by a broad natural clearing. The forest grows
+densely again beyond the clearing, making the tree and its open
+surroundings highly distinctive. The Great Tree is one of Westmere’s
+most recognizable natural landmarks and can be reached by a Secondary
+Trail branching from the region’s main travel network. The tree is not
+inherently magical or supernatural. Its significance comes from its
+immense age and size, its distinctive appearance, and the ecosystem that
+has developed around it. The clearing provides a natural gathering place
+for both people and Entheon.</p><h3 id="the-great-windmill-greenvale">The Great Windmill —
+Greenvale</h3><p>The Great Windmill is an enormous functioning structure located in
+the agricultural heart of Greenvale. Rather than being a conventional
+factory with a windmill attached, the entire facility was designed
+around the concept of a gigantic wind-powered processing plant. Its
+machinery processes agricultural products produced throughout the
+surrounding region. Its enormous scale makes it visible from
+considerable distances across Greenvale’s relatively open farmland. The
+structure is both an important piece of regional infrastructure and one
+of Greenvale’s defining landmarks. A Secondary Trail connects the main
+transportation network to the facility.</p><h3 id="great-hawthorne-lake-hawthorne">Great Hawthorne Lake —
+Hawthorne</h3><p>Great Hawthorne Lake is a vast inland freshwater lake that dominates
+the geography of Hawthorne. Its shoreline contains a mixture of
+wetlands, forests, beaches, rocky sections, and smaller waterways.
+Rivers and streams flow into and away from the lake, creating a diverse
+range of freshwater habitats. Lakecrest City was established directly
+alongside the lake, making the waterway an important part of the city’s
+history, commerce, and everyday life. The lake is large enough to
+significantly influence regional travel. Trails naturally follow
+portions of its shoreline or route around its edges rather than treating
+it as an obstacle that can simply be crossed.</p><h3 id="the-cascading-river-northvale">The Cascading River —
+Northvale</h3><p>A distinctive rocky river system runs through Northvale, descending
+through a sequence of natural levels. Rather than forming one enormous
+waterfall, the river repeatedly drops over rocky shelves, creating a
+series of smaller waterfalls, pools, rapids, and cascades. The resulting
+landscape resembles a natural staircase carved into the terrain. The
+Cascading River is both a notable landmark and an important freshwater
+habitat for Entheon. Trails in the surrounding area follow the river
+where practical, while some sections require travellers to move around
+the steeper drops.</p><h3 id="the-highreach-hot-springs-highreach-dunridge-northvale">The
+Highreach Hot Springs — Highreach / Dunridge / Northvale</h3><p>Near the mountainous meeting point of <strong>Highreach, Dunridge,
+and Northvale</strong> lies a geothermal area containing a series of
+naturally heated springs. The springs remain warm despite the
+surrounding high-altitude environment, where snow and cold weather are
+common. Steam rising from the pools can be visible against the
+surrounding mountains, particularly during colder weather. The area is
+known throughout Kaleo as a place to rest and recover during mountain
+travel. Different pools vary in temperature and surrounding terrain, and
+the area also provides a distinctive habitat for Entheon adapted to the
+combination of geothermal warmth and mountainous conditions. The hot
+springs are accessible through a Secondary Trail branching from the
+regional mountain routes.</p><h3 id="lume-port-lume">Lume Port — Lume</h3><p>Lume’s major city is built around a naturally sheltered coastal
+harbor and serves as the island’s primary connection to the rest of
+Kaleo. The city functions as a major trading and transportation hub,
+with ships and ferries carrying passengers, goods, and supplies between
+Lume and established coastal destinations throughout Kaleo. The port is
+not a separate settlement from the city. <strong>Lume Port is the
+central maritime district and defining function of the island’s major
+city.</strong> Outside the city, much of Lume remains relatively
+undeveloped, allowing substantial areas of the island to remain natural
+Entheon habitat.</p><h3 id="the-frozen-expanse-isen">The Frozen Expanse — Isen</h3><p>Rather than a single constructed landmark, Isen’s defining feature is
+the immense frozen landscape itself. Vast stretches of tundra,
+snowfield, permafrost, frozen waterways, and exposed rocky ground extend
+across the region. During periods of particularly severe weather,
+visibility can become extremely limited and familiar terrain can become
+difficult to navigate. The Frozen Expanse is one of the least developed
+environments in Kaleo. Outside Winterhold and its established travel
+connections, human infrastructure becomes increasingly scarce. The
+wilderness itself is what defines Isen.</p><h2 id="trails-transportation">Trails &amp; Transportation</h2><h3 id="main-trails">Main Trails</h3><p>Main Trails are Kaleo’s principal overland travel routes. A Main
+Trail generally leads toward or through a <strong>major city</strong>
+and passes established settlements along the way. Main Trails are not
+arranged around Gym progression and do not require travellers to visit
+the Gyms in geographical order. Trails naturally curve around terrain,
+waterways, mountains, and other geographical features rather than
+following perfectly straight lines.</p><h3 id="secondary-trails">Secondary Trails</h3><p>Secondary Trails branch away from Main Trails when a destination is
+not directly along the primary route. They may lead to:</p><ul>
+<li>smaller settlements</li>
+<li>landmarks</li>
+<li>alternative destinations</li>
+<li>areas of particular natural or Entheon interest</li>
+</ul><p>A Secondary Trail does not necessarily lead toward another major city
+or Gym.</p><h3 id="ferry-routes">Ferry Routes</h3><p>Established ferry routes provide maritime transportation,
+particularly around <strong>Lume</strong>. Ferries connect existing
+coastal settlements and cities with Lume, allowing travellers and goods
+to cross the Central Sea without requiring long overland journeys around
+it. Ferry routes are separate from the Trail network and are represented
+geographically as maritime routes rather than roads.</p><h2 id="geographic-principle">Geographic Principle</h2><p>Kaleo should feel like a <strong>coherent inhabited continent rather
+than a linear adventure path</strong>. Cities, settlements, landmarks,
+wilderness, Trails, and ferry connections exist because of the geography
+and needs of the people living there. Gym progression is layered onto
+this world rather than determining its structure.</p><h2 id="wild-entheon-ecology">Wild Entheon Ecology</h2><p>Wild Entheon populations vary significantly between regions. Not
+every Entheon species occurs throughout Kaleo; many have specific
+natural ranges determined by habitat, climate and environmental
+conditions. Regional encounter frequency is described using three
+categories:</p><ul>
+<li><strong>Common</strong> — regularly encountered within suitable
+habitat.</li>
+<li><strong>Uncommon</strong> — naturally present but encountered less
+frequently.</li>
+<li><strong>Rare</strong> — unusual encounters even within suitable
+habitat.</li>
+</ul><p>An Entheon being classified as Common, Uncommon or Rare describes its
+<strong>wild encounter frequency</strong>, not necessarily its overall
+population, commercial availability or rarity as a species.</p><h3 id="evolutionary-stages">Evolutionary Stages</h3><p>Wild Entheon can exceptionally be encountered in evolved forms, but
+these are considerably less common than their earlier stages.
+<strong>Stage 3 Entheon are never encountered as normal wild
+Entheon.</strong> Stage 3 forms represent a level of development reached
+through training and progression rather than a form encountered
+naturally in the wild. Entheon whose evolution requires a specific
+evolutionary item also <strong>do not naturally appear in their evolved
+forms</strong>. The required item makes deliberate intervention
+necessary for that evolution to occur.</p><h3 id="veyli-1">Veyli</h3><p>Veyli is an unusual case. Although classified as a Common Entheon
+species, naturally occurring Veyli populations are restricted to only a
+small number of regions. Veyli naturally occur in <strong>Westmere and
+Eastmere</strong>, where they are nevertheless <strong>Rare
+encounters</strong>. Veyli are adaptable but naturally maintain small
+populations, meaning that encountering one in the wild is considered
+fortunate. Veyli encountered elsewhere are likely to be owned, bred,
+traded or transported individuals rather than members of a natural wild
+population. Veyli’s evolved forms are <strong>never wild
+encounters</strong>, as their evolution requires a specific evolutionary
+item.</p><h2 id="alphan-entheon">Alphan Entheon</h2><p>An <strong>Alphan Entheon</strong> is an unusually large and
+exceptionally developed individual of its species. Alphan Entheon are
+not a separate species or evolutionary form. They retain the same basic
+appearance and characteristics as ordinary members of their species but
+are noticeably larger and generally more physically imposing. Alpha
+individuals are usually found toward the <strong>upper end of the
+natural level range for their area</strong> and are considerably less
+common than ordinary encounters. An Alphan Entheon is not inherently
+hostile, although its size, territorial behavior or confidence may make
+encounters more dangerous. Alpha status does not override normal
+evolutionary rules:</p><ul>
+<li>A Stage 3 Entheon cannot appear as a wild Alpha.</li>
+<li>An item-dependent evolution cannot appear as a wild Alpha.</li>
+<li>Alpha status does not create a separate evolutionary line.</li>
+<li>An Alpha remains an individual of its normal species.</li>
+</ul><p>The presence of an Alpha can sometimes be inferred from the behavior
+of other Entheon in the area, particularly when ordinary individuals
+avoid or give unusual space to a particular territory.</p><h2 id="wild-entheon-distribution">Wild Entheon Distribution</h2><p>Wild Entheon are distributed according to the ecology, terrain,
+climate and level range of each region. Encounter frequency is divided
+into four categories:</p><ul>
+<li><strong>Common:</strong> Regularly encountered within suitable
+habitats.</li>
+<li><strong>Uncommon:</strong> Present in the region but encountered
+less frequently.</li>
+<li><strong>Rare:</strong> Unusual encounters that may require
+exploration or suitable conditions.</li>
+<li><strong>Rare Evolution:</strong> Evolved Entheon that can naturally
+occur in the wild despite their rarity.</li>
+</ul><p>Some species have additional encounter conditions, such as time of
+day or geographic exclusivity. Stage 3 Entheon do not occur as wild
+encounters. Certain special-evolution forms also do not occur naturally
+in the wild, and Veyli’s evolved forms require specific catalysts and
+are therefore excluded from wild encounters.</p><h2 id="westmere-1">Westmere</h2><p><strong>Level Range: 2–15</strong> Westmere is the primary starting
+region and contains a relatively gentle ecosystem of forests, grasslands
+and settled countryside. Wild Entheon here are exclusively Stage 1 or
+single-stage species.</p><h3 id="common-1">Common</h3><ul>
+<li>Nimblet</li>
+<li>Brindlew</li>
+<li>Sovel</li>
+<li>Orven</li>
+<li>Pavren</li>
+</ul><h3 id="uncommon-1">Uncommon</h3><ul>
+<li>Kivvi</li>
+<li>Meliu</li>
+<li>Virel</li>
+<li>Caelo</li>
+</ul><h3 id="rare-1">Rare</h3><ul>
+<li>Veyli</li>
+<li>Elnu</li>
+<li>Lumae</li>
+</ul><h3 id="rare-evolutions">Rare Evolutions</h3><ul>
+<li>None</li>
+</ul><h2 id="greenvale-1">Greenvale</h2><p><strong>Level Range: 7–23</strong> Greenvale’s fertile farmland, open
+fields, woodland and extensive agricultural activity support a broad
+ecosystem. Its enormous windmill processing complex sits within an
+otherwise predominantly rural landscape.</p><h3 id="common-2">Common</h3><ul>
+<li>Brindlew</li>
+<li>Meliu</li>
+<li>Virel</li>
+<li>Caelo</li>
+<li>Orven</li>
+<li>Pavren</li>
+</ul><h3 id="uncommon-2">Uncommon</h3><ul>
+<li>Nimblet</li>
+<li>Kivvi</li>
+<li>Rilsa</li>
+<li>Sovel</li>
+<li>Tivvi</li>
+</ul><h3 id="rare-2">Rare</h3><ul>
+<li>Quiblet</li>
+<li>Lumae</li>
+<li>Avenn</li>
+</ul><h3 id="rare-evolutions-1">Rare Evolutions</h3><ul>
+<li>Nymbril</li>
+<li>Brindrel</li>
+<li>Sovelle</li>
+<li>Quivane</li>
+</ul><h2 id="dunridge-1">Dunridge</h2><p><strong>Level Range: 8–22</strong> Dunridge consists primarily of
+rocky uplands, exposed terrain, valleys and ancient geological
+formations. Its harsher terrain supports a more specialized
+ecosystem.</p><h3 id="common-3">Common</h3><ul>
+<li>Tarnit</li>
+<li>Dovik</li>
+<li>Cairnix</li>
+<li>Ossari</li>
+<li>Norrik</li>
+</ul><h3 id="uncommon-3">Uncommon</h3><ul>
+<li>Pellin</li>
+<li>Arko</li>
+<li>Keln</li>
+<li>Sovel</li>
+<li>Caelo</li>
+</ul><h3 id="rare-3">Rare</h3><ul>
+<li>Braska</li>
+<li>Ruun</li>
+<li>Thessa</li>
+<li>Orli</li>
+</ul><h3 id="rare-evolutions-2">Rare Evolutions</h3><ul>
+<li>Nymbril</li>
+<li>Brindrel</li>
+<li>Tarnelle</li>
+</ul><h2 id="seawick-1">Seawick</h2><p><strong>Level Range: 8–24</strong> Seawick is a coastal region
+dominated by beaches, cliffs, maritime settlements and surrounding
+waters. Tide-affiliated Entheon make up a significant portion of its
+ecosystem.</p><h3 id="common-4">Common</h3><ul>
+<li>Pipiri</li>
+<li>Vessa</li>
+<li>Koroa</li>
+<li>Selka</li>
+<li>Marnel</li>
+<li>Mirel</li>
+</ul><h3 id="uncommon-4">Uncommon</h3><ul>
+<li>Rilsa</li>
+<li>Thessa</li>
+<li>Caelo</li>
+<li>Veyro</li>
+</ul><h3 id="rare-4">Rare</h3><ul>
+<li>Braska</li>
+<li>Avenn</li>
+<li>Korri</li>
+<li>Veysha</li>
+</ul><h3 id="rare-evolutions-3">Rare Evolutions</h3><ul>
+<li>Pirello</li>
+</ul><h2 id="hawthorne-1">Hawthorne</h2><p><strong>Level Range: 10–27</strong> Hawthorne is dominated by the
+Great Lake and its extensive surrounding wetlands, waterways, forests
+and shoreline habitats. The region consequently supports one of Kaleo’s
+most diverse freshwater ecosystems.</p><h3 id="common-5">Common</h3><ul>
+<li>Vessa</li>
+<li>Koroa</li>
+<li>Marnel</li>
+<li>Mirel</li>
+<li>Selka</li>
+<li>Pipiri</li>
+</ul><h3 id="uncommon-5">Uncommon</h3><ul>
+<li>Rilsa</li>
+<li>Veyro</li>
+<li>Lumae</li>
+<li>Orven</li>
+<li>Elnu</li>
+</ul><h3 id="rare-5">Rare</h3><ul>
+<li>Uvera</li>
+<li>Ilyra</li>
+<li>Avenn</li>
+</ul><h3 id="rare-evolutions-4">Rare Evolutions</h3><ul>
+<li>Pirello</li>
+<li>Kivara</li>
+<li>Sovelle</li>
+<li>Elvara</li>
+</ul><h2 id="lume-1">Lume</h2><p><strong>Level Range: 10–32</strong> Lume is an island region with a
+distinctive ecosystem shaped by its surrounding waters, sheltered
+coastal habitats and isolated geography. Several Tide-affiliated Entheon
+are found naturally only on Lume. Lume is also a major trading hub and
+an important transport connection between distant parts of Kaleo.</p><h3 id="common-6">Common</h3><ul>
+<li>Vessa</li>
+<li>Koroa</li>
+<li>Selka</li>
+<li>Caelo</li>
+<li>Virel</li>
+<li>Lumae</li>
+</ul><h3 id="uncommon-6">Uncommon</h3><ul>
+<li>Meliu</li>
+<li>Veyro</li>
+<li>Ilyra</li>
+<li>Pavren</li>
+</ul><h3 id="rare-6">Rare</h3><ul>
+<li>Uvera</li>
+<li>Sindra</li>
+<li>Korri</li>
+</ul><h3 id="rare-evolutions-5">Rare Evolutions</h3><ul>
+<li>Vessari — <strong>Lume-exclusive</strong></li>
+<li>Korovan — <strong>Lume-exclusive</strong></li>
+<li>Marnyx — <strong>Lume-exclusive</strong></li>
+</ul><h2 id="eastmere-1">Eastmere</h2><p><strong>Level Range: 12–29</strong> Eastmere contains a broad mixture
+of woodland, open country and temperate terrain. Its position and varied
+habitats allow numerous species from other regions to overlap here.</p><h3 id="common-7">Common</h3><ul>
+<li>Sairi</li>
+<li>Nimblet</li>
+<li>Elnu</li>
+<li>Virel</li>
+<li>Rilsa</li>
+<li>Meliu</li>
+</ul><h3 id="uncommon-7">Uncommon</h3><ul>
+<li>Kivvi</li>
+<li>Sovel</li>
+<li>Caelo</li>
+<li>Orrin</li>
+<li>Avenn</li>
+</ul><h3 id="rare-7">Rare</h3><ul>
+<li>Veyli</li>
+<li>Mavren</li>
+<li>Yori</li>
+</ul><h3 id="rare-evolutions-6">Rare Evolutions</h3><ul>
+<li>Nymbril</li>
+<li>Kivara</li>
+<li>Elvara</li>
+<li>Rookane</li>
+<li>Arkelle</li>
+</ul><h2 id="highreach-1">Highreach</h2><p><strong>Level Range: 16–33</strong> Highreach is one of Kaleo’s most
+ecologically diverse regions. Its varied elevation, mountain valleys,
+forests, exposed rock, streams and geothermal areas create numerous
+distinct habitats within a relatively compact area. The region’s hot
+springs create warm microhabitats that support species otherwise unusual
+for the surrounding mountain environment. Morrowe is a particularly rare
+species found naturally only in Highreach.</p><h3 id="common-8">Common</h3><ul>
+<li>Pellin</li>
+<li>Fenni</li>
+<li>Tarnit</li>
+<li>Norrik</li>
+<li>Caelo</li>
+</ul><h3 id="uncommon-8">Uncommon</h3><ul>
+<li>Braska</li>
+<li>Arko</li>
+<li>Rookit</li>
+<li>Cairnix</li>
+<li>Uvera</li>
+</ul><h3 id="rare-8">Rare</h3><ul>
+<li>Morrowe</li>
+<li>Ruun</li>
+<li>Sindra</li>
+</ul><h3 id="rare-evolutions-7">Rare Evolutions</h3><ul>
+<li>Morvane</li>
+<li>Sovelle</li>
+<li>Quivane</li>
+<li>Dovaryn</li>
+<li>Pellune</li>
+<li>Orravel</li>
+<li>Virenne</li>
+<li>Thessane</li>
+<li>Caelune</li>
+<li>Meliora</li>
+<li>Lumaryn</li>
+</ul><h2 id="northvale-1">Northvale</h2><p><strong>Level Range: 18–35</strong> Northvale is a cold northern
+mountain region characterized by rugged terrain, rocky riverbeds,
+cascading waterfalls and increasingly harsh conditions toward its
+northern reaches. Northvale is the <strong>only region in which the
+Dragon Entheon line occurs naturally</strong>.</p><h3 id="common-9">Common</h3><ul>
+<li>Tarnit</li>
+<li>Pellin</li>
+<li>Fenni</li>
+<li>Norrik</li>
+<li>Ossari</li>
+</ul><h3 id="uncommon-9">Uncommon</h3><ul>
+<li>Rookit</li>
+<li>Dovik</li>
+<li>Keln</li>
+<li>Talvi</li>
+<li>Braska</li>
+</ul><h3 id="rare-9">Rare</h3><ul>
+<li>Drakyn</li>
+<li>Cairnix</li>
+<li>Ruun</li>
+<li>Yori</li>
+</ul><h3 id="rare-evolutions-8">Rare Evolutions</h3><ul>
+<li>Voltaryn</li>
+<li>Dovaryn</li>
+<li>Pellune</li>
+<li>Braskel</li>
+<li>Fennovar</li>
+<li>Cairneth</li>
+<li>Meliora</li>
+<li>Orravel</li>
+<li>Virenne</li>
+<li>Thessane</li>
+<li>Caelune</li>
+<li>Lumaryn</li>
+</ul><h2 id="isen-1">Isen</h2><p><strong>Level Range: 24–35</strong> Isen is the northernmost and most
+extreme region of Kaleo. Its harsh climate and sparse habitable terrain
+support a comparatively small but highly specialized ecosystem.</p><h3 id="common-10">Common</h3><ul>
+<li>Talvi</li>
+<li>Pellin</li>
+<li>Fenni</li>
+<li>Norrik</li>
+</ul><h3 id="uncommon-10">Uncommon</h3><ul>
+<li>Ossari</li>
+<li>Ruun</li>
+<li>Keln</li>
+<li>Rookit</li>
+</ul><h3 id="rare-10">Rare</h3><ul>
+<li>Yori</li>
+<li>Uvera</li>
+<li>Mavren</li>
+<li>Esvin — <strong>Night only</strong></li>
+</ul><h3 id="rare-evolutions-9">Rare Evolutions</h3><ul>
+<li>Rookane</li>
+<li>Arkelle</li>
+<li>Dovaryn</li>
+<li>Pellune</li>
+<li>Fennovar</li>
+<li>Braskel</li>
+<li>Cairneth</li>
+<li>Meliora</li>
+<li>Lumaryn</li>
+</ul><h2 id="gym-leaders">Gym Leaders</h2><p>Gym Leaders are prominent Trainers who serve as the public
+representatives of their respective Gyms. Each specializes in a
+particular Affinity, but their personal identity, profession, battle
+philosophy and approach to training are not necessarily defined by that
+Affinity alone. A Gym Leader’s established roster consists of six
+Entheon. During Gym challenges, Leaders may use an appropriate subset of
+that roster depending on the challenger’s progression.</p><h2 id="everhope-gym-rowan-vale">Everhope Gym — Rowan Vale</h2><p><strong>Region:</strong> Westmere <strong>Affinity:</strong> Gale
+<strong>Age:</strong> 32</p><h3 id="appearance">Appearance</h3><p>Rowan has a lean, athletic build and an easygoing appearance that
+makes him look more like an experienced outdoorsman than a formal Gym
+Leader. He has medium-length dark-blond hair that falls loosely around
+his face and neck, deliberately kept long enough for him to feel the
+breeze moving through it. He has light grey-blue eyes and a perpetual
+hint of stubble. His clothing combines practical outdoor gear with a
+slightly stylish edge: a lightweight weatherproof jacket, fitted shirt,
+durable trousers and well-worn hiking boots. His jacket is usually left
+open, even when the weather would suggest otherwise. Rowan likes the
+feeling of wind in his hair and rarely bothers tying it back unless he
+genuinely needs to. If the wind is blowing, he is perfectly happy to let
+it do its thing.</p><h3 id="personality">Personality</h3><p>Rowan is relaxed, observant and quietly confident. He rarely raises
+his voice and does not particularly care about maintaining the
+intimidating image some Gym Leaders cultivate. He enjoys talking to
+challengers and will often have a casual conversation with them before
+the battle. He is, however, extremely observant. Rowan notices small
+things: how a Trainer interacts with their Entheon, whether they panic
+when something goes wrong, and whether they adapt their plans or
+stubbornly continue with them. He believes that a good Trainer should
+not need everything to go according to plan.</p><h3 id="background">Background</h3><p>Rowan grew up around Westmere’s forests and developed a fascination
+with climbing, hiking and weather patterns. Before becoming a Gym
+Leader, he worked as an outdoor guide, taking people through some of
+Westmere’s more difficult wilderness routes. His experience with Gale
+Entheon began through those expeditions. Rather than seeking out
+powerful Entheon specifically, he developed relationships with species
+that naturally accompanied him through the region. Eventually, his
+reputation as an exceptionally adaptable Trainer led to him being
+offered the position at Everhope Gym.</p><h3 id="gym-philosophy">Gym Philosophy</h3><blockquote>
+<p><strong>“You can’t control the wind. You can only learn how to move
+with it.”</strong></p>
+</blockquote><p>Rowan sees battling as an exercise in <strong>adaptation</strong>. A
+Trainer can enter a battle with the perfect strategy, but the opponent
+gets to make decisions too. Their Entheon may behave unexpectedly, the
+environment may change, or a carefully planned attack may simply fail.
+The important question is not <em>“What was your plan?”</em> It is:
+<strong>“What do you do when your plan stops working?”</strong></p><h3 id="battle-style">Battle Style</h3><p>Rowan’s battles are fast, mobile and reactive. He prefers Entheon
+that can reposition themselves, exploit openings and force opponents to
+continually reconsider their approach. He does not necessarily overwhelm
+opponents with raw power. Instead, he creates situations where an
+opponent’s positioning, timing or assumptions become liabilities. His
+battles tend to feel dynamic rather than predictable.</p><h3 id="gym-assessment">Gym Assessment</h3><p>The Everhope Gym does not simply test whether a challenger can defeat
+Rowan. The Gym’s assessment is built around <strong>adaptability and
+communication</strong>. Before the battle, challengers must navigate a
+wind-based obstacle course with their Entheon. The exact route changes
+depending on environmental conditions, and some obstacles cannot be
+overcome simply through strength. Rowan watches how the Trainer
+communicates with their Entheon:</p><ul>
+<li>Do they adapt when the original route fails?</li>
+<li>Do they understand what their Entheon is comfortable doing?</li>
+<li>Do they give useful commands rather than simply shouting
+instructions?</li>
+<li>Do they recognize when their Entheon needs to change approach?</li>
+<li>Can they remain composed when something unexpected happens?</li>
+</ul><p>The final battle then tests the same principle under pressure. A
+challenger who defeats Rowan through brute force but demonstrates poor
+communication may receive considerably more criticism than someone who
+loses narrowly but demonstrates exceptional adaptability.</p><h3 id="established-entheon-roster">Established Entheon Roster</h3><p>Rowan’s established six-Entheon roster consists of six distinct
+evolutionary lines, with no duplicate evolution families.</p><ol type="1">
+<li><strong>Nymbril</strong> — Wild/Gale Rowan’s signature partner and
+the clearest representation of his philosophy. Nymbril’s mobility and
+ability to exploit its surroundings make it particularly suited to
+Rowan’s approach to battle.</li>
+<li><strong>Rookane</strong> — Metal/Gale Rowan’s dedicated aerial
+specialist. Its combination of aerial control and Metal affinity gives
+him a different tactical approach from his other mobile Entheon.</li>
+<li><strong>Avenn</strong> — Gale A highly maneuverable specialist
+suited to precision attacks, rapid directional changes and controlling
+the pace of an encounter.</li>
+<li><strong>Sovel</strong> — Gale A playful and unpredictable member of
+the team that excels at sudden changes of direction and momentum.</li>
+<li><strong>Caelune</strong> — Gale/Tide A highly unusual aerial Entheon
+whose biological jetpack allows it to launch itself rapidly through the
+battlefield and make sharp turns. Its secondary Tide Affinity gives
+Rowan additional tactical options.</li>
+<li><strong>Quiblet</strong> — Flame Rowan’s wildcard. Although it does
+not possess the Gale Affinity, Quiblet is airborne and fits his
+philosophy of movement and adaptability. Its inclusion also prevents his
+team from becoming overly predictable.</li>
+</ol><h3 id="entheon-levels">Entheon Levels</h3><p>Rowan’s established Entheon range from approximately <strong>Lv.
+10–16</strong>. The exact levels and composition used during a Gym
+challenge depend on the challenger’s progression, allowing Rowan to
+provide an appropriate assessment without necessarily revealing or using
+the full strength of his established team. His full six-Entheon roster
+represents <strong>Rowan the Trainer</strong>; the smaller Gym battle
+roster represents <strong>Rowan as an assessor</strong>.</p><h2 id="gullhaven-gym-maya-corwin">Gullhaven Gym — Maya Corwin</h2><p><strong>Region:</strong> Seawick <strong>Affinity:</strong> Tide
+<strong>Age:</strong> 29</p><h3 id="appearance-1">Appearance</h3><p>Maya has the athletic physique you’d expect from someone who has
+spent years surfing, swimming and working as a lifeguard. She has
+sun-kissed skin, bright blue-green eyes and long dark-auburn hair,
+usually worn in a loose braid or ponytail while she is working. Away
+from work, she is just as likely to leave it loose. Her clothing is
+practical rather than ceremonial. She typically wears a sleeveless rash
+guard, lightweight board shorts, water-resistant sandals and a weathered
+rescue jacket that can be thrown on when needed. A whistle hangs around
+her neck almost constantly, largely because she has worn one for so long
+that she barely notices it anymore. Her battered surfboard is rarely far
+away, covered in stickers and the accumulated marks of years spent in
+the water.</p><h3 id="personality-1">Personality</h3><p>Maya is energetic, outgoing and naturally approachable. She is
+competitive in a cheerful way and might challenge someone she has just
+met to a race along the beach without giving it a second thought. That
+easygoing attitude changes immediately when someone’s safety is
+involved. Her experience as a lifeguard has given her a strong
+protective instinct, and she takes reckless behaviour seriously. Maya
+doesn’t equate courage with ignoring danger. She respects people who
+understand their own limitations and recognize when circumstances have
+changed. Losing a battle doesn’t particularly bother her; failing to
+learn from one does.</p><h3 id="background-1">Background</h3><p>Maya was raised in Gullhaven and grew up around the sea. Swimming
+became second nature to her at an early age, and she discovered surfing
+during her early teens. She eventually trained as a lifeguard and spent
+years working along Gullhaven’s beaches, becoming one of the area’s most
+experienced rescue swimmers. That career also brought her into frequent
+contact with Tide Entheon. Many of her strongest relationships with
+Entheon developed naturally through beach patrols, rescues and countless
+hours spent in and around the water rather than through deliberately
+seeking out powerful battle partners. Her reputation as both an
+accomplished Trainer and an experienced lifeguard eventually resulted in
+her appointment as Gullhaven’s Gym Leader.</p><h3 id="gym-philosophy-1">Gym Philosophy</h3><blockquote>
+<p><strong>“The water doesn’t care how strong you are. Learn to read
+it.”</strong></p>
+</blockquote><p>For Maya, Tide represents <strong>flow, adaptation and
+awareness</strong>. She doesn’t believe the strongest Trainer is
+necessarily the one capable of producing the most powerful attack. A
+capable Trainer understands what is happening around them, recognizes
+when circumstances shift and knows when to advance, change direction or
+give ground. Maya often compares battling to surfing. A surfer doesn’t
+defeat a wave through brute force. They read its movement, work with it
+and recognize the precise moment when they can turn that movement to
+their advantage.</p><h3 id="battle-style-1">Battle Style</h3><p>Maya’s battles revolve around momentum and constant adjustment.
+Rather than committing herself to either offense or defense, she moves
+fluidly between the two. Her Entheon may retreat deliberately,
+reposition themselves and then suddenly turn that apparent loss of
+ground into an offensive opportunity. She likes creating situations in
+which the opponent has to make difficult choices: whether to attack
+immediately or wait, whether to pursue or reposition, and whether to
+persist with an existing strategy or abandon it. As a result, her
+battles tend to develop a distinctive rhythm, alternating between
+periods of pressure and sudden changes in tempo.</p><h3 id="gym-assessment-1">Gym Assessment</h3><p>The Gullhaven Gym incorporates the surrounding water into its
+assessment. Challengers are required to work alongside their Entheon
+through a series of aquatic exercises, including navigating changing
+currents, reaching designated locations and responding to simulated
+rescue situations. Physical strength alone isn’t what Maya is
+evaluating. She pays particular attention to whether the Trainer
+understands their Entheon’s abilities and limitations, responds
+effectively when conditions change, recognizes when an approach has
+become unsafe and communicates without trying to micromanage every
+action. Most importantly, she looks at whether a Trainer will prioritize
+their Entheon’s wellbeing over simply completing the challenge. A
+challenger who recklessly forces an Entheon through a dangerous
+situation can fail the assessment even if they technically complete the
+obstacle. To Maya, recognizing when to stop is evidence of good judgment
+rather than weakness.</p><h3 id="established-entheon-roster-1">Established Entheon Roster</h3><p>Maya’s established team contains six distinct evolutionary lines,
+with no repeated evolution families.</p><ol type="1">
+<li><strong>Vessa</strong> — Tide Maya’s original partner and the
+Entheon that accompanied her during the early years when she was
+learning to surf.</li>
+<li><strong>Koroa</strong> — Tide A powerful swimmer capable of
+manipulating the battlefield through water and controlling the space
+around an opponent.</li>
+<li><strong>Selka</strong> — Tide A quick and agile aquatic Entheon that
+gives Maya an option focused on rapid repositioning.</li>
+<li><strong>Veysha</strong> — Tide A less conventional member of Maya’s
+team, providing a tactical option that opponents may not immediately
+anticipate.</li>
+<li><strong>Mirel</strong> — Tide A versatile member capable of helping
+Maya transition between defensive and offensive approaches while
+controlling the battle’s tempo.</li>
+<li><strong>Pirello</strong> — Tide <strong>(Ace)</strong> Maya’s
+strongest and most trusted battle partner. Pirello embodies her approach
+to battling: understand the current situation, wait for the right
+opening, and then use the momentum of the battle to make a decisive
+push.</li>
+</ol><h3 id="entheon-levels-1">Entheon Levels</h3><p>Maya’s established Entheon range from approximately <strong>Lv.
+14–20</strong>. The levels and specific members she uses in an official
+Gym challenge can vary according to the challenger’s progression. This
+allows her to provide an appropriate assessment without necessarily
+revealing or deploying the full strength of her established team. Her
+complete roster represents <strong>Maya as an experienced
+Trainer</strong>, while the smaller team used during a Gym challenge
+represents <strong>Maya in her role as an assessor</strong>.</p><h2 id="thermalis-gym-darius-voss">Thermalis Gym — Darius Voss</h2><p><strong>Region:</strong> Highreach <strong>Affinity:</strong>
+Fire/Stone <strong>Age:</strong> 41</p><h3 id="appearance-2">Appearance</h3><p>Darius is broad-shouldered and powerfully built, with the physique of
+someone who has spent decades doing physical work rather than training
+for appearance. He has dark, slightly greying hair, a short beard and
+deep brown eyes. He usually wears a heavy work apron over a simple
+sleeveless shirt, reinforced work trousers and sturdy boots. His
+forearms show the occasional small scar or burn from years around
+furnaces and stonework. Protective gloves are usually tucked into his
+belt rather than worn unless he is actually working. His clothing is
+practical and well-used, but he takes pride in keeping his tools in
+excellent condition.</p><h3 id="personality-2">Personality</h3><p>Darius is calm, patient and straightforward. He isn’t particularly
+interested in impressing people and has little tolerance for unnecessary
+theatrics. He can initially come across as intimidating because of his
+size and reserved manner, but he is actually remarkably approachable. He
+enjoys teaching people how things work and has a habit of giving
+practical advice even when nobody asked for it. He believes quality
+comes from repetition, patience and accepting that mistakes are part of
+learning. He is also stubborn. Once Darius believes something is worth
+doing, convincing him otherwise can be extremely difficult.</p><h3 id="background-2">Background</h3><p>Darius grew up in Thermalis and comes from a family of craftspeople
+who have worked with the region’s volcanic stone and mineral resources
+for generations. He initially became a blacksmith, eventually expanding
+into stonework and specialized equipment used by Trainers and Entheon
+researchers. His work brought him into close contact with Fire and Stone
+Entheon, and he gradually developed a reputation as an exceptionally
+capable Trainer. Rather than abandoning his trade when he became Gym
+Leader, Darius incorporated the Gym into his workshop. The Thermalis Gym
+therefore doubles as a functioning forge and stoneworking facility.</p><h3 id="gym-philosophy-2">Gym Philosophy</h3><blockquote>
+<p><strong>“Heat reveals what something is made of. Pressure reveals
+what it can become.”</strong></p>
+</blockquote><p>Darius believes that strength isn’t something you simply possess. It
+is something you <strong>build</strong>. Fire represents transformation:
+applying enough energy to change something. Stone represents endurance:
+remaining stable when that energy and pressure are applied. His
+philosophy extends to Trainers as much as Entheon. He doesn’t expect
+challengers to be perfect. He wants to see whether they can withstand
+setbacks, learn from mistakes and continue improving rather than falling
+apart when their first plan fails.</p><h3 id="battle-style-2">Battle Style</h3><p>Darius favours <strong>controlled pressure and endurance</strong>.
+His battles tend to begin deliberately rather than explosively. He
+establishes his position, forces the opponent to commit and gradually
+increases the pressure. His Entheon combine defensive resilience with
+powerful bursts of Fire or Stone attacks. Rather than constantly
+switching tactics, Darius is comfortable allowing a battle to become a
+contest of endurance—provided he has prepared his Entheon properly for
+it. He is particularly good at punishing opponents who become
+impatient.</p><h3 id="gym-assessment-2">Gym Assessment</h3><p>The Thermalis Gym assessment takes place throughout Darius’s working
+forge. Challengers must complete a series of practical tasks alongside
+their Entheon, involving heat, pressure and stone. These aren’t simply
+strength tests. Some tasks require careful control, others require
+persistence, and some require recognizing when continuing to push would
+be counterproductive. Darius observes:</p><ul>
+<li>Can the Trainer remain calm when something goes wrong?</li>
+<li>Do they understand the difference between persistence and
+recklessness?</li>
+<li>Can they adjust their approach without abandoning the
+objective?</li>
+<li>Do they trust their Entheon to perform tasks independently?</li>
+<li>Can they work patiently toward a result rather than rushing for
+immediate success?</li>
+</ul><p>The final battle tests the same qualities. Darius wants to see
+whether the challenger can <strong>take pressure without losing their
+composure</strong>.</p><h3 id="established-entheon-roster-2">Established Entheon Roster</h3><p>Darius’s established team consists of six distinct evolutionary
+lines, with no repeated evolution families.</p><ol type="1">
+<li><strong>Dovik</strong> — Stone A dependable Stone Entheon that
+represents the endurance and stability at the heart of Darius’s
+philosophy.</li>
+<li><strong>Arko</strong> — Flame Darius’s straightforward offensive
+specialist, providing a sharp contrast to his more defensive
+Entheon.</li>
+<li><strong>Braska</strong> — Fire/Stone The first member of his roster
+to combine both of his specialized Affinities, representing the balance
+between transformation and endurance.</li>
+<li><strong>Brindrel</strong> — Verdant/Stone A less obvious member of
+Darius’s team whose secondary Stone Affinity makes it a natural fit
+despite its Verdant aspect. It gives him an option that opponents may
+not immediately expect from a Fire/Stone Gym.</li>
+<li><strong>Tarnelle</strong> — Stone/Metal Darius’s defensive
+specialist. Its Metal Affinity complements its Stone characteristics and
+reinforces his emphasis on resilience and sustained pressure.</li>
+<li><strong>Quivane</strong> — Flame/Volt <strong>(Ace)</strong>
+Darius’s most trusted battle partner and his greatest tactical surprise.
+Its Volt Affinity gives his otherwise methodical team an additional
+dimension, allowing him to punish challengers who assume they have
+completely prepared for a Fire/Stone specialist.</li>
+</ol><h3 id="entheon-levels-2">Entheon Levels</h3><p>Darius’s established Entheon range from approximately <strong>Lv.
+20–26</strong>. The levels and specific members he uses in an official
+Gym challenge can vary according to the challenger’s progression. This
+allows him to provide an appropriate assessment without necessarily
+revealing or deploying the full strength of his established team. His
+complete roster represents <strong>Darius as an experienced
+Trainer</strong>, while the smaller team used during a Gym challenge
+represents <strong>Darius in his role as an assessor</strong>.</p><h2 id="harveston-gym-elara-greenfield">Harveston Gym — Elara
+Greenfield</h2><p><strong>Region:</strong> Westmere <strong>Affinity:</strong> Verdant
+<strong>Age:</strong> 36</p><h3 id="appearance-3">Appearance</h3><p>Elara has a sturdy, healthy build from years of agricultural work,
+with warm brown skin, green eyes and thick chestnut hair that she
+usually wears in a loose braid. Her clothing is practical and
+comfortable: a linen shirt with rolled-up sleeves, durable trousers,
+sturdy work boots and a weathered gardening apron. Small traces of her
+work are almost always visible—soil beneath her fingernails, a few
+leaves caught in her hair, or a smudge of dirt on one sleeve. She
+doesn’t particularly care. Rather than wearing anything resembling a
+traditional Gym Leader uniform, Elara dresses much like the farmers and
+horticulturalists she works alongside.</p><h3 id="personality-3">Personality</h3><p>Elara is warm, patient and quietly stubborn. She has a nurturing
+personality and tends to treat people much like she treats plants: give
+them the right conditions, give them room to grow, and don’t expect them
+to develop at exactly the same pace. She’s friendly and approachable,
+but her patience has limits. She has little sympathy for people who
+mistreat Entheon, plants or the land around them. She is also
+surprisingly competitive once a battle begins. Her gentle demeanour
+shouldn’t be mistaken for passivity.</p><h3 id="background-3">Background</h3><p>Elara grew up around Harveston’s agricultural communities and became
+involved in farming from an early age. Her family maintained a mixed
+farm, growing crops and raising produce suited to the region’s fertile
+land. As she grew older, she became particularly interested in the
+relationship between agriculture and Verdant Entheon. She eventually
+began working with local farmers to understand how Entheon could help
+maintain crops, manage difficult terrain and protect farmland from wild
+creatures. Her success eventually led to her becoming Harveston’s Gym
+Leader. She still maintains her own agricultural plots, and the Gym
+incorporates working gardens and cultivated land rather than being
+separated from the community around it.</p><h3 id="gym-philosophy-3">Gym Philosophy</h3><blockquote>
+<p><strong>“You can’t force something to grow. You can only give it what
+it needs.”</strong></p>
+</blockquote><p>Elara believes that good Trainers understand <strong>growth, patience
+and individual potential</strong>. Every Entheon develops differently.
+Some thrive under pressure. Others need time and encouragement. Some are
+naturally aggressive, while others are better suited to support or
+defensive roles. A Trainer who tries to force every Entheon into the
+same mould will eventually limit their own team.</p><h3 id="battle-style-3">Battle Style</h3><p>Elara prefers <strong>sustainable pressure and battlefield
+control</strong>. Rather than immediately trying to overwhelm an
+opponent, she establishes favourable conditions and gradually makes the
+battlefield work against them. Her Entheon use terrain, positioning and
+sustained effects to restrict an opponent’s options while maintaining
+their own resilience. She is particularly fond of battles where her
+opponent becomes increasingly frustrated because their original strategy
+gradually stops working.</p><h3 id="gym-assessment-3">Gym Assessment</h3><p>The Harveston Gym assessment takes place among cultivated gardens,
+fields and greenhouses. Challengers must work with their Entheon to
+complete a series of tasks involving cultivation, navigation and
+maintaining living environments. Some challenges require physical
+strength, while others reward patience, observation and careful
+cooperation. Elara watches for:</p><ul>
+<li>Does the Trainer understand what their Entheon actually needs?</li>
+<li>Can they adapt their approach to different individuals?</li>
+<li>Are they willing to let their Entheon contribute rather than
+controlling every action?</li>
+<li>Can they recognize gradual progress rather than expecting immediate
+results?</li>
+<li>Do they demonstrate care for the environment around them?</li>
+</ul><p>The final battle tests whether the challenger can maintain a coherent
+strategy over time rather than simply attempting to end the battle as
+quickly as possible.</p><h3 id="established-entheon-roster-3">Established Entheon Roster</h3><p>Elara’s established team consists of six distinct evolutionary lines,
+with no repeated evolution families.</p><ol type="1">
+<li><strong>Meliu</strong> — Verdant A gentle and plant-associated
+Entheon that reflects Elara’s nurturing approach and her connection to
+horticulture.</li>
+<li><strong>Orven</strong> — Verdant A distinct single-stage Verdant
+Entheon that gives Elara another established species without relying on
+an evolutionary line already represented on her team.</li>
+<li><strong>Mirel</strong> — Tide/Verdant A versatile member that brings
+a secondary Affinity into Elara’s team while maintaining a strong
+connection to cultivated and natural environments.</li>
+<li><strong>Rilsa</strong> — Verdant/Tide A natural fit for Harveston’s
+fertile environment and a member that gives Elara additional options
+through its Tide Affinity.</li>
+<li><strong>Brindrel</strong> — Verdant/Stone The more physically
+imposing member of Elara’s team. Its Stone Affinity provides additional
+resilience and allows her to shift away from purely defensive Verdant
+strategies.</li>
+<li><strong>Virenne</strong> — Verdant/Gale <strong>(Ace)</strong>
+Elara’s fastest and most mobile team member. Virenne gives her battle
+style an important change of pace and prevents opponents from assuming
+that her team will simply rely on slow, sustained pressure.</li>
+</ol><h3 id="entheon-levels-3">Entheon Levels</h3><p>Elara’s established Entheon range from approximately <strong>Lv.
+24–30</strong>. The levels and specific members she uses in an official
+Gym challenge can vary according to the challenger’s progression. This
+allows her to provide an appropriate assessment without necessarily
+revealing or deploying the full strength of her established team. Her
+complete roster represents <strong>Elara as an experienced
+Trainer</strong>, while the smaller team used during a Gym challenge
+represents <strong>Elara in her role as an assessor</strong>.</p><h2 id="lakecrest-gym-lena-hartwell">Lakecrest Gym — Lena Hartwell</h2><p><strong>Region:</strong> Westmere <strong>Affinity:</strong> Volt
+<strong>Age:</strong> 31</p><h3 id="appearance-4">Appearance</h3><p>Lena has a lean, athletic build and an energetic presence. She has
+dark, almost black hair worn around shoulder length, with several vivid
+red-dyed streaks running through the lower layers. The red is
+deliberately a little uneven rather than perfectly salon-styled, giving
+her a casual rocker’s aesthetic. Her eyes are bright hazel, and she
+usually wears a mischievous expression that makes it difficult to tell
+whether she is about to explain something technical or make a joke. Her
+clothing blends practical electrical workwear with a distinctly modern
+rock-inspired style: a fitted black utility jacket, dark work trousers,
+sturdy boots and a tool belt containing various small instruments. She
+sometimes wears a band-style shirt underneath her jacket, and insulated
+gloves are usually shoved into one of her pockets rather than actually
+worn. Small electrical motifs appear on some of her equipment, but she
+avoids dressing like a literal walking lightning bolt.</p><h3 id="personality-4">Personality</h3><p>Lena is energetic, curious and extremely quick-thinking. She loves
+figuring out how things work and has a tendency to start explaining an
+interesting technical problem before realizing the person she is talking
+to may have absolutely no idea what she is talking about. She is playful
+and enjoys teasing challengers, particularly when they become too
+predictable. Lena believes almost every problem can be solved by
+<strong>understanding the system</strong>. However, she also knows that
+understanding a pattern is not enough. Once an opponent has figured out
+what she is doing, she expects herself and her Entheon to be capable of
+changing the system before it can be exploited. Her enthusiasm
+occasionally leads her to overcomplicate things that could have been
+solved much more simply.</p><h3 id="background-4">Background</h3><p>Lena grew up around Lakecrest and became fascinated with electrical
+systems at a young age. She studied electrical engineering and
+eventually returned to the region, where she began working on power
+infrastructure and small-scale technology projects. Her work brought her
+into contact with Volt Entheon, particularly those living around the
+lake’s infrastructure and nearby settlements. She eventually began
+designing equipment that allowed communities to make better use of
+naturally occurring electrical energy while also developing as a
+Trainer. Outside of her engineering work, Lena has a strong interest in
+rock music and occasionally performs with a local band. When the
+Lakecrest Gym needed a new Leader, Lena was an obvious candidate. The
+Gym itself doubles as a demonstration workshop, with generators,
+electrical systems and experimental equipment incorporated into the
+challenge.</p><h3 id="gym-philosophy-4">Gym Philosophy</h3><blockquote>
+<p><strong>“Understand the system. Then break the pattern.”</strong></p>
+</blockquote><p>Lena believes that battles are problems to be solved. She encourages
+Trainers to observe what is happening, identify patterns and recognize
+what their opponent is trying to accomplish. But she also believes that
+understanding a pattern isn’t enough. Once an opponent has figured out
+what you are doing, you need to be capable of changing the system before
+they exploit it.</p><h3 id="battle-style-4">Battle Style</h3><p>Lena’s battles focus on <strong>speed, disruption and exploiting
+predictable behaviour</strong>. She likes forcing opponents to react
+rather than allowing them to establish their preferred rhythm. Her
+Entheon may rapidly change targets, reposition or use Volt techniques to
+create openings for another member. She particularly enjoys punishing
+Trainers who rely too heavily on a single strategy. Her battles can feel
+chaotic to inexperienced opponents, but there is usually a very
+deliberate structure underneath the apparent chaos.</p><h3 id="gym-assessment-4">Gym Assessment</h3><p>The Lakecrest Gym is effectively a giant electrical puzzle.
+Challengers must navigate a series of interconnected rooms where
+switches, circuits and mechanical systems affect one another. Activating
+one system may disable another, open a route elsewhere or change the
+environment in a different section. The challenge isn’t designed to test
+technical knowledge. Everything necessary can be learned through
+observation. Lena watches for:</p><ul>
+<li>Does the Trainer observe before acting?</li>
+<li>Can they recognize patterns?</li>
+<li>Do they learn from previous mistakes?</li>
+<li>Can they adapt when their assumptions are wrong?</li>
+<li>Do they communicate effectively with their Entheon?</li>
+<li>Can they distinguish between a complicated solution and a genuinely
+useful one?</li>
+</ul><p>The final battle tests the same principle. Lena deliberately
+establishes patterns during the battle and then breaks them, forcing the
+challenger to recognize that their opponent has adapted.</p><h3 id="established-entheon-roster-4">Established Entheon Roster</h3><p>Lena’s established team consists of six distinct evolutionary lines,
+with no repeated evolution families.</p><ol type="1">
+<li><strong>Tivvi</strong> — Volt A small, hyperactive electric Entheon
+that perfectly matches Lena’s energetic personality. Tivvi is constantly
+attracted to electrical equipment and can often be found investigating
+the Gym’s machinery.</li>
+<li><strong>Keln</strong> — Metal A practical fit for Lena’s engineering
+background. Keln gives her a strong connection to machinery and the
+Metal Affinity while providing a different combat identity from her Volt
+Entheon.</li>
+<li><strong>Avenn</strong> — Gale Lena’s fast aerial specialist. Its
+exceptional maneuverability gives her a way to control positioning and
+introduces another dimension to her battle style.</li>
+<li><strong>Rookane</strong> — Metal/Gale A more substantial aerial
+threat that combines mobility with Metal resilience. Rookane allows Lena
+to maintain pressure from above while continuing to challenge an
+opponent’s assumptions about her team.</li>
+<li><strong>Veyro</strong> — Gale/Volt A highly mobile Volt-affiliated
+aerial Entheon and a natural expression of Lena’s personality. Veyro’s
+affinity for strong winds and thunderstorms makes it particularly well
+suited to Lena’s energetic, unconventional style.</li>
+<li><strong>Stage 2 Dragon-line Entheon — Dragon (Ace)</strong> Lena’s
+hidden ace and the member she reserves for exceptional challengers.</li>
+</ol><h3 id="ace-selection">Ace Selection</h3><p>Lena does <strong>not normally use her Dragon-line Entheon during
+standard Gym challenges</strong>. She reserves it for exceptional
+Trainers—particularly challengers who arrive with a reputation for being
+unusually strong, or those whose confidence crosses into outright
+arrogance. Sometimes Lena will have heard stories about a challenger
+beforehand. Other times, she recognizes it during the assessment: a
+challenger who dismisses her earlier Entheon, assumes they have figured
+out her strategy, or begins treating victory as inevitable. That is when
+Lena brings out her ace. The Dragon-line Entheon represents the ultimate
+expression of her Gym philosophy. Lena deliberately allows opponents to
+identify patterns in her battle style, only to completely break those
+patterns with an Entheon they were not expecting. People who have
+witnessed Lena use her Dragon-line ace often talk about the experience
+afterward, contributing to its growing reputation among Trainers.</p><h3 id="entheon-levels-4">Entheon Levels</h3><p>Lena’s established Entheon range from approximately <strong>Lv.
+28–34</strong>. The levels and specific members she uses in an official
+Gym challenge can vary according to the challenger’s progression. Her
+Dragon-line Stage 2 Entheon is generally reserved for exceptional
+challengers rather than ordinary Gym battles. Her complete roster
+represents <strong>Lena as an experienced Trainer</strong>, while the
+smaller team used during a Gym challenge represents <strong>Lena in her
+role as an assessor</strong>.</p><h2 id="northreach-gym-magnus-veyr">Northreach Gym — Magnus Veyr</h2><p><strong>Region:</strong> Highreach <strong>Affinity:</strong>
+Metal/Frost <strong>Age:</strong> 44</p><h3 id="appearance-5">Appearance</h3><p>Magnus is tall, broad-shouldered and heavily built, with a weathered
+appearance that reflects years spent working in the northern climate. He
+has pale skin, steel-grey eyes and thick dark-blond hair beginning to
+grey at the temples. His beard is kept short and neatly trimmed. He
+dresses for practicality rather than style: a heavy insulated coat,
+reinforced trousers, sturdy winter boots and thick gloves. Beneath the
+outer layers he usually wears a simple dark shirt and a reinforced
+utility harness. His clothing contains subtle Metal detailing, including
+reinforced buckles, clasps and protective plates. He carries himself
+with an almost military-like posture, though he has never actually
+served in the military.</p><h3 id="personality-5">Personality</h3><p>Magnus is quiet, disciplined and exceptionally patient. He rarely
+raises his voice and dislikes unnecessary theatrics. He listens
+carefully before speaking and has a habit of considering a problem from
+several angles before committing to a decision. Despite his imposing
+appearance, he is not particularly intimidating once someone gets to
+know him. He has a dry sense of humour that tends to appear
+unexpectedly. Magnus respects preparation above almost everything else.
+He doesn’t believe that courage means charging into danger. To him,
+courage is <strong>knowing what you’re facing and being prepared to
+endure it anyway</strong>.</p><h3 id="background-5">Background</h3><p>Magnus grew up in Northreach and spent much of his early life working
+in the region’s mining and metalworking industries. The harsh
+environment taught him the importance of preparation, equipment and
+endurance. A poorly maintained tool could become a serious problem when
+working far from civilization, and a failure to prepare for sudden
+changes in weather could be dangerous. His relationship with Metal and
+Frost Entheon developed naturally through this lifestyle. He eventually
+became a specialist in cold-weather equipment and reinforced tools used
+by explorers, miners and Trainers travelling through Highreach. His
+reputation as a Trainer eventually led to him becoming Northreach’s Gym
+Leader.</p><h3 id="gym-philosophy-5">Gym Philosophy</h3><blockquote>
+<p><strong>“Steel is forged by what it survives. Frost hardens those it
+faces.”</strong></p>
+</blockquote><p>Magnus believes that strength is not demonstrated by avoiding
+adversity, but by enduring it and coming out stronger. Metal represents
+discipline, structure and the ability to withstand pressure. Frost
+represents hardship: something that cannot simply be ignored or overcome
+through brute force. His Gym therefore tests whether a Trainer can keep
+functioning when things become difficult. He doesn’t particularly care
+whether a challenger has the perfect strategy from the beginning. He
+cares whether they can <strong>adapt, endure setbacks and keep making
+good decisions under pressure</strong>.</p><h3 id="battle-style-5">Battle Style</h3><p>Magnus favours <strong>attrition, defensive positioning and
+controlled counterattacks</strong>. His battles rarely begin
+explosively. He establishes a defensive position, watches how the
+opponent attacks and gradually forces them to expend resources. His
+Metal Entheon provide durability and defensive pressure, while Frost
+Entheon create opportunities to slow, restrict or disrupt opponents.
+Magnus is particularly fond of turning an opponent’s aggression against
+them. If a challenger repeatedly throws themselves at his defenses
+without adapting, he will happily let them exhaust themselves.</p><h3 id="gym-assessment-5">Gym Assessment</h3><p>Northreach Gym is designed around a simulated northern expedition.
+Challengers must navigate a cold environment while managing limited
+resources, changing paths and mechanical obstacles. Some sections
+require their Entheon to assist directly, while others test the
+Trainer’s ability to recognize when their current approach is becoming
+inefficient. Magnus observes:</p><ul>
+<li>Does the Trainer prepare before acting?</li>
+<li>Can they remain calm when conditions change?</li>
+<li>Do they understand their Entheon’s strengths and limitations?</li>
+<li>Can they conserve resources rather than constantly attacking?</li>
+<li>Do they know when to retreat and reassess?</li>
+<li>Can they remain effective when their original strategy fails?</li>
+</ul><p>The final battle is deliberately longer and more methodical than the
+earlier Gym battles. Magnus isn’t looking for the Trainer who can
+produce the biggest attack. He’s looking for the Trainer who can
+<strong>still think clearly after everything has gone
+wrong</strong>.</p><h3 id="established-entheon-roster-5">Established Entheon Roster</h3><p>Magnus’s established team consists of six distinct evolutionary
+lines, with no repeated evolution families.</p><ol type="1">
+<li><strong>Keln</strong> — Metal A sturdy Metal Entheon and Magnus’s
+dependable opener. Keln represents the simple reliability that Magnus
+values in both tools and partners.</li>
+<li><strong>Talvi</strong> — Frost A surprisingly fast Frost specialist.
+Its playful appearance contrasts with the more serious members of
+Magnus’s team, making it an effective way to disrupt an opponent’s
+expectations.</li>
+<li><strong>Pellune</strong> — Frost/Mystic A more technical Frost
+fighter capable of combining its cold-based abilities with Mystic
+techniques. This gives Magnus a tactical option that doesn’t rely purely
+on physical endurance.</li>
+<li><strong>Rookane</strong> — Metal/Gale Magnus’s mobile Metal
+specialist. Its Gale Affinity gives the otherwise methodical team a
+much-needed increase in mobility and allows it to attack from unexpected
+angles.</li>
+<li><strong>Fennovar</strong> — Frost/Stone A heavily built Frost
+Entheon whose Stone characteristics make it exceptionally durable.
+Fennovar represents the literal combination of cold and physical
+resilience that defines Magnus’s Gym.</li>
+<li><strong>Ruun</strong> — Frost/Umbral <strong>(Ace)</strong> Magnus’s
+rarest and most formidable partner. Ruun is a solitary, territorial dark
+yeti that normally avoids settlements and has an almost folkloric
+reputation among people living near its habitat. Its Frost abilities
+combine with Umbral energy to allow it to disappear into snowstorms and
+darkness.</li>
+</ol><h3 id="entheon-levels-5">Entheon Levels</h3><p>Magnus’s established Entheon range from approximately <strong>Lv.
+34–40</strong>. His earlier team members are used for ordinary Gym
+assessments, while <strong>Ruun is reserved for particularly capable
+challengers</strong> and represents the upper end of Magnus’s
+established strength. Ruun’s inclusion is not because Magnus simply
+happened to capture a powerful rare Entheon. The two have a
+long-standing relationship built on mutual respect, and Magnus is one of
+the few people Ruun willingly fights alongside. Many Trainers know
+Magnus has a “snow beast” somewhere in his team, but relatively few have
+actually seen him use it.</p><h2 id="fairhaven-gym-celeste-laurent">Fairhaven Gym — Celeste
+Laurent</h2><p><strong>Region:</strong> Eastmere <strong>Affinity:</strong> Mystic
+<strong>Age:</strong> 38</p><h3 id="appearance-6">Appearance</h3><p>Celeste is an elegant woman with a graceful, almost effortlessly
+poised presence. She has long, dark auburn hair that falls well past her
+shoulders, usually worn loose or gathered into an elegant half-up style.
+Her eyes are a striking violet-grey, and she has a refined complexion
+and an athletic but distinctly feminine build. Her clothing resembles
+sophisticated evening wear adapted for movement rather than a
+traditional Trainer’s outfit: a fitted dark dress with layered fabric
+panels, elegant boots and a tailored jacket that she removes before
+serious battles. Subtle silver jewellery and violet gemstones complete
+the look. Nothing about her appearance is excessive; everything is
+carefully chosen. There is something inherently captivating about
+Celeste. She knows exactly how to use eye contact, posture and a
+perfectly timed smile, and she is quite comfortable allowing someone
+else to wonder whether she is flirting with them or simply enjoying
+watching them become distracted.</p><h3 id="personality-6">Personality</h3><p>Celeste is sophisticated, confident and extraordinarily perceptive.
+She is charming without being overly familiar, flirtatious without being
+crude and enjoys making people slightly unsure of themselves. She has an
+excellent sense of humour and genuinely enjoys intelligent conversation.
+She is particularly fond of people who can surprise her. Celeste rarely
+reveals everything she is thinking. Even when she is being completely
+honest, she has a habit of saying things in a way that leaves people
+wondering whether there was another meaning hidden underneath. She is
+not cruel or manipulative by nature. Her fascination with psychology
+comes from genuine curiosity about people. She also has a surprisingly
+warm side that she shows primarily toward people she trusts and her
+Entheon.</p><h3 id="background-6">Background</h3><p>Celeste grew up in Fairhaven’s upper social circles but deliberately
+chose not to pursue the conventional career expected of her. She became
+fascinated with Mystic Entheon and eventually studied perception,
+cognition and the ways humans and Entheon interpret their surroundings.
+Over time, she developed into an accomplished Trainer whose battles
+became known for their psychological complexity. Her reputation
+eventually brought her to the Fairhaven Gym. Rather than turning the Gym
+into a conventional battle facility, Celeste transformed it into an
+elegant series of salons, mirrored chambers and carefully constructed
+environments where challengers are forced to question what they are
+seeing.</p><h3 id="gym-philosophy-6">Gym Philosophy</h3><blockquote>
+<p><strong>“The moment you believe you understand what you see, you’ve
+already given me an advantage.”</strong></p>
+</blockquote><p>Celeste believes that perception is one of the most powerful weapons
+a Trainer possesses. A battle isn’t simply about knowing what an Entheon
+can do. It is about understanding what your opponent <strong>wants you
+to believe</strong> they are doing. She teaches that confidence is
+useful, but certainty is dangerous.</p><h3 id="battle-style-6">Battle Style</h3><p>Celeste specializes in <strong>misdirection, prediction and
+psychological pressure</strong>. She deliberately creates uncertainty
+about her next move, using her Entheon’s different abilities and
+secondary Affinities to make opponents question their assumptions.
+Rather than overwhelming opponents immediately, she encourages them to
+commit to an interpretation of the battle and then punishes them for it.
+Her Dragons provide an important contrast: when Celeste decides that
+subtlety has served its purpose, she can suddenly bring overwhelming
+physical power onto the field.</p><h3 id="gym-assessment-6">Gym Assessment</h3><p>The Fairhaven Gym is less a physical obstacle course and more a test
+of <strong>perception and judgment</strong>. Challengers move through a
+sequence of elegant rooms containing mirrors, illusions, misleading
+pathways and situations in which the obvious solution isn’t necessarily
+the correct one. Celeste observes:</p><ul>
+<li>Can the Trainer distinguish observation from assumption?</li>
+<li>Do they notice inconsistencies?</li>
+<li>Can they remain composed when they aren’t certain what is
+happening?</li>
+<li>Do they understand their Entheon’s individual behaviour rather than
+relying solely on species expectations?</li>
+<li>Can they recognize when an opponent is deliberately trying to
+manipulate their decisions?</li>
+<li>Most importantly, can they change their interpretation when new
+information appears?</li>
+</ul><p>The final battle is designed around the same principle. Celeste wants
+the challenger to understand that <strong>being fooled once is not
+failure; refusing to reconsider after discovering you were fooled
+is.</strong></p><h3 id="established-entheon-roster-6">Established Entheon Roster</h3><p>Celeste’s established team consists of six distinct evolutionary
+lines, with no repeated evolution families.</p><ol type="1">
+<li><strong>Veysha</strong> — Mystic/Umbral An unsettling Mystic Entheon
+whose Umbral Affinity complements Celeste’s emphasis on misdirection and
+perception. Veysha allows her to introduce uncertainty from the very
+beginning of a battle.</li>
+<li><strong>Thessane</strong> — Mystic/Frost An elegant Mystic/Frost
+Entheon that combines refined Mystic techniques with Frost-based
+control. Thessane provides Celeste with a more methodical option when
+subtle disruption isn’t enough.</li>
+<li><strong>Elvarin</strong> — Mystic/Radiant The shrine-maiden-like
+member of Celeste’s team. Elvarin’s serene presence and spiritual nature
+make it an especially natural fit for Celeste’s sophisticated aesthetic
+and Mystic specialization.</li>
+<li><strong>Lumaryn</strong> — Radiant/Mystic A powerful Stage 2 Entheon
+combining Radiant and Mystic Affinities. Lumaryn gives Celeste another
+avenue for perception and support while providing a markedly different
+presence from Elvarin despite their shared secondary Affinity.</li>
+<li><strong>Yori</strong> — Dragon Celeste’s first Dragon and a
+deliberate escalation in raw physical power. Yori provides a dramatic
+contrast to the more controlled and deceptive members of her team.</li>
+<li><strong>Uveryn</strong> — Mystic/Dragon <strong>(Ace)</strong>
+Celeste’s ultimate battle partner. Uveryn combines her signature Mystic
+Affinity with the overwhelming potential of a Dragon, making it the
+perfect culmination of her battle philosophy.</li>
+</ol><h3 id="entheon-levels-6">Entheon Levels</h3><p>Celeste’s established Entheon range from approximately <strong>Lv.
+40–46</strong>. Her earlier members allow her to conduct a conventional
+Gym assessment without immediately revealing the full strength of her
+roster. The later members provide progressively greater pressure,
+culminating in <strong>Uveryn at the upper end of her established
+range</strong>. Celeste’s Dragons are not simply there to provide
+overwhelming power. She uses them to punish challengers who become too
+certain that they have correctly understood her strategy. By the time
+Uveryn enters the field, Celeste expects the challenger to have learned
+an important lesson from the Gym: <strong>Knowing what you see is not
+the same as understanding what it means.</strong></p><h2 id="part-ii-world-reference">Part II — World Reference</h2></article><div class="reader-footer"><a href="index.html">← Back to Kaleo</a><a href="reference.html">Open Complete Reference →</a></div></main></div></div><script>
+const input=document.getElementById('search'),article=document.querySelector('.reference'),blocks=[...article.children];
+function filter(q){q=q.toLowerCase().trim();blocks.forEach(function(el){el.classList.toggle('hidden',!!q && !el.textContent.toLowerCase().includes(q));});}
+input.addEventListener('input',function(){filter(input.value);});
+const params=new URLSearchParams(location.search);
+if(params.get('search')){input.value=params.get('search');filter(input.value);}
+</script></body></html>

@@ -1,0 +1,2845 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Kaleo — Move Database</title><meta content="The canonical move pools, move fields and move design rules." name="description"/><style>
+
+:root{--bg:#071018;--panel:#0d1a25;--panel2:#112536;--text:#edf7fb;--muted:#9fb5c2;--accent:#63d8ff;--accent2:#b58cff;--border:rgba(255,255,255,.11)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0%,rgba(99,216,255,.10),transparent 28rem),radial-gradient(circle at 90% 10%,rgba(181,140,255,.10),transparent 30rem),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}
+a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1450px;margin:auto;padding:13px 22px;display:flex;align-items:center;gap:28px}.brand{font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.search{flex:1}.search input{width:100%;max-width:680px;padding:11px 16px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.06);color:var(--text);font-size:1rem;outline:none}.search input:focus{border-color:rgba(99,216,255,.7)}
+.page{max-width:1450px;margin:auto;padding:42px 22px 80px}.hero{padding:70px 58px;border:1px solid var(--border);border-radius:26px;background:linear-gradient(135deg,rgba(99,216,255,.13),rgba(181,140,255,.09)),var(--panel);box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.kicker{color:var(--accent);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem}h1{font-size:clamp(3.5rem,8vw,7rem);line-height:.9;margin:15px 0 22px}.hero h2{font-size:1.5rem;color:#cbeef8;margin:0 0 18px}.hero p{max-width:850px;color:var(--muted);font-size:1.12rem}
+.section{margin-top:34px}.section h2{font-size:2rem;margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{display:block;text-decoration:none;padding:24px;border:1px solid var(--border);border-radius:18px;background:rgba(13,26,37,.8);transition:.18s ease;min-height:155px}.card:hover{transform:translateY(-3px);border-color:rgba(99,216,255,.45);background:var(--panel2)}
+.card-title{font-size:1.18rem;font-weight:800;margin-bottom:8px}.card-desc{color:var(--muted);font-size:.94rem}.card-arrow{display:block;color:var(--accent);font-size:.86rem;font-weight:700;margin-top:18px}
+.species-box{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.species-box a{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03);text-decoration:none;color:#cfe9f2}.species-box a:hover{border-color:rgba(99,216,255,.45);color:white}
+.footer{margin-top:45px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}.sidebar-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:26px}.sidebar{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto}
+.sidebar a{display:block;text-decoration:none;padding:9px 11px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted)}.sidebar a:hover{color:white;background:rgba(255,255,255,.04);border-left-color:var(--accent)}.sidebar small{display:block;font-size:.72rem;line-height:1.35;margin-top:2px}
+.reference{padding:35px 42px;border:1px solid var(--border);border-radius:20px;background:rgba(13,26,37,.75)}.reference h1{font-size:2.1rem;line-height:1.15;margin-top:2em;border-bottom:1px solid var(--border);padding-bottom:.35em}.reference h2{font-size:1.55rem;color:#dff7ff;margin-top:2em}.reference h3{color:#bfefff}
+.reference table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}.reference th,.reference td{border:1px solid var(--border);padding:9px 11px;text-align:left}.reference th{background:rgba(255,255,255,.05)}.reference blockquote{border-left:3px solid var(--accent);padding:10px 17px;background:rgba(99,216,255,.05)}.reference pre{overflow:auto;background:#050b10;padding:15px;border-radius:10px}.reference img{max-width:100%;border-radius:12px}.hidden{display:none!important}
+@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.species-box{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.sidebar-layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;max-height:300px}.grid{grid-template-columns:1fr}.species-box{grid-template-columns:repeat(2,1fr)}.hero{padding:45px 28px}.reference{padding:25px 20px}}
+
+
+.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:26px;align-items:start}
+.reader-nav{position:sticky;top:76px;height:calc(100vh - 96px);overflow:auto;padding-right:4px}
+.reader-nav a{display:block;text-decoration:none;padding:10px 12px;border-left:2px solid transparent;border-radius:0 8px 8px 0;color:var(--muted);margin-bottom:3px}
+.reader-nav a:hover{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.05)}
+.reader-nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(99,216,255,.07)}
+.reader-nav small{display:block;color:var(--muted);font-size:.72rem;line-height:1.35;margin-top:3px}
+.reader-main{min-width:0}
+.reference{max-width:100%;}
+.reader-meta{color:var(--muted);font-size:.86rem;margin:-8px 0 26px}
+.reader-footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.reader-footer a{color:var(--accent);text-decoration:none;font-weight:700}
+@media(max-width:900px){.reader-layout{grid-template-columns:1fr}.reader-nav{position:relative;top:auto;height:auto;display:flex;gap:5px;overflow-x:auto;padding-bottom:8px}.reader-nav a{min-width:max-content}.reader-nav small{display:none}}
+</style></head><body><header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">KALEO · ENTHEON</a><div class="search"><input aria-label="Search the reference" id="search" placeholder="Search this section…" type="search"/></div></div></header><div class="page"><div class="reader-layout"><aside class="reader-nav"><a href="index.html"><strong>← Home</strong><small>Return to the Kaleo homepage.</small></a><a data-page="creature-systems.html" href="creature-systems.html"><span>Creature Systems</span><small>Combat categories, statistics and battle fundamentals.</small></a><a class="active" data-page="move-database.html" href="move-database.html"><span>Move Database</span><small>The canonical move pools, move fields and move design rules.</small></a><a data-page="special-abilities.html" href="special-abilities.html"><span>Special Moves &amp; Abilities</span><small>Special acquisition, innate abilities and special move rules.</small></a><a data-page="nature-personality.html" href="nature-personality.html"><span>Nature &amp; Personality</span><small>Nature, temperament and personality rules.</small></a><a data-page="species-moves.html" href="species-moves.html"><span>Species-Specific Moves</span><small>Species-specific learnsets and move compatibility.</small></a><a data-page="growth-evolution.html" href="growth-evolution.html"><span>Growth &amp; Evolution</span><small>Leveling, experience, evolution and progression rules.</small></a><a data-page="items.html" href="items.html"><span>Items</span><small>The established item system and its role in Kaleo.</small></a><a data-page="trainers-battles.html" href="trainers-battles.html"><span>Trainers &amp; Battles</span><small>Trainer, capture and battle systems.</small></a><a data-page="world.html" href="world.html"><span>The World</span><small>Kaleo’s geography, regions and broad world structure.</small></a><a data-page="human-entheon.html" href="human-entheon.html"><span>Human–Entheon Relationship</span><small>The relationship between people and Entheon.</small></a><a data-page="affinities.html" href="affinities.html"><span>Affinities</span><small>The established Affinities and their place in the world.</small></a><a data-page="technology.html" href="technology.html"><span>Technology</span><small>Kaleo’s technological development.</small></a><a data-page="settlements-regions.html" href="settlements-regions.html"><span>Settlements &amp; Regions</span><small>Settlements and regional structure.</small></a><a data-page="wild-habitats.html" href="wild-habitats.html"><span>Wild Habitats</span><small>Where Entheon live and how habitats shape the world.</small></a><a data-page="research.html" href="research.html"><span>Research &amp; Starter Distribution</span><small>Research institutions, Entheon study and starter distribution.</small></a><a data-page="trainers-leagues.html" href="trainers-leagues.html"><span>Trainers, Leagues &amp; Gyms</span><small>Trainer organizations and the seven Gyms.</small></a><a data-page="economy.html" href="economy.html"><span>Economy &amp; Vale</span><small>Economy and the established Vale currency.</small></a><a data-page="shops-services.html" href="shops-services.html"><span>Shops &amp; Services</span><small>Everyday services and commerce.</small></a><a data-page="travel.html" href="travel.html"><span>Travel &amp; Transportation</span><small>Established travel and transportation.</small></a><a data-page="education.html" href="education.html"><span>Education &amp; Everyday Life</span><small>Education and ordinary life in Kaleo.</small></a><a data-page="law-safety.html" href="law-safety.html"><span>Law &amp; Public Safety</span><small>Law, safety and public rules.</small></a><a data-page="compendium.html" href="compendium.html"><span>Entheon Species Compendium</span><small>The canonical species compendium, evolution lines and physical scale.</small></a></aside><main class="reader-main"><article class="reference"><h1 id="move-database">Move Database</h1><h2 id="purpose-1">Purpose</h2><p>This document establishes the reusable move pool for the 13 creature
+Affinities and the General/Neutral pool. These moves form the shared
+mechanical vocabulary from which individual species learnsets will be
+constructed. This version deliberately treats <strong>moves as a
+complete combat toolkit</strong>, rather than as an attack catalogue.
+Offensive attacks, Status moves, utility, defensive techniques,
+recovery, cleansing, setup and field interaction are all represented.
+Species-specific Signature Moves are intentionally excluded and will be
+established separately.</p><h2 id="move-data-fields">Move Data Fields</h2><p>Every move entry contains: - Move Name - Affinity - Category - Power
+- Accuracy - PP - Priority - Target - Effect</p><h3 id="category">Category</h3><ul>
+<li><strong>Physical</strong> — uses the user’s physical offensive
+capability.</li>
+<li><strong>Special</strong> — uses the user’s special offensive
+capability.</li>
+<li><strong>Status</strong> — does not directly deal damage and instead
+produces a condition, buff, debuff, recovery effect, field effect or
+other utility.</li>
+</ul><h3 id="power-1">Power</h3><p>The base offensive strength of a damaging move. Status moves have no
+Power value.</p><h3 id="accuracy-1">Accuracy</h3><p>The base probability that a move successfully affects its intended
+target.</p><h3 id="pp-1">PP</h3><p>The normal number of times the move may be used before requiring
+restoration.</p><h3 id="priority-1">Priority</h3><p>Determines whether a move acts before or after normal turn order.</p><h3 id="target">Target</h3><p>Defines the intended target pattern, such as: - Single opponent - All
+opponents - User - Ally - User or ally - Allied side - Field - All
+combatants</p><h2 id="move-pool-design-philosophy">Move Pool Design Philosophy</h2><p>The Affinity pools are <strong>toolkits</strong>, not lists of
+attacks. Individual Affinities should have recognizable mechanical
+identities. A typical Affinity pool should contain a mixture of: - Basic
+offensive moves - Stronger offensive moves - Physical and/or Special
+options where appropriate - Status moves - Buffs and debuffs - Defensive
+or utility techniques - Recovery or sustain where thematically
+appropriate - Field/weather interaction where appropriate - One or more
+distinctive mechanical effects Not every Affinity needs access to direct
+HP recovery. In particular: - <strong>Verdant</strong> specializes in
+natural regeneration and vitality. - <strong>Radiant</strong>
+specializes in restoration, purification and protective light. -
+<strong>Mystic</strong> specializes in arcane/psychic restoration and
+mental resilience. - Other Affinities can specialize in defense, speed,
+disruption, offense, battlefield control or other identities instead of
+receiving generic healing. The exact number of moves in each pool may be
+expanded later.</p><h2 id="flame-move-pool">01 — FLAME MOVE POOL</h2><p>Flame emphasizes offensive pressure, burning effects, momentum and
+high-output attacks.</p><table>
+<colgroup>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 4%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 17%"/>
+<col style="width: 33%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ember</td>
+<td>Flame</td>
+<td>Special</td>
+<td>40</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to inflict Burn</td>
+<td>Launches a small, concentrated burst of flame at the opponent.</td>
+</tr>
+<tr class="even">
+<td>Flame Burst</td>
+<td>Flame</td>
+<td>Special</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Blasts an opponent with a sudden explosive burst of flame.</td>
+</tr>
+<tr class="odd">
+<td>Flame Wheel</td>
+<td>Flame</td>
+<td>Physical</td>
+<td>60</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to inflict Burn</td>
+<td>The user wraps itself in flames and charges directly into the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Heat Wave</td>
+<td>Flame</td>
+<td>Special</td>
+<td>95</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Chance to inflict Burn</td>
+<td>Sweeps the battlefield with a wave of scorching heat.</td>
+</tr>
+<tr class="odd">
+<td>Inferno</td>
+<td>Flame</td>
+<td>Special</td>
+<td>110</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>High chance to inflict Burn</td>
+<td>Engulfs the opponent in an intense column of roaring fire.</td>
+</tr>
+<tr class="even">
+<td>Flame Fang</td>
+<td>Flame</td>
+<td>Physical</td>
+<td>65</td>
+<td>95</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to inflict Burn or Flinch</td>
+<td>The user bites down with jaws wreathed in searing flame.</td>
+</tr>
+<tr class="odd">
+<td>Burning Rush</td>
+<td>Flame</td>
+<td>Physical</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Raises user’s Speed</td>
+<td>The user surges forward in a burst of fire and momentum.</td>
+</tr>
+<tr class="even">
+<td>Cinder Shot</td>
+<td>Flame</td>
+<td>Special</td>
+<td>55</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to reduce Defense</td>
+<td>Fires a volley of glowing embers that scatter across the
+target.</td>
+</tr>
+<tr class="odd">
+<td>Scorching Veil</td>
+<td>Flame</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense and creates a heat barrier</td>
+<td>Surrounds the user with shimmering heat that hardens into a
+protective barrier.</td>
+</tr>
+<tr class="even">
+<td>Flame Charge</td>
+<td>Flame</td>
+<td>Physical</td>
+<td>50</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Raises user’s Speed</td>
+<td>The user cloaks itself in fire and rushes into the opponent.</td>
+</tr>
+<tr class="odd">
+<td>Firestorm</td>
+<td>Flame</td>
+<td>Special</td>
+<td>100</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Creates intense Flame field pressure</td>
+<td>Summons a violent storm of flames across the battlefield.</td>
+</tr>
+<tr class="even">
+<td>Overheat</td>
+<td>Flame</td>
+<td>Special</td>
+<td>130</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Sharply lowers user’s Special Attack</td>
+<td>Unleashes an enormous blast of concentrated heat at the
+opponent.</td>
+</tr>
+</tbody>
+</table><h2 id="tide-move-pool">02 — TIDE MOVE POOL</h2><p>Tide emphasizes fluidity, sustained pressure, cleansing, defensive
+flow and battlefield control.</p><table>
+<colgroup>
+<col style="width: 6%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 5%"/>
+<col style="width: 7%"/>
+<col style="width: 4%"/>
+<col style="width: 7%"/>
+<col style="width: 6%"/>
+<col style="width: 17%"/>
+<col style="width: 30%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Water Pulse</td>
+<td>Tide</td>
+<td>Special</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Confuse</td>
+<td>Fires a rippling sphere of compressed water at the opponent.</td>
+</tr>
+<tr class="even">
+<td>Aqua Jet</td>
+<td>Tide</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>20</td>
+<td>1</td>
+<td>Single opponent</td>
+<td>Priority attack</td>
+<td>The user propels itself forward inside a rushing stream of
+water.</td>
+</tr>
+<tr class="odd">
+<td>Tide Lash</td>
+<td>Tide</td>
+<td>Physical</td>
+<td>65</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Attack</td>
+<td>Forms a powerful whip of water and strikes the opponent.</td>
+</tr>
+<tr class="even">
+<td>Water Burst</td>
+<td>Tide</td>
+<td>Special</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Explodes a concentrated mass of water against the opponent.</td>
+</tr>
+<tr class="odd">
+<td>Aqua Wave</td>
+<td>Tide</td>
+<td>Special</td>
+<td>80</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>All opponents</td>
+<td>—</td>
+<td>Sends a broad crashing wave across the opposing side.</td>
+</tr>
+<tr class="even">
+<td>Hydro Surge</td>
+<td>Tide</td>
+<td>Special</td>
+<td>110</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Unleashes a massive surge of pressurized water.</td>
+</tr>
+<tr class="odd">
+<td>Whirlpool</td>
+<td>Tide</td>
+<td>Special</td>
+<td>35</td>
+<td>85</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Traps target and deals residual damage</td>
+<td>Creates a swirling vortex of water around the opponent.</td>
+</tr>
+<tr class="even">
+<td>Brine Armor</td>
+<td>Tide</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense</td>
+<td>Coats the user in dense, flowing water that hardens
+defensively.</td>
+</tr>
+<tr class="odd">
+<td>Cleansing Flow</td>
+<td>Tide</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User or ally</td>
+<td>Removes selected status conditions</td>
+<td>A gentle current of water washes harmful effects away.</td>
+</tr>
+<tr class="even">
+<td>Current Rush</td>
+<td>Tide</td>
+<td>Physical</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Raises user’s Speed</td>
+<td>The user rides a sudden current of water to accelerate its
+movement.</td>
+</tr>
+<tr class="odd">
+<td>Deluge</td>
+<td>Tide</td>
+<td>Special</td>
+<td>100</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Intensifies Tide conditions</td>
+<td>Floods the battlefield with a tremendous volume of rushing
+water.</td>
+</tr>
+<tr class="even">
+<td>Tsunami</td>
+<td>Tide</td>
+<td>Special</td>
+<td>130</td>
+<td>80</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Very powerful area attack</td>
+<td>Summons a towering wall of water that crashes over the opposing
+side.</td>
+</tr>
+</tbody>
+</table><h2 id="verdant-move-pool">03 — VERDANT MOVE POOL</h2><p>Verdant emphasizes life, regeneration, growth, draining, roots and
+natural resilience.</p><table>
+<colgroup>
+<col style="width: 4%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 3%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 18%"/>
+<col style="width: 36%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Vine Lash</td>
+<td>Verdant</td>
+<td>Physical</td>
+<td>45</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Strikes the opponent with a rapidly growing vine.</td>
+</tr>
+<tr class="even">
+<td>Leaf Dart</td>
+<td>Verdant</td>
+<td>Special</td>
+<td>50</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a sharp leaf like a natural projectile.</td>
+</tr>
+<tr class="odd">
+<td>Razor Leaf</td>
+<td>Verdant</td>
+<td>Physical</td>
+<td>55</td>
+<td>95</td>
+<td>25</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Increased critical-hit chance</td>
+<td>Launches a spread of razor-edged leaves toward the opposing
+side.</td>
+</tr>
+<tr class="even">
+<td>Bloom Burst</td>
+<td>Verdant</td>
+<td>Special</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Detonates a burst of petals and concentrated plant energy.</td>
+</tr>
+<tr class="odd">
+<td>Thorn Strike</td>
+<td>Verdant</td>
+<td>Physical</td>
+<td>75</td>
+<td>95</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to inflict a minor damage-over-time effect</td>
+<td>Drives a cluster of hardened thorns into the opponent.</td>
+</tr>
+<tr class="even">
+<td>Seed Drain</td>
+<td>Verdant</td>
+<td>Special</td>
+<td>60</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Restores part of damage as HP</td>
+<td>Plants an energy-rich seed that siphons vitality from the
+opponent.</td>
+</tr>
+<tr class="odd">
+<td>Root Bind</td>
+<td>Verdant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Restricts movement and deals residual damage</td>
+<td>Roots erupt from the ground and coil around the opponent.</td>
+</tr>
+<tr class="even">
+<td>Growth</td>
+<td>Verdant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Attack and Special Attack</td>
+<td>The user’s body surges with natural energy as its strength rapidly
+increases.</td>
+</tr>
+<tr class="odd">
+<td>Floral Guard</td>
+<td>Verdant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense and Special Defense</td>
+<td>A wreath of leaves and flowers forms a protective natural
+barrier.</td>
+</tr>
+<tr class="even">
+<td>Regrowth</td>
+<td>Verdant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User</td>
+<td>Restores a significant amount of HP</td>
+<td>The user draws upon its natural vitality, rapidly restoring its
+health as fresh growth emerges.</td>
+</tr>
+<tr class="odd">
+<td>Forest Surge</td>
+<td>Verdant</td>
+<td>Special</td>
+<td>100</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Creates Verdant field</td>
+<td>Unleashes a sweeping surge of plant energy while transforming the
+battlefield.</td>
+</tr>
+<tr class="even">
+<td>Overgrowth</td>
+<td>Verdant</td>
+<td>Special</td>
+<td>125</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Becomes stronger when user’s HP is low</td>
+<td>Channels overwhelming plant energy into a devastating attack.</td>
+</tr>
+</tbody>
+</table><h2 id="gale-move-pool">04 — GALE MOVE POOL</h2><p>Gale emphasizes speed, mobility, evasion, aerial control and
+momentum.</p><table>
+<colgroup>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 4%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 19%"/>
+<col style="width: 31%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gust</td>
+<td>Gale</td>
+<td>Special</td>
+<td>40</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a concentrated blast of cutting wind.</td>
+</tr>
+<tr class="even">
+<td>Air Slash</td>
+<td>Gale</td>
+<td>Special</td>
+<td>75</td>
+<td>95</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Flinch</td>
+<td>Launches a sharp crescent of compressed air.</td>
+</tr>
+<tr class="odd">
+<td>Wing Strike</td>
+<td>Gale</td>
+<td>Physical</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>The user strikes with a powerful sweep of its wings or aerial
+appendages.</td>
+</tr>
+<tr class="even">
+<td>Tailwind</td>
+<td>Gale</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Allied side</td>
+<td>Raises allied Speed</td>
+<td>Summons a favorable wind that accelerates the allied side.</td>
+</tr>
+<tr class="odd">
+<td>Wind Cutter</td>
+<td>Gale</td>
+<td>Special</td>
+<td>55</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Increased critical-hit chance</td>
+<td>Sends multiple razor-thin blades of wind across the
+battlefield.</td>
+</tr>
+<tr class="even">
+<td>Aerial Rush</td>
+<td>Gale</td>
+<td>Physical</td>
+<td>80</td>
+<td>95</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>The user darts through the air before slamming into the
+opponent.</td>
+</tr>
+<tr class="odd">
+<td>Cyclone</td>
+<td>Gale</td>
+<td>Special</td>
+<td>90</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to disrupt or force repositioning</td>
+<td>Creates a spiraling column of wind that tears at the opponent.</td>
+</tr>
+<tr class="even">
+<td>Feather Guard</td>
+<td>Gale</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense</td>
+<td>A swirling layer of feathers and wind shields the user.</td>
+</tr>
+<tr class="odd">
+<td>Sky Dive</td>
+<td>Gale</td>
+<td>Physical</td>
+<td>100</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>User becomes harder to hit during preparation</td>
+<td>The user launches high into the air before plunging toward the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Tempest</td>
+<td>Gale</td>
+<td>Special</td>
+<td>110</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Strong area attack</td>
+<td>Unleashes a violent storm of wind across the battlefield.</td>
+</tr>
+<tr class="odd">
+<td>Jetstream</td>
+<td>Gale</td>
+<td>Special</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Raises user’s Speed</td>
+<td>The user surrounds itself with a powerful current of air and
+accelerates.</td>
+</tr>
+<tr class="even">
+<td>Hurricane</td>
+<td>Gale</td>
+<td>Special</td>
+<td>120</td>
+<td>75</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>High chance to Confuse</td>
+<td>Summons a massive spiraling storm around the opponent.</td>
+</tr>
+</tbody>
+</table><h2 id="volt-move-pool">05 — VOLT MOVE POOL</h2><p>Volt emphasizes speed, paralysis, momentum, burst damage and
+electrical field control.</p><table>
+<colgroup>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 3%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 20%"/>
+<col style="width: 34%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Spark</td>
+<td>Volt</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>30</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Paralyze</td>
+<td>Surges forward with a body crackling with electricity.</td>
+</tr>
+<tr class="even">
+<td>Shock Bolt</td>
+<td>Volt</td>
+<td>Special</td>
+<td>55</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Paralyze</td>
+<td>Fires a concentrated bolt of electricity at the opponent.</td>
+</tr>
+<tr class="odd">
+<td>Volt Strike</td>
+<td>Volt</td>
+<td>Physical</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Delivers a powerful electrically charged physical blow.</td>
+</tr>
+<tr class="even">
+<td>Thunder Pulse</td>
+<td>Volt</td>
+<td>Special</td>
+<td>75</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Paralyze</td>
+<td>Releases a pulsing wave of electrical energy.</td>
+</tr>
+<tr class="odd">
+<td>Static Field</td>
+<td>Volt</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Field</td>
+<td>Creates Volt field</td>
+<td>Fills the battlefield with crackling electrical energy.</td>
+</tr>
+<tr class="even">
+<td>Charge</td>
+<td>Volt</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Powers the next Volt attack and raises Special Defense</td>
+<td>The user gathers electricity around its body, preparing for a
+stronger electrical attack.</td>
+</tr>
+<tr class="odd">
+<td>Quick Spark</td>
+<td>Volt</td>
+<td>Special</td>
+<td>40</td>
+<td>100</td>
+<td>20</td>
+<td>1</td>
+<td>Single opponent</td>
+<td>Priority attack</td>
+<td>Fires a rapid electrical burst before the opponent can react.</td>
+</tr>
+<tr class="even">
+<td>Chain Lightning</td>
+<td>Volt</td>
+<td>Special</td>
+<td>85</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>All opponents</td>
+<td>May strike adjacent targets</td>
+<td>A bolt of electricity leaps rapidly between nearby targets.</td>
+</tr>
+<tr class="odd">
+<td>Thunder Fang</td>
+<td>Volt</td>
+<td>Physical</td>
+<td>65</td>
+<td>95</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Paralyze or Flinch</td>
+<td>The user’s jaws crackle with electricity as it bites down.</td>
+</tr>
+<tr class="even">
+<td>Storm Lance</td>
+<td>Volt</td>
+<td>Special</td>
+<td>100</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a focused lance of lightning at the opponent.</td>
+</tr>
+<tr class="odd">
+<td>Thunderstorm</td>
+<td>Volt</td>
+<td>Special</td>
+<td>110</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Intensifies Volt conditions</td>
+<td>Summons a violent electrical storm across the battlefield.</td>
+</tr>
+<tr class="even">
+<td>Thunder</td>
+<td>Volt</td>
+<td>Special</td>
+<td>120</td>
+<td>75</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Improved accuracy during storms</td>
+<td>Calls down a massive bolt of lightning upon the opponent.</td>
+</tr>
+</tbody>
+</table><h2 id="frost-move-pool">06 — FROST MOVE POOL</h2><p>Frost emphasizes control, slowing, freezing, defense and punishing
+movement.</p><table>
+<colgroup>
+<col style="width: 6%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 6%"/>
+<col style="width: 7%"/>
+<col style="width: 4%"/>
+<col style="width: 7%"/>
+<col style="width: 6%"/>
+<col style="width: 17%"/>
+<col style="width: 29%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Frost Shard</td>
+<td>Frost</td>
+<td>Special</td>
+<td>40</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a sharp fragment of condensed frost.</td>
+</tr>
+<tr class="even">
+<td>Ice Fang</td>
+<td>Frost</td>
+<td>Physical</td>
+<td>65</td>
+<td>95</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Freeze or Flinch</td>
+<td>The user attacks with jaws coated in freezing ice.</td>
+</tr>
+<tr class="odd">
+<td>Frost Breath</td>
+<td>Frost</td>
+<td>Special</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Speed</td>
+<td>Exhales a frigid cloud that chills the opponent.</td>
+</tr>
+<tr class="even">
+<td>Ice Lance</td>
+<td>Frost</td>
+<td>Special</td>
+<td>75</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Launches a long, razor-sharp spear of ice.</td>
+</tr>
+<tr class="odd">
+<td>Frozen Edge</td>
+<td>Frost</td>
+<td>Physical</td>
+<td>80</td>
+<td>95</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Increased critical-hit chance</td>
+<td>Forms a gleaming blade of ice and strikes with precision.</td>
+</tr>
+<tr class="even">
+<td>Snow Veil</td>
+<td>Frost</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Evasion in Frost conditions</td>
+<td>A swirling veil of snow obscures and protects the user.</td>
+</tr>
+<tr class="odd">
+<td>Hailstorm</td>
+<td>Frost</td>
+<td>Special</td>
+<td>90</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Creates Frost weather</td>
+<td>Summons a storm of freezing hail across the battlefield.</td>
+</tr>
+<tr class="even">
+<td>Ice Armor</td>
+<td>Frost</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense</td>
+<td>Encases the user in a layer of dense protective ice.</td>
+</tr>
+<tr class="odd">
+<td>Cold Snap</td>
+<td>Frost</td>
+<td>Special</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Freeze</td>
+<td>Suddenly drops the surrounding temperature around the opponent.</td>
+</tr>
+<tr class="even">
+<td>Absolute Zero</td>
+<td>Frost</td>
+<td>Special</td>
+<td>125</td>
+<td>80</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Very high Freeze potential</td>
+<td>Releases an extreme wave of cold that flash-freezes the area.</td>
+</tr>
+<tr class="odd">
+<td>Glacial Crash</td>
+<td>Frost</td>
+<td>Physical</td>
+<td>100</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Speed</td>
+<td>Brings down a massive chunk of ice upon the opponent.</td>
+</tr>
+<tr class="even">
+<td>Blizzard</td>
+<td>Frost</td>
+<td>Special</td>
+<td>120</td>
+<td>75</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Improved accuracy during Frost weather</td>
+<td>Unleashes a raging snowstorm that engulfs the opposing side.</td>
+</tr>
+</tbody>
+</table><h2 id="stone-move-pool">07 — STONE MOVE POOL</h2><p>Stone emphasizes durability, physical defense, barriers, heavy impact
+and battlefield stability.</p><table>
+<colgroup>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 5%"/>
+<col style="width: 7%"/>
+<col style="width: 4%"/>
+<col style="width: 7%"/>
+<col style="width: 9%"/>
+<col style="width: 12%"/>
+<col style="width: 31%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pebble Shot</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Launches a small stone projectile at the opponent.</td>
+</tr>
+<tr class="even">
+<td>Rock Toss</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>50</td>
+<td>95</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Hurls a solid chunk of rock at the opponent.</td>
+</tr>
+<tr class="odd">
+<td>Stone Edge</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>100</td>
+<td>80</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>High critical-hit chance</td>
+<td>Creates a massive razor-edged stone and drives it into the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Rock Burst</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>75</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Multiple-hit potential</td>
+<td>Launches a rapid succession of chunks of stone.</td>
+</tr>
+<tr class="odd">
+<td>Boulder Crash</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>90</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Flinch</td>
+<td>Slams a heavy boulder into the opponent with tremendous force.</td>
+</tr>
+<tr class="even">
+<td>Earth Shard</td>
+<td>Stone</td>
+<td>Special</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a concentrated shard of earth energy.</td>
+</tr>
+<tr class="odd">
+<td>Rock Armor</td>
+<td>Stone</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense</td>
+<td>Coats the user’s body in dense layers of stone.</td>
+</tr>
+<tr class="even">
+<td>Tremor</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Chance to lower Speed</td>
+<td>Sends a violent vibration through the ground beneath the opposing
+side.</td>
+</tr>
+<tr class="odd">
+<td>Earthquake</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>100</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>All grounded opponents</td>
+<td>—</td>
+<td>Shakes the battlefield with a powerful seismic shock.</td>
+</tr>
+<tr class="even">
+<td>Stone Wall</td>
+<td>Stone</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User or ally</td>
+<td>Creates a defensive barrier</td>
+<td>Raises a solid wall of stone between the user and danger.</td>
+</tr>
+<tr class="odd">
+<td>Mountain Breaker</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>120</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Smashes the opponent with a colossal mass of stone.</td>
+</tr>
+<tr class="even">
+<td>Cataclysm</td>
+<td>Stone</td>
+<td>Physical</td>
+<td>130</td>
+<td>80</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Massive area attack</td>
+<td>Tears the battlefield apart in a devastating eruption of stone.</td>
+</tr>
+</tbody>
+</table><h2 id="metal-move-pool">08 — METAL MOVE POOL</h2><p>Metal emphasizes defense, precision, armor, structural durability and
+powerful controlled attacks.</p><table>
+<colgroup>
+<col style="width: 6%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 5%"/>
+<col style="width: 7%"/>
+<col style="width: 4%"/>
+<col style="width: 7%"/>
+<col style="width: 6%"/>
+<col style="width: 14%"/>
+<col style="width: 31%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Metal Claw</td>
+<td>Metal</td>
+<td>Physical</td>
+<td>50</td>
+<td>95</td>
+<td>35</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to raise Attack</td>
+<td>The user forms hardened metallic claws and slashes the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Steel Shard</td>
+<td>Metal</td>
+<td>Physical</td>
+<td>60</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a sharp fragment of hardened metal.</td>
+</tr>
+<tr class="odd">
+<td>Iron Guard</td>
+<td>Metal</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense</td>
+<td>Hardens the user’s body into a resilient metallic shell.</td>
+</tr>
+<tr class="even">
+<td>Metal Burst</td>
+<td>Metal</td>
+<td>Special</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Releases a concentrated burst of metallic energy.</td>
+</tr>
+<tr class="odd">
+<td>Gear Grind</td>
+<td>Metal</td>
+<td>Physical</td>
+<td>65</td>
+<td>90</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Multiple-hit potential</td>
+<td>Strikes the opponent with rapidly rotating metallic edges.</td>
+</tr>
+<tr class="even">
+<td>Iron Head</td>
+<td>Metal</td>
+<td>Physical</td>
+<td>80</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Flinch</td>
+<td>Rams the opponent with a head hardened like forged metal.</td>
+</tr>
+<tr class="odd">
+<td>Alloy Beam</td>
+<td>Metal</td>
+<td>Special</td>
+<td>85</td>
+<td>95</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a concentrated beam of metallic energy.</td>
+</tr>
+<tr class="even">
+<td>Magnet Pull</td>
+<td>Metal</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Restricts switching and movement</td>
+<td>Creates a powerful magnetic field that anchors the opponent in
+place.</td>
+</tr>
+<tr class="odd">
+<td>Iron Defense</td>
+<td>Metal</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Sharply raises Defense</td>
+<td>The user’s body becomes exceptionally rigid and heavily
+reinforced.</td>
+</tr>
+<tr class="even">
+<td>Steel Tempest</td>
+<td>Metal</td>
+<td>Special</td>
+<td>100</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>—</td>
+<td>Unleashes a storm of spinning metal fragments.</td>
+</tr>
+<tr class="odd">
+<td>Meteor Strike</td>
+<td>Metal</td>
+<td>Physical</td>
+<td>120</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Calls down or launches a devastating mass of metallic energy.</td>
+</tr>
+<tr class="even">
+<td>Alloy Overdrive</td>
+<td>Metal</td>
+<td>Physical</td>
+<td>130</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Lowers user’s Speed</td>
+<td>Channels immense metallic power into a reckless finishing blow.</td>
+</tr>
+</tbody>
+</table><h2 id="mystic-move-pool">09 — MYSTIC MOVE POOL</h2><p>Mystic emphasizes mental power, arcane manipulation, special offense,
+protection and <strong>arcane restoration</strong>.</p><table>
+<colgroup>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 5%"/>
+<col style="width: 4%"/>
+<col style="width: 5%"/>
+<col style="width: 3%"/>
+<col style="width: 5%"/>
+<col style="width: 5%"/>
+<col style="width: 18%"/>
+<col style="width: 36%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mind Pulse</td>
+<td>Mystic</td>
+<td>Special</td>
+<td>50</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Confuse</td>
+<td>Releases a pulsing wave of psychic energy into the opponent’s
+mind.</td>
+</tr>
+<tr class="even">
+<td>Mystic Bolt</td>
+<td>Mystic</td>
+<td>Special</td>
+<td>65</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a concentrated bolt of arcane energy.</td>
+</tr>
+<tr class="odd">
+<td>Psywave</td>
+<td>Mystic</td>
+<td>Special</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Variable damage</td>
+<td>Sends an unstable wave of psychic force toward the opponent.</td>
+</tr>
+<tr class="even">
+<td>Arcane Barrier</td>
+<td>Mystic</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Special Defense</td>
+<td>Conjures a shimmering barrier of mystical energy around the
+user.</td>
+</tr>
+<tr class="odd">
+<td>Mind Pierce</td>
+<td>Mystic</td>
+<td>Special</td>
+<td>80</td>
+<td>95</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Ignores some defensive effects</td>
+<td>Focuses psychic energy into a precise strike that penetrates
+defenses.</td>
+</tr>
+<tr class="even">
+<td>Telekinetic Strike</td>
+<td>Mystic</td>
+<td>Special</td>
+<td>75</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>May disrupt priority</td>
+<td>Seizes the opponent with invisible force and hurls them aside.</td>
+</tr>
+<tr class="odd">
+<td>Astral Shift</td>
+<td>Mystic</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Evasion and Speed</td>
+<td>The user’s body briefly shimmers as its awareness shifts beyond
+normal physical limits.</td>
+</tr>
+<tr class="even">
+<td>Psychic Field</td>
+<td>Mystic</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>Field</td>
+<td>Creates Mystic field</td>
+<td>Fills the battlefield with a visible haze of mystical energy.</td>
+</tr>
+<tr class="odd">
+<td>Dream Bind</td>
+<td>Mystic</td>
+<td>Status</td>
+<td>—</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Sleep</td>
+<td>Wraps the opponent in a hypnotic veil of dreamlike energy.</td>
+</tr>
+<tr class="even">
+<td>Astral Mend</td>
+<td>Mystic</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User or ally</td>
+<td>Restores HP and grants temporary mental resilience</td>
+<td>Channels calm astral energy through the user or ally, restoring
+health and strengthening the mind.</td>
+</tr>
+<tr class="odd">
+<td>Mind Break</td>
+<td>Mystic</td>
+<td>Special</td>
+<td>110</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Special Defense</td>
+<td>Strikes the opponent with a concentrated psychic shock.</td>
+</tr>
+<tr class="even">
+<td>Astral Collapse</td>
+<td>Mystic</td>
+<td>Special</td>
+<td>130</td>
+<td>80</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Massive Mystic attack</td>
+<td>Collapses a sphere of overwhelming mystical energy across the
+battlefield.</td>
+</tr>
+</tbody>
+</table><h2 id="radiant-move-pool">10 — RADIANT MOVE POOL</h2><p>Radiant emphasizes purification, protection, restoration,
+illumination and powerful light-based offense.</p><table>
+<colgroup>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 3%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 19%"/>
+<col style="width: 34%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gleam</td>
+<td>Radiant</td>
+<td>Special</td>
+<td>40</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Releases a brief flash of concentrated radiant light.</td>
+</tr>
+<tr class="even">
+<td>Light Pulse</td>
+<td>Radiant</td>
+<td>Special</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Sends a pulse of luminous energy toward the opponent.</td>
+</tr>
+<tr class="odd">
+<td>Radiant Beam</td>
+<td>Radiant</td>
+<td>Special</td>
+<td>80</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a focused beam of brilliant light.</td>
+</tr>
+<tr class="even">
+<td>Holy Strike</td>
+<td>Radiant</td>
+<td>Physical</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to remove minor effects</td>
+<td>Channels radiant energy through a physical strike.</td>
+</tr>
+<tr class="odd">
+<td>Flash Burst</td>
+<td>Radiant</td>
+<td>Special</td>
+<td>55</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Chance to lower Accuracy</td>
+<td>Explodes with blinding light across the opposing side.</td>
+</tr>
+<tr class="even">
+<td>Light Guard</td>
+<td>Radiant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Special Defense</td>
+<td>Surrounds the user with a luminous protective aura.</td>
+</tr>
+<tr class="odd">
+<td>Purifying Light</td>
+<td>Radiant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User or ally</td>
+<td>Restores HP and removes negative status conditions</td>
+<td>Bathes the target in restorative light that heals wounds and
+cleanses harmful conditions.</td>
+</tr>
+<tr class="even">
+<td>Radiant Field</td>
+<td>Radiant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>Field</td>
+<td>Creates Radiant field</td>
+<td>Floods the battlefield with warm, protective radiance.</td>
+</tr>
+<tr class="odd">
+<td>Solar Lance</td>
+<td>Radiant</td>
+<td>Special</td>
+<td>95</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Forms a spear of concentrated light and fires it at the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Dawn Burst</td>
+<td>Radiant</td>
+<td>Special</td>
+<td>110</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Stronger under Radiant field</td>
+<td>Unleashes a brilliant explosion of dawn-like energy.</td>
+</tr>
+<tr class="odd">
+<td>Judgment</td>
+<td>Radiant</td>
+<td>Special</td>
+<td>120</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Calls down a devastating column of radiant energy upon the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Ascension</td>
+<td>Radiant</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>5</td>
+<td>0</td>
+<td>User</td>
+<td>Greatly raises one offensive stat and Speed</td>
+<td>The user’s body erupts with brilliant light as its power and speed
+surge.</td>
+</tr>
+</tbody>
+</table><h2 id="umbral-move-pool">11 — UMBRAL MOVE POOL</h2><p>Umbral emphasizes disruption, concealment, debuffs, draining,
+critical strikes and battlefield manipulation.</p><table>
+<colgroup>
+<col style="width: 4%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 4%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 15%"/>
+<col style="width: 38%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shadow Claw</td>
+<td>Umbral</td>
+<td>Physical</td>
+<td>55</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Increased critical-hit chance</td>
+<td>Forms dark energy around the user’s claws and tears into the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Dark Pulse</td>
+<td>Umbral</td>
+<td>Special</td>
+<td>80</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Flinch</td>
+<td>Releases a concentrated wave of shadowy energy.</td>
+</tr>
+<tr class="odd">
+<td>Night Slash</td>
+<td>Umbral</td>
+<td>Physical</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Increased critical-hit chance</td>
+<td>Strikes from the darkness with a swift, precise slash.</td>
+</tr>
+<tr class="even">
+<td>Shadow Bolt</td>
+<td>Umbral</td>
+<td>Special</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a dense projectile of dark energy.</td>
+</tr>
+<tr class="odd">
+<td>Umbral Step</td>
+<td>Umbral</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>1</td>
+<td>User</td>
+<td>Raises Evasion and changes positioning</td>
+<td>The user dissolves briefly into shadow before shifting
+position.</td>
+</tr>
+<tr class="even">
+<td>Shadow Bind</td>
+<td>Umbral</td>
+<td>Status</td>
+<td>—</td>
+<td>90</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Restricts movement</td>
+<td>Dark tendrils rise from the shadows and restrain the opponent.</td>
+</tr>
+<tr class="odd">
+<td>Fear Pulse</td>
+<td>Umbral</td>
+<td>Special</td>
+<td>65</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Attack</td>
+<td>Sends a chilling wave of oppressive energy through the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Night Veil</td>
+<td>Umbral</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Creates concealment</td>
+<td>Wraps the user in a cloak of deep shadow that obscures its
+presence.</td>
+</tr>
+<tr class="odd">
+<td>Soul Rend</td>
+<td>Umbral</td>
+<td>Special</td>
+<td>90</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Special Defense</td>
+<td>Strikes at the opponent with a tearing wave of dark energy.</td>
+</tr>
+<tr class="even">
+<td>Shadow Surge</td>
+<td>Umbral</td>
+<td>Special</td>
+<td>100</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Creates Umbral field</td>
+<td>Floods the battlefield with oppressive shadow energy.</td>
+</tr>
+<tr class="odd">
+<td>Abyssal Fang</td>
+<td>Umbral</td>
+<td>Physical</td>
+<td>105</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Restores a portion of damage as HP</td>
+<td>The user attacks with darkened fangs and draws vitality from the
+wound.</td>
+</tr>
+<tr class="even">
+<td>Eclipse</td>
+<td>Umbral</td>
+<td>Special</td>
+<td>130</td>
+<td>80</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Stronger under Umbral field</td>
+<td>Covers the battlefield in overwhelming darkness before unleashing a
+devastating shadow attack.</td>
+</tr>
+</tbody>
+</table><h2 id="wild-move-pool">12 — WILD MOVE POOL</h2><p>Wild emphasizes instinct, physical ability, adaptability, speed,
+aggression and survival.</p><table>
+<colgroup>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 4%"/>
+<col style="width: 6%"/>
+<col style="width: 3%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 14%"/>
+<col style="width: 40%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tackle</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>35</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Charges directly into the opponent with the user’s body.</td>
+</tr>
+<tr class="even">
+<td>Scratch</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>35</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Strikes the opponent with a quick physical swipe.</td>
+</tr>
+<tr class="odd">
+<td>Quick Attack</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>30</td>
+<td>1</td>
+<td>Single opponent</td>
+<td>Priority attack</td>
+<td>The user darts forward with sudden speed and strikes before the
+opponent can react.</td>
+</tr>
+<tr class="even">
+<td>Bite</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>60</td>
+<td>100</td>
+<td>25</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Flinch</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Headbutt</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Flinch</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Pounce</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>65</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>May raise user’s Speed</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Rend</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>80</td>
+<td>95</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Increased critical-hit chance</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Roar</td>
+<td>Wild</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Disrupts target</td>
+<td>Lowers Attack; may disrupt action The user releases a forceful roar
+that disrupts the opponent’s composure.</td>
+</tr>
+<tr class="odd">
+<td>Focus</td>
+<td>Wild</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Attack and accuracy</td>
+<td>The user steadies itself and concentrates completely on the
+battle.</td>
+</tr>
+<tr class="even">
+<td>Survival Instinct</td>
+<td>Wild</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Speed and Defense when HP is low</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Savage Rush</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>100</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>User takes minor recoil</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Primal Impact</td>
+<td>Wild</td>
+<td>Physical</td>
+<td>125</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Heavy recoil</td>
+<td></td>
+</tr>
+</tbody>
+</table><h2 id="dragon-move-pool">13 — DRAGON MOVE POOL</h2><p>Dragon emphasizes ancient power, overwhelming physical and special
+force, intimidation and exceptional late-stage techniques.</p><table>
+<colgroup>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 4%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 15%"/>
+<col style="width: 35%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Dragon Claw</td>
+<td>Dragon</td>
+<td>Physical</td>
+<td>70</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Forms ancient draconic energy around the user’s claws and tears into
+the opponent.</td>
+</tr>
+<tr class="even">
+<td>Dragon Breath</td>
+<td>Dragon</td>
+<td>Special</td>
+<td>60</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to inflict a minor status effect</td>
+<td>Exhales a concentrated stream of draconic energy.</td>
+</tr>
+<tr class="odd">
+<td>Dragon Fang</td>
+<td>Dragon</td>
+<td>Physical</td>
+<td>65</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Defense</td>
+<td>The user attacks with powerful jaws infused with ancient Dragon
+energy.</td>
+</tr>
+<tr class="even">
+<td>Dragon Pulse</td>
+<td>Dragon</td>
+<td>Special</td>
+<td>85</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Fires a concentrated wave of pure draconic power.</td>
+</tr>
+<tr class="odd">
+<td>Dragon Rush</td>
+<td>Dragon</td>
+<td>Physical</td>
+<td>100</td>
+<td>85</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to Flinch</td>
+<td>The user charges forward with overwhelming draconic force.</td>
+</tr>
+<tr class="even">
+<td>Dragon Roar</td>
+<td>Dragon</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Lowers Attack and Special Attack</td>
+<td>Releases a thunderous roar that shakes the confidence of nearby
+opponents.</td>
+</tr>
+<tr class="odd">
+<td>Draconic Guard</td>
+<td>Dragon</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense and Special Defense</td>
+<td>Wraps the user in a dense aura of ancient draconic power.</td>
+</tr>
+<tr class="even">
+<td>Dragon Dance</td>
+<td>Dragon</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Attack and Speed</td>
+<td>The user performs a powerful ritualistic movement that heightens its
+physical abilities.</td>
+</tr>
+<tr class="odd">
+<td>Ancient Flame</td>
+<td>Dragon</td>
+<td>Special</td>
+<td>90</td>
+<td>95</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Dragon/Flame-style energy</td>
+<td>Unleashes a strange ancient flame infused with draconic energy.</td>
+</tr>
+<tr class="even">
+<td>Sky Rend</td>
+<td>Dragon</td>
+<td>Physical</td>
+<td>110</td>
+<td>90</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Tears through the air with a massive sweeping arc of draconic
+power.</td>
+</tr>
+<tr class="odd">
+<td>Cataclysmic Roar</td>
+<td>Dragon</td>
+<td>Special</td>
+<td>120</td>
+<td>85</td>
+<td>5</td>
+<td>0</td>
+<td>All opponents</td>
+<td>Powerful area attack</td>
+<td>Releases a devastating roar that erupts outward across the
+battlefield.</td>
+</tr>
+<tr class="even">
+<td>Dragon Ascension</td>
+<td>Dragon</td>
+<td>Special</td>
+<td>135</td>
+<td>80</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Massive Dragon attack</td>
+<td>The user gathers overwhelming ancient power and releases it in a
+devastating attack.</td>
+</tr>
+</tbody>
+</table><h2 id="general-neutral-move-pool">14 — GENERAL / NEUTRAL MOVE POOL</h2><p>General moves are not inherently associated with an Affinity. Their
+availability depends primarily on anatomy, species design and learnset
+compatibility.</p><table>
+<colgroup>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 6%"/>
+<col style="width: 3%"/>
+<col style="width: 6%"/>
+<col style="width: 5%"/>
+<col style="width: 22%"/>
+<col style="width: 31%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Move</strong></th>
+<th><strong>Affinity</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Power</strong></th>
+<th><strong>Accuracy</strong></th>
+<th><strong>PP</strong></th>
+<th><strong>Priority</strong></th>
+<th><strong>Target</strong></th>
+<th><strong>Effect</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tackle</td>
+<td>General</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>35</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Charges directly into the opponent with the user’s body.</td>
+</tr>
+<tr class="even">
+<td>Scratch</td>
+<td>General</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>35</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Strikes the opponent with a quick physical swipe.</td>
+</tr>
+<tr class="odd">
+<td>Pound</td>
+<td>General</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>35</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Delivers a straightforward heavy physical blow.</td>
+</tr>
+<tr class="even">
+<td>Quick Strike</td>
+<td>General</td>
+<td>Physical</td>
+<td>40</td>
+<td>100</td>
+<td>30</td>
+<td>1</td>
+<td>Single opponent</td>
+<td>Priority attack</td>
+<td>Launches a rapid physical strike before the opponent can react.</td>
+</tr>
+<tr class="odd">
+<td>Slam</td>
+<td>General</td>
+<td>Physical</td>
+<td>80</td>
+<td>75</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>—</td>
+<td>Brings the user’s body or limbs crashing down onto the
+opponent.</td>
+</tr>
+<tr class="even">
+<td>Crush</td>
+<td>General</td>
+<td>Physical</td>
+<td>80</td>
+<td>85</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Chance to lower Defense</td>
+<td>Grabs or pins the opponent before delivering a powerful crushing
+blow.</td>
+</tr>
+<tr class="odd">
+<td>Focus</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Attack and accuracy</td>
+<td>The user steadies itself and concentrates completely on the
+battle.</td>
+</tr>
+<tr class="even">
+<td>Protect</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>4</td>
+<td>User</td>
+<td>Blocks most incoming attacks</td>
+<td>A brief protective barrier forms around the user.</td>
+</tr>
+<tr class="odd">
+<td>Guard</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Defense</td>
+<td>The user braces its body and adopts a more defensive stance.</td>
+</tr>
+<tr class="even">
+<td>Brace</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Special Defense</td>
+<td>The user concentrates inwardly and reinforces its resistance to
+special forces.</td>
+</tr>
+<tr class="odd">
+<td>Recover</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User</td>
+<td>Restores moderate HP</td>
+<td>The user pauses briefly and restores a portion of its health.</td>
+</tr>
+<tr class="even">
+<td>Rest</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User</td>
+<td>Fully restores HP but causes Sleep</td>
+<td>The user enters a deep restorative sleep and recovers its
+strength.</td>
+</tr>
+<tr class="odd">
+<td>Taunt</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Restricts Status techniques</td>
+<td>The user provokes the opponent into abandoning cautious or
+supportive techniques.</td>
+</tr>
+<tr class="even">
+<td>Roar</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Disrupts target</td>
+<td>The user releases a forceful roar that disrupts the opponent’s
+composure.</td>
+</tr>
+<tr class="odd">
+<td>Agility</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Speed</td>
+<td>The user rapidly lightens its movements and becomes much
+faster.</td>
+</tr>
+<tr class="even">
+<td>Iron Will</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+<td>0</td>
+<td>User</td>
+<td>Prevents certain mental disruption</td>
+<td>The user steels its mind against fear, confusion and other mental
+disruption.</td>
+</tr>
+<tr class="odd">
+<td>Camouflage</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Temporarily alters defensive profile</td>
+<td>The user’s appearance and energy signature shift to blend with its
+surroundings.</td>
+</tr>
+<tr class="even">
+<td>Double Strike</td>
+<td>General</td>
+<td>Physical</td>
+<td>50</td>
+<td>95</td>
+<td>15</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>May strike twice</td>
+<td>The user follows one physical strike immediately with a second.</td>
+</tr>
+<tr class="odd">
+<td>Reckless Charge</td>
+<td>General</td>
+<td>Physical</td>
+<td>90</td>
+<td>90</td>
+<td>10</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>User takes recoil</td>
+<td>The user throws its full body weight into a forceful charge.</td>
+</tr>
+<tr class="even">
+<td>Last Stand</td>
+<td>General</td>
+<td>Physical</td>
+<td>100</td>
+<td>100</td>
+<td>5</td>
+<td>0</td>
+<td>Single opponent</td>
+<td>Power increases as user’s HP decreases</td>
+<td>The user gathers its remaining strength for a desperate attack.</td>
+</tr>
+<tr class="odd">
+<td>Battle Cry</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>Allied side</td>
+<td>Raises Attack</td>
+<td>The user releases a rallying cry that emboldens its allies.</td>
+</tr>
+<tr class="even">
+<td>Calm Mind</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+<td>0</td>
+<td>User</td>
+<td>Raises Special Attack and Special Defense</td>
+<td>The user clears its thoughts and focuses its inner energy.</td>
+</tr>
+<tr class="odd">
+<td>Endure</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>4</td>
+<td>User</td>
+<td>Prevents the user from being reduced below 1 HP this turn</td>
+<td>The user braces itself and refuses to fall despite overwhelming
+force.</td>
+</tr>
+<tr class="even">
+<td>Restorative Pulse</td>
+<td>General</td>
+<td>Status</td>
+<td>—</td>
+<td>100</td>
+<td>10</td>
+<td>0</td>
+<td>User or ally</td>
+<td>Restores moderate HP</td>
+<td>The user releases a gentle wave of restorative energy toward itself
+or an ally.</td>
+</tr>
+</tbody>
+</table><h2 id="recovery-philosophy">Recovery Philosophy</h2><p>Recovery should not be treated as a mandatory feature of every
+Affinity. Instead, recovery should help establish mechanical
+identity.</p><h3 id="verdant-regeneration">Verdant — Regeneration</h3><p>Verdant recovery represents natural life force, growth and biological
+renewal. Verdant recovery can: - Restore HP directly - Restore HP over
+multiple turns - Become stronger under Verdant field effects - Interact
+with draining or plant-based techniques</p><h3 id="radiant-restoration-and-purification">Radiant — Restoration and
+Purification</h3><p>Radiant recovery represents cleansing, healing light and restoration.
+Radiant recovery can: - Restore HP - Remove negative status conditions -
+Protect against further negative effects - Support allies - Interact
+with Radiant field effects</p><h3 id="mystic-arcane-restoration">Mystic — Arcane Restoration</h3><p>Mystic recovery represents psychic focus, magical energy and mental
+resilience. Mystic recovery can: - Restore HP - Strengthen Special
+Defense - Protect against mental/status disruption - Restore allies
+through controlled energy - Interact with Mystic field effects</p><h3 id="general-basic-recovery">General — Basic Recovery</h3><p>General recovery provides universally understandable survival tools
+without giving a creature a specialized Affinity identity. Recover,
+Rest, Endure and similar moves belong here.</p><h3 id="other-affinities">Other Affinities</h3><p>Other Affinities are not required to possess direct healing. They can
+instead sustain themselves through: - Damage mitigation - Defensive
+buffs - Drain effects - Speed and evasion - Field control - Status
+disruption - Recoil tradeoffs - Offensive pressure This prevents every
+Affinity from becoming mechanically interchangeable.</p><h2 id="affinity-identity-summary">Affinity Identity Summary</h2><table>
+<colgroup>
+<col style="width: 24%"/>
+<col style="width: 75%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Affinity</strong></th>
+<th><strong>Primary Mechanical Identity</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Flame</td>
+<td>Offensive pressure, Burn, momentum</td>
+</tr>
+<tr class="even">
+<td>Tide</td>
+<td>Flow, cleansing, control, defensive adaptability</td>
+</tr>
+<tr class="odd">
+<td>Verdant</td>
+<td>Regeneration, growth, draining, vitality</td>
+</tr>
+<tr class="even">
+<td>Gale</td>
+<td>Speed, mobility, evasion, aerial control</td>
+</tr>
+<tr class="odd">
+<td>Volt</td>
+<td>Speed, paralysis, burst damage, field control</td>
+</tr>
+<tr class="even">
+<td>Frost</td>
+<td>Slowing, freezing, defense, control</td>
+</tr>
+<tr class="odd">
+<td>Stone</td>
+<td>Durability, barriers, heavy impact</td>
+</tr>
+<tr class="even">
+<td>Metal</td>
+<td>Armor, precision, defense, controlled power</td>
+</tr>
+<tr class="odd">
+<td>Mystic</td>
+<td>Special power, mental effects, arcane restoration</td>
+</tr>
+<tr class="even">
+<td>Radiant</td>
+<td>Purification, healing, protection, illumination</td>
+</tr>
+<tr class="odd">
+<td>Umbral</td>
+<td>Debuffs, concealment, disruption, draining</td>
+</tr>
+<tr class="even">
+<td>Wild</td>
+<td>Physical ability, instinct, adaptability, survival</td>
+</tr>
+<tr class="odd">
+<td>Dragon</td>
+<td>Ancient power, overwhelming force, intimidation</td>
+</tr>
+</tbody>
+</table><h2 id="move-pool-design-rules">Move Pool Design Rules</h2><h2 id="affinity-access">Affinity Access</h2><p>A creature may learn techniques from: - Its own Affinity or
+Affinities - The General Move Pool - Other Affinity pools where species
+compatibility is explicitly established Possessing an Affinity does
+<strong>not</strong> automatically grant every move within that
+Affinity.</p><h2 id="anatomy">Anatomy</h2><p>Species anatomy determines compatibility with physical techniques. A
+wingless creature should not automatically learn wing-based techniques.
+A creature without suitable limbs, fangs, horns, claws, etc. should not
+automatically learn techniques that require those anatomical
+features.</p><h2 id="evolution">Evolution</h2><p>Evolution may unlock additional techniques while retaining previously
+learned compatible moves. A change in Affinity may expand or alter the
+available move pool.</p><h2 id="signature-moves-2">Signature Moves</h2><p>Species-specific Signature Moves are separate from this global
+database. Signature Moves should reinforce the creature’s identity
+rather than simply duplicate an existing generic move.</p><h2 id="balance">Balance</h2><p>Move Power, Accuracy and PP should be considered together. High-power
+techniques generally have one or more balancing factors such as: - Lower
+Accuracy - Low PP - Recoil - Stat reduction - Preparation requirements -
+Conditional availability - Self-debuffs - Strong defensive
+counterplay</p><h2 id="species-learnsets">Species Learnsets</h2><p>The global move pool is a source catalogue. An individual species
+should receive a <strong>small curated learnset</strong>, not the entire
+pool. Its learnset should reflect: - Affinity - Anatomy - Species
+concept - Evolution stage - Combat identity - Rarity - Personality or
+lore where appropriate</p><h2 id="reserved-for-future-expansion">Reserved for Future
+Expansion</h2><ol type="1">
+<li>Complete Affinity effectiveness chart</li>
+<li>Exact Same-Affinity Bonus</li>
+<li>Status condition mechanics</li>
+<li>Weather mechanics</li>
+<li>Affinity field mechanics</li>
+<li>Critical-hit mechanics</li>
+<li>Exact damage formula</li>
+<li>Species-specific Signature Moves</li>
+<li>Individual species learnsets</li>
+<li>Technique/TM compatibility lists</li>
+<li>Level-up progression</li>
+<li>Evolution-specific move acquisition</li>
+<li>Ally-support and multi-target rules</li>
+<li>Exact recovery percentages and formulas</li>
+</ol><h2 id="data-integrity-rule">Data Integrity Rule</h2><p>The move names, properties, effects and narrative descriptions in
+this document constitute the canonical reusable move pool once this
+version is approved. Species-specific exceptions or modifications must
+be explicitly documented in the relevant species entry.</p></article><div class="reader-footer"><a href="index.html">← Back to Kaleo</a><a href="reference.html">Open Complete Reference →</a></div></main></div></div><script>
+const input=document.getElementById('search'),article=document.querySelector('.reference'),blocks=[...article.children];
+function filter(q){q=q.toLowerCase().trim();blocks.forEach(function(el){el.classList.toggle('hidden',!!q && !el.textContent.toLowerCase().includes(q));});}
+input.addEventListener('input',function(){filter(input.value);});
+const params=new URLSearchParams(location.search);
+if(params.get('search')){input.value=params.get('search');filter(input.value);}
+</script></body></html>
