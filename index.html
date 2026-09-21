@@ -22,90 +22,211 @@ a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24
 .reference table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}.reference th,.reference td{border:1px solid var(--border);padding:9px 11px;text-align:left}.reference th{background:rgba(255,255,255,.05)}.reference blockquote{border-left:3px solid var(--accent);padding:10px 17px;background:rgba(99,216,255,.05)}.reference pre{overflow:auto;background:#050b10;padding:15px;border-radius:10px}.reference img{max-width:100%;border-radius:12px}.hidden{display:none!important}
 @media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.species-box{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.sidebar-layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;max-height:300px}.grid{grid-template-columns:1fr}.species-box{grid-template-columns:repeat(2,1fr)}.hero{padding:45px 28px}.reference{padding:25px 20px}}
 
-</style></head>
+</style>
+<style id="homepage-design">
+.portal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.portal{display:block;text-decoration:none;padding:28px;border:1px solid var(--border);border-radius:20px;background:linear-gradient(145deg,rgba(17,38,54,.82),rgba(9,23,34,.92));min-height:170px;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.portal:hover{transform:translateY(-3px);border-color:var(--accent);background:linear-gradient(145deg,rgba(22,48,67,.95),rgba(9,25,37,.96))}
+.portal-large{grid-column:span 2;min-height:190px}
+.portal-number{font-size:.75rem;font-weight:800;letter-spacing:.14em;color:var(--accent);margin-bottom:18px}
+.portal h3{font-size:1.35rem;margin:0 0 9px}
+.portal p{color:var(--muted);margin:0 0 20px;max-width:720px}
+.portal span{font-weight:800;color:var(--accent);font-size:.85rem}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:18px}
+.section-head.compact{margin-bottom:14px}
+.section-intro{color:var(--muted);max-width:520px;margin:0}
+.entehon-feature,.entheon-feature{display:grid;grid-template-columns:1fr 240px;gap:40px;align-items:center;padding:45px 50px;border:1px solid var(--border);border-radius:24px;background:radial-gradient(circle at 85% 50%,rgba(99,216,255,.12),transparent 38%),linear-gradient(135deg,rgba(18,44,61,.9),rgba(12,27,41,.96))}
+.feature-copy h2{font-size:clamp(2.3rem,4vw,3.7rem);margin:0 0 12px}
+.feature-copy p{color:var(--muted);max-width:700px;font-size:1.02rem;line-height:1.75}
+.button{display:inline-block;margin-top:12px;padding:12px 17px;border:1px solid var(--accent);border-radius:10px;color:var(--accent);text-decoration:none;font-weight:800}
+.feature-mark{text-align:center;border:1px solid var(--border);border-radius:22px;padding:30px 20px;background:rgba(5,15,24,.35)}
+.feature-mark span{display:block;font-size:4rem;font-weight:900;line-height:1}
+.feature-mark small{display:block;margin-top:10px;color:var(--muted);font-weight:800;letter-spacing:.12em}
+.link-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.link-row a{display:flex;justify-content:space-between;gap:15px;padding:16px 18px;border:1px solid var(--border);border-radius:12px;background:rgba(13,29,42,.72);color:var(--text);text-decoration:none}
+.link-row a:hover{border-color:var(--accent)}
+.link-row span{color:var(--accent);font-weight:800}
+.compendium-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.compendium-stat{padding:24px 18px;border:1px solid var(--border);border-radius:15px;background:rgba(13,29,42,.72)}
+.compendium-stat strong{display:block;font-size:1.25rem;margin-bottom:6px}
+.compendium-stat span{color:var(--muted);font-size:.88rem}
+.reference-link{display:flex;flex-direction:column;gap:7px;padding:23px 25px;border:1px solid var(--border);border-radius:16px;background:rgba(13,29,42,.8);text-decoration:none}
+.reference-link strong{color:var(--accent)}
+.reference-link span{color:var(--muted)}
+@media(max-width:850px){.portal-grid,.link-row{grid-template-columns:1fr}.portal-large{grid-column:auto}.entheon-feature{grid-template-columns:1fr}.feature-mark{max-width:240px}.compendium-preview{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.section-intro{margin-top:8px}}
+@media(max-width:520px){.compendium-preview{grid-template-columns:1fr}.portal{padding:22px}}
+</style>
+
+</head>
 <body>
 <header class="topbar"><div class="topbar-inner">
 <a class="brand" href="index.html">KALEO · ENTHEON</a>
 <div class="search"><input id="search" type="search" placeholder="Search the reference…" aria-label="Search the reference"></div>
 </div></header>
 <main class="page">
-<section class="hero"><div class="kicker">The World of Entheon</div><h1>Kaleo</h1>
-<h2>A living reference to the world, its people, and its Entheon.</h2>
-<p>Explore the established systems, places, institutions and species of Kaleo — from Entheon evolution and Affinities to trainers, Gyms, research, technology and everyday life.</p></section>
-<section class="section">
-<h2>Explore Kaleo</h2>
-<div class="grid">
-<a class="card" href="reference.html#creature-combat-system"><div class="card-title">Creature Systems</div><div class="card-desc">Combat categories, statistics and battle fundamentals.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#move-database"><div class="card-title">Moves &amp; Abilities</div><div class="card-desc">Moves, special moves, abilities and established move pools.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#leveling-evolution-system"><div class="card-title">Growth &amp; Evolution</div><div class="card-desc">Leveling, evolution and progression rules.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#item-system"><div class="card-title">Items</div><div class="card-desc">The established item system and its role in Kaleo.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#trainer-capture-battle-systems"><div class="card-title">Trainers &amp; Battles</div><div class="card-desc">Trainer, capture and battle systems.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#5-kaleo-geography-regions-travel"><div class="card-title">The World</div><div class="card-desc">Kaleo's geography, regions and travel.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#6-human-entheon-relationship"><div class="card-title">People &amp; Entheon</div><div class="card-desc">The relationship between people and Entheon.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#7-affinity-in-the-world"><div class="card-title">Affinities</div><div class="card-desc">The established Affinities and their place in the world.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#8-technology-level"><div class="card-title">Technology</div><div class="card-desc">Kaleo's technological development.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#9-settlements-regions"><div class="card-title">Settlements &amp; Regions</div><div class="card-desc">Settlements and regional structure.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#10-wild-habitats"><div class="card-title">Wild Habitats</div><div class="card-desc">Where Entheon live and how habitats shape the world.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#11-research-institutions"><div class="card-title">Research &amp; Science</div><div class="card-desc">Research institutions, Entheon study and scientific infrastructure.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#12-trainer-organizations-leagues"><div class="card-title">Trainers, Leagues &amp; Gyms</div><div class="card-desc">Trainer organizations, leagues and the seven Gyms of Kaleo.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#13-economy-currency"><div class="card-title">Economy &amp; Vale</div><div class="card-desc">Kaleo's economy and established currency.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#14-shops-services"><div class="card-title">Shops &amp; Services</div><div class="card-desc">Everyday services, commerce and practical life.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#15-travel-transportation"><div class="card-title">Travel &amp; Transportation</div><div class="card-desc">Established methods of travel and transportation.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#16-education-everyday-life"><div class="card-title">Education &amp; Everyday Life</div><div class="card-desc">Education and ordinary life throughout Kaleo.</div><span class="card-arrow">Explore →</span></a>
-<a class="card" href="reference.html#17-law-safety-public-rules"><div class="card-title">Law &amp; Public Safety</div><div class="card-desc">Law, safety and established public rules.</div><span class="card-arrow">Explore →</span></a>
-</div>
-</section>
-<section class="section">
-<h2>Entheon</h2>
-<p style="color:var(--muted);max-width:850px">The canonical Entheon reference covers established species, evolution lines, Affinities, rarity and physical scale.</p>
-<div class="grid">
-<a class="card" href="reference.html#18-entheon-species-compendium"><div class="card-title">Species Compendium</div><div class="card-desc">Browse the established Entheon species and evolution lines.</div><span class="card-arrow">Open compendium →</span></a>
-<a class="card" href="reference.html#18-entheon-species-compendium"><div class="card-title">Evolution Lines</div><div class="card-desc">Follow each established Entheon from its earliest stage to its final form.</div><span class="card-arrow">View evolution data →</span></a>
-<a class="card" href="reference.html#18-entheon-species-compendium"><div class="card-title">Physical Scale</div><div class="card-desc">Average height and length provide consistent scale for descriptions and imagery.</div><span class="card-arrow">View species data →</span></a>
-</div>
-<div class="species-box" style="margin-top:16px">
-<a href="reference.html#starter-line-1-nimblet-nymbril-nymbrake">Starter Line 1 — Nimblet → Nymbril → Nymbrake</a>
-<a href="reference.html#starter-line-2-pipiri-pirello-piravelle">Starter Line 2 — Pipiri → Pirello → Piravelle</a>
-<a href="reference.html#starter-line-3-morrowe-morvane-morvayne">Starter Line 3 — Morrowe → Morvane → Morvayne</a>
-<a href="reference.html#kivvi-kivara-kivarune-1">10–12 — Kivvi → Kivara → Kivarune</a>
-<a href="reference.html#brindlew-brindrel-brinderv-1">13–15 — Brindlew → Brindrel → Brinderv</a>
-<a href="reference.html#sovel-sovelle-sovaryn-1">16–18 — Sovel → Sovelle → Sovaryn</a>
-<a href="reference.html#tarnit-tarnelle-tarnovar-1">19–21 — Tarnit → Tarnelle → Tarnovar</a>
-<a href="reference.html#quiblet-quivane-quivaryn-1">22–24 — Quiblet → Quivane → Quivaryn</a>
-<a href="reference.html#elnu-elvara-elvarin-1">25–27 — Elnu → Elvara → Elvarin</a>
-<a href="reference.html#drakyn-voltaryn-drakoryn-1">28–30 — Drakyn → Voltaryn → Drakoryn</a>
-<a href="reference.html#vessa-vessari">31–32 — Vessa → Vessari</a>
-<a href="reference.html#rookit-rookane">33–34 — Rookit → Rookane</a>
-<a href="reference.html#meliu-meliora">35–36 — Meliu → Meliora</a>
-<a href="reference.html#dovik-dovaryn">37–38 — Dovik → Dovaryn</a>
-<a href="reference.html#pellin-pellune">39–40 — Pellin → Pellune</a>
-<a href="reference.html#arko-arkelle">41–42 — Arko → Arkelle</a>
-<a href="reference.html#sairi-sairune-1">43–44 — Sairi → Sairune</a>
-<a href="reference.html#orrin-orravel">47–48 — Orrin → Orravel</a>
-<a href="reference.html#tivvi-tivarra-1">49–50 — Tivvi → Tivarra</a>
-<a href="reference.html#cairnix-cairneth">51–52 — Cairnix → Cairneth</a>
-<a href="reference.html#lumae-lumaryn">53–54 — Lumae → Lumaryn</a>
-<a href="reference.html#virel-virenne">55–56 — Virel → Virenne</a>
-<a href="reference.html#koroa-korovan">57–58 — Koroa → Korovan</a>
-<a href="reference.html#esvin-esvar-1">59–60 — Esvin → Esvar</a>
-<a href="reference.html#marnel-marnyx">61–62 — Marnel → Marnyx</a>
-<a href="reference.html#yori-yorvale-2">63–64 — Yori → Yorvale</a>
-<a href="reference.html#thessa-thessane-1">65–66 — Thessa → Thessane</a>
-<a href="reference.html#orli-orlith-1">67–68 — Orli → Orlith</a>
-<a href="reference.html#fenni-fennovar">69–70 — Fenni → Fennovar</a>
-<a href="reference.html#caelo-caelune">71–72 — Caelo → Caelune</a>
-<a href="reference.html#rilsa-rilsaryn-1">73–74 — Rilsa → Rilsaryn</a>
-<a href="reference.html#uvera-uveryn">75–76 — Uvera → Uveryn</a>
-<a href="reference.html#veyli-and-branching-evolutions">77–80 — Veyli and Branching Evolutions</a>
-<a href="reference.html#avenn-1">92 — Avenn</a>
-</div>
-</section>
-<section class="section"><h2>Reference</h2><div class="grid">
-<a class="card" href="reference.html"><div class="card-title">Open the Complete Reference</div><div class="card-desc">Browse the full canonical master reference, including detailed system, worldbuilding and species material.</div><span class="card-arrow">Open reference →</span></a>
-<a class="card" href="reference.html#11-research-institutions"><div class="card-title">Research &amp; Starter Distribution</div><div class="card-desc">Explore the established research infrastructure surrounding Entheon study and starter distribution.</div><span class="card-arrow">View research →</span></a>
-<a class="card" href="reference.html#12-trainer-organizations-leagues"><div class="card-title">The Seven Gyms</div><div class="card-desc">Find the established Gym and league framework within Kaleo.</div><span class="card-arrow">View Gym system →</span></a>
-</div></section>
-<div class="footer">Kaleo · Entheon — canonical world reference.</div>
+  <section class="hero">
+    <div class="kicker">THE WORLD OF ENTHEON</div>
+    <h1>Kaleo</h1>
+    <h2>A living reference to the world, its people, and its Entheon.</h2>
+    <p>Explore the established systems, places, institutions and species of Kaleo — from Entheon evolution and Affinities to trainers, Gyms, research, technology and everyday life.</p>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <div class="kicker">EXPLORE</div>
+        <h2>Kaleo at a Glance</h2>
+      </div>
+      <p class="section-intro">Choose an area of the world to explore.</p>
+    </div>
+
+    <div class="portal-grid">
+      <a class="portal portal-large" href="#entheon">
+        <div class="portal-number">01</div>
+        <h3>Entheon</h3>
+        <p>The creatures of Kaleo — species, evolution, Affinities, biology and established lore.</p>
+        <span>Explore the Entheon →</span>
+      </a>
+
+      <a class="portal" href="#battle">
+        <div class="portal-number">02</div>
+        <h3>Battle &amp; Training</h3>
+        <p>Combat systems, techniques, trainers, progression and the seven Gyms.</p>
+        <span>Explore →</span>
+      </a>
+
+      <a class="portal" href="#world">
+        <div class="portal-number">03</div>
+        <h3>The World</h3>
+        <p>Regions, settlements, habitats, travel, economy and everyday places.</p>
+        <span>Explore →</span>
+      </a>
+
+      <a class="portal" href="#society">
+        <div class="portal-number">04</div>
+        <h3>People &amp; Society</h3>
+        <p>Human–Entheon relationships, education, daily life, law and public safety.</p>
+        <span>Explore →</span>
+      </a>
+
+      <a class="portal" href="#science">
+        <div class="portal-number">05</div>
+        <h3>Science &amp; Technology</h3>
+        <p>Research, Entheon study, technology and the institutions that support them.</p>
+        <span>Explore →</span>
+      </a>
+
+      <a class="portal" href="reference.html">
+        <div class="portal-number">06</div>
+        <h3>Complete Reference</h3>
+        <p>The full canonical master reference containing the established systems and worldbuilding.</p>
+        <span>Open Reference →</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section entheon-feature" id="entheon">
+    <div class="feature-copy">
+      <div class="kicker">THE CREATURES OF KALEO</div>
+      <h2>Entheon</h2>
+      <p>The Entheon are the established creatures of Kaleo. Explore their evolution lines, Affinities, rarity, physical scale and species descriptions in the dedicated compendium.</p>
+      <a class="button" href="#compendium">Open the Entheon Compendium →</a>
+    </div>
+    <div class="feature-mark">
+      <span>100</span>
+      <small>ESTABLISHED<br>ENTHEON</small>
+    </div>
+  </section>
+
+  <section class="section" id="battle">
+    <div class="section-head compact">
+      <div>
+        <div class="kicker">BATTLE &amp; TRAINING</div>
+        <h2>How Kaleo Battles</h2>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="reference.html#creature-combat-system">Creature Combat System <span>→</span></a>
+      <a href="reference.html#status-techniques">Techniques &amp; Status <span>→</span></a>
+      <a href="reference.html#gyms">Trainers &amp; Seven Gyms <span>→</span></a>
+    </div>
+  </section>
+
+  <section class="section" id="world">
+    <div class="section-head compact">
+      <div>
+        <div class="kicker">THE WORLD</div>
+        <h2>Places &amp; Everyday Life</h2>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="reference.html">Settlements &amp; Regions <span>→</span></a>
+      <a href="reference.html">Wild Habitats <span>→</span></a>
+      <a href="reference.html">Travel &amp; Transportation <span>→</span></a>
+      <a href="reference.html">Economy &amp; Vale <span>→</span></a>
+    </div>
+  </section>
+
+  <section class="section" id="society">
+    <div class="section-head compact">
+      <div>
+        <div class="kicker">PEOPLE &amp; SOCIETY</div>
+        <h2>Life in Kaleo</h2>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="reference.html">Human–Entheon Relationships <span>→</span></a>
+      <a href="reference.html">Education &amp; Everyday Life <span>→</span></a>
+      <a href="reference.html">Law &amp; Public Safety <span>→</span></a>
+    </div>
+  </section>
+
+  <section class="section" id="science">
+    <div class="section-head compact">
+      <div>
+        <div class="kicker">SCIENCE &amp; TECHNOLOGY</div>
+        <h2>Research &amp; Development</h2>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="reference.html">Research &amp; Starter Distribution <span>→</span></a>
+      <a href="reference.html">Technology <span>→</span></a>
+    </div>
+  </section>
+
+  <section class="section" id="compendium">
+    <div class="section-head">
+      <div>
+        <div class="kicker">ENTHEON COMPENDIUM</div>
+        <h2>Evolution Lines</h2>
+      </div>
+      <p class="section-intro">The full species index belongs here — separate from the homepage so Kaleo's front door stays clean.</p>
+    </div>
+
+    <div class="compendium-preview">
+      <div class="compendium-stat">
+        <strong>100</strong>
+        <span>Established Entheon</span>
+      </div>
+      <div class="compendium-stat">
+        <strong>Evolution</strong>
+        <span>Lines and stages</span>
+      </div>
+      <div class="compendium-stat">
+        <strong>Affinity</strong>
+        <span>Species classifications</span>
+      </div>
+      <div class="compendium-stat">
+        <strong>Scale</strong>
+        <span>Height and length</span>
+      </div>
+    </div>
+
+    <a class="reference-link" href="reference.html">
+      <strong>Open the complete reference →</strong>
+      <span>Browse the canonical master reference and detailed Entheon material.</span>
+    </a>
+  </section>
 </main>
 <script>
 const input=document.getElementById('search');
