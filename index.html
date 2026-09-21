@@ -113,37 +113,157 @@ a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24
 
 </style>
 <style id="homepage-design">
-.portal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.portal{display:block;text-decoration:none;padding:28px;border:1px solid var(--border);border-radius:20px;background:linear-gradient(145deg,rgba(17,38,54,.82),rgba(9,23,34,.92));min-height:170px;transition:transform .18s ease,border-color .18s ease,background .18s ease}
-.portal:hover{transform:translateY(-3px);border-color:var(--accent);background:linear-gradient(145deg,rgba(22,48,67,.95),rgba(9,25,37,.96))}
-.portal-large{grid-column:span 2;min-height:190px}
-.portal-number{font-size:.75rem;font-weight:800;letter-spacing:.14em;color:var(--accent);margin-bottom:18px}
-.portal h3{font-size:1.35rem;margin:0 0 9px}
-.portal p{color:var(--muted);margin:0 0 20px;max-width:720px}
-.portal span{font-weight:800;color:var(--accent);font-size:.85rem}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:18px}
+/* Homepage portal system: large category tiles unfold their sub-sections on hover/focus. */
+.portal-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  align-items:start;
+}
+.portal{
+  position:relative;
+  display:block;
+  text-decoration:none;
+  padding:30px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:linear-gradient(145deg,rgba(17,38,54,.82),rgba(9,23,34,.92));
+  min-height:185px;
+  overflow:hidden;
+  transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease;
+}
+.portal:hover,
+.portal:focus-within{
+  transform:translateY(-2px);
+  border-color:rgba(99,216,255,.7);
+  background:linear-gradient(145deg,rgba(22,48,67,.97),rgba(9,25,37,.98));
+  box-shadow:0 16px 40px rgba(0,0,0,.22);
+}
+.portal-number{
+  font-size:.75rem;
+  font-weight:800;
+  letter-spacing:.14em;
+  color:var(--accent);
+  margin-bottom:18px;
+}
+.portal h3{
+  font-size:1.45rem;
+  margin:0 0 9px;
+}
+.portal p{
+  color:var(--muted);
+  margin:0;
+  max-width:720px;
+}
+.portal-action{
+  display:block;
+  margin-top:22px;
+  color:var(--accent);
+  font-weight:800;
+  font-size:.84rem;
+  transition:opacity .15s ease;
+}
+.portal-action::after{content:"  ↓";font-weight:900}
+.portal-subnav{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:20px;
+  padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.10);
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  transform:translateY(-8px);
+  transition:max-height .3s ease,opacity .2s ease,transform .25s ease;
+}
+.portal:hover .portal-subnav,
+.portal:focus-within .portal-subnav{
+  max-height:260px;
+  opacity:1;
+  transform:translateY(0);
+}
+.portal-subnav a{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 11px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:9px;
+  background:rgba(4,13,21,.42);
+  color:#dcecf2;
+  text-decoration:none;
+  font-size:.82rem;
+  line-height:1.35;
+}
+.portal-subnav a::after{
+  content:"→";
+  color:var(--accent);
+  font-weight:900;
+  flex:none;
+}
+.portal-subnav a:hover{
+  border-color:rgba(99,216,255,.55);
+  background:rgba(99,216,255,.07);
+}
+.portal-full{
+  grid-column:1 / -1;
+  min-height:145px;
+}
+.portal-full .portal-subnav{
+  grid-template-columns:1fr;
+}
+.portal-full .portal-action::after{content:"  →"}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:30px;
+  margin-bottom:18px;
+}
 .section-head.compact{margin-bottom:14px}
 .section-intro{color:var(--muted);max-width:520px;margin:0}
-.entehon-feature,.entheon-feature{display:grid;grid-template-columns:1fr 240px;gap:40px;align-items:center;padding:45px 50px;border:1px solid var(--border);border-radius:24px;background:radial-gradient(circle at 85% 50%,rgba(99,216,255,.12),transparent 38%),linear-gradient(135deg,rgba(18,44,61,.9),rgba(12,27,41,.96))}
+
+.entheon-feature{
+  display:grid;
+  grid-template-columns:1fr 240px;
+  gap:40px;
+  align-items:center;
+  padding:45px 50px;
+  border:1px solid var(--border);
+  border-radius:24px;
+  background:radial-gradient(circle at 85% 50%,rgba(99,216,255,.12),transparent 38%),linear-gradient(135deg,rgba(18,44,61,.9),rgba(12,27,41,.96));
+}
 .feature-copy h2{font-size:clamp(2.3rem,4vw,3.7rem);margin:0 0 12px}
 .feature-copy p{color:var(--muted);max-width:700px;font-size:1.02rem;line-height:1.75}
 .button{display:inline-block;margin-top:12px;padding:12px 17px;border:1px solid var(--accent);border-radius:10px;color:var(--accent);text-decoration:none;font-weight:800}
 .feature-mark{text-align:center;border:1px solid var(--border);border-radius:22px;padding:30px 20px;background:rgba(5,15,24,.35)}
 .feature-mark span{display:block;font-size:4rem;font-weight:900;line-height:1}
 .feature-mark small{display:block;margin-top:10px;color:var(--muted);font-weight:800;letter-spacing:.12em}
-.link-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.link-row a{display:flex;justify-content:space-between;gap:15px;padding:16px 18px;border:1px solid var(--border);border-radius:12px;background:rgba(13,29,42,.72);color:var(--text);text-decoration:none}
-.link-row a:hover{border-color:var(--accent)}
-.link-row span{color:var(--accent);font-weight:800}
-.compendium-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.compendium-stat{padding:24px 18px;border:1px solid var(--border);border-radius:15px;background:rgba(13,29,42,.72)}
-.compendium-stat strong{display:block;font-size:1.25rem;margin-bottom:6px}
-.compendium-stat span{color:var(--muted);font-size:.88rem}
-.reference-link{display:flex;flex-direction:column;gap:7px;padding:23px 25px;border:1px solid var(--border);border-radius:16px;background:rgba(13,29,42,.8);text-decoration:none}
-.reference-link strong{color:var(--accent)}
-.reference-link span{color:var(--muted)}
-@media(max-width:850px){.portal-grid,.link-row{grid-template-columns:1fr}.portal-large{grid-column:auto}.entheon-feature{grid-template-columns:1fr}.feature-mark{max-width:240px}.compendium-preview{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.section-intro{margin-top:8px}}
-@media(max-width:520px){.compendium-preview{grid-template-columns:1fr}.portal{padding:22px}}
+
+@media(max-width:850px){
+  .portal-grid{grid-template-columns:1fr}
+  .portal-full{grid-column:auto}
+  .portal-subnav{grid-template-columns:1fr 1fr}
+  .entheon-feature{grid-template-columns:1fr}
+  .feature-mark{max-width:240px}
+  .section-head{display:block}
+  .section-intro{margin-top:8px}
+}
+@media(max-width:520px){
+  .portal{padding:23px}
+  .portal-subnav{grid-template-columns:1fr}
+}
+@media(hover:none){
+  .portal-subnav{
+    max-height:500px;
+    opacity:1;
+    transform:none;
+  }
+  .portal-action{display:none}
+}
 </style>
 
 </head>
@@ -174,59 +294,73 @@ a{color:inherit}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,16,24
     </div>
   </section>
 
-  <section class="section" id="battle">
-    <div class="section-head compact">
+  <section class="section" id="explore">
+    <div class="section-head">
       <div>
-        <div class="kicker">BATTLE &amp; TRAINING</div>
-        <h2>How Kaleo Battles</h2>
+        <div class="kicker">EXPLORE</div>
+        <h2>Kaleo at a Glance</h2>
       </div>
+      <p class="section-intro">Hover over an area to unfold the topics inside it.</p>
     </div>
-    <div class="link-row">
-      <a href="reference.html#creature-combat-system">Creature Combat System <span>→</span></a>
-      <a href="reference.html#status-techniques">Techniques &amp; Status <span>→</span></a>
-      <a href="reference.html#gyms">Trainers &amp; Seven Gyms <span>→</span></a>
-    </div>
-  </section>
 
-  <section class="section" id="world">
-    <div class="section-head compact">
-      <div>
-        <div class="kicker">THE WORLD</div>
-        <h2>Places &amp; Everyday Life</h2>
-      </div>
-    </div>
-    <div class="link-row">
-      <a href="reference.html">Settlements &amp; Regions <span>→</span></a>
-      <a href="reference.html">Wild Habitats <span>→</span></a>
-      <a href="reference.html">Travel &amp; Transportation <span>→</span></a>
-      <a href="reference.html">Economy &amp; Vale <span>→</span></a>
-    </div>
-  </section>
+    <div class="portal-grid">
+      <article class="portal">
+        <div class="portal-number">01</div>
+        <h3>Battle &amp; Training</h3>
+        <p>Combat systems, techniques, trainers, progression and the seven Gyms.</p>
+        <span class="portal-action">Explore</span>
+        <nav class="portal-subnav" aria-label="Battle and Training">
+          <a href="reference.html#creature-combat-system">Creature Combat System</a>
+          <a href="reference.html#status-techniques">Techniques &amp; Status</a>
+          <a href="reference.html#gyms">Trainers &amp; Seven Gyms</a>
+        </nav>
+      </article>
 
-  <section class="section" id="society">
-    <div class="section-head compact">
-      <div>
-        <div class="kicker">PEOPLE &amp; SOCIETY</div>
-        <h2>Life in Kaleo</h2>
-      </div>
-    </div>
-    <div class="link-row">
-      <a href="reference.html">Human–Entheon Relationships <span>→</span></a>
-      <a href="reference.html">Education &amp; Everyday Life <span>→</span></a>
-      <a href="reference.html">Law &amp; Public Safety <span>→</span></a>
-    </div>
-  </section>
+      <article class="portal">
+        <div class="portal-number">02</div>
+        <h3>The World</h3>
+        <p>Regions, settlements, habitats, travel, economy and the places of everyday life.</p>
+        <span class="portal-action">Explore</span>
+        <nav class="portal-subnav" aria-label="The World">
+          <a href="reference.html">Settlements &amp; Regions</a>
+          <a href="reference.html">Wild Habitats</a>
+          <a href="reference.html">Travel &amp; Transportation</a>
+          <a href="reference.html">Economy &amp; Vale</a>
+        </nav>
+      </article>
 
-  <section class="section" id="science">
-    <div class="section-head compact">
-      <div>
-        <div class="kicker">SCIENCE &amp; TECHNOLOGY</div>
-        <h2>Research &amp; Development</h2>
-      </div>
-    </div>
-    <div class="link-row">
-      <a href="reference.html">Research &amp; Starter Distribution <span>→</span></a>
-      <a href="reference.html">Technology <span>→</span></a>
+      <article class="portal">
+        <div class="portal-number">03</div>
+        <h3>People &amp; Society</h3>
+        <p>Human–Entheon relationships, education, daily life, law and public safety.</p>
+        <span class="portal-action">Explore</span>
+        <nav class="portal-subnav" aria-label="People and Society">
+          <a href="reference.html">Human–Entheon Relationships</a>
+          <a href="reference.html">Education &amp; Everyday Life</a>
+          <a href="reference.html">Law &amp; Public Safety</a>
+        </nav>
+      </article>
+
+      <article class="portal">
+        <div class="portal-number">04</div>
+        <h3>Science &amp; Technology</h3>
+        <p>Research, Entheon study, technology and the institutions that support them.</p>
+        <span class="portal-action">Explore</span>
+        <nav class="portal-subnav" aria-label="Science and Technology">
+          <a href="reference.html">Research &amp; Starter Distribution</a>
+          <a href="reference.html">Technology</a>
+        </nav>
+      </article>
+
+      <article class="portal portal-full">
+        <div class="portal-number">05</div>
+        <h3>Complete Reference</h3>
+        <p>The full canonical master reference containing the established systems and worldbuilding.</p>
+        <span class="portal-action">Open the Reference</span>
+        <nav class="portal-subnav" aria-label="Complete Reference">
+          <a href="reference.html">Open the complete canonical reference</a>
+        </nav>
+      </article>
     </div>
   </section>
 
