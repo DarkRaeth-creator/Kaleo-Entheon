@@ -3,42 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Kaleo – World of Entheon</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
     <div id="game">
-
         <div class="game-window">
 
             <header class="game-header">
-                <h1>Kaleo</h1>
-                <p>World of Entheon</p>
+                <div>
+                    <h1>Kaleo</h1>
+                    <p>World of Entheon</p>
+                </div>
+                <div id="status-bar">
+                    <span id="starter-status">Starter: —</span>
+                </div>
             </header>
 
             <main class="game-screen">
 
-                <div class="dialogue">
-
-                    <h2 id="scene-title"></h2>
-
-                    <div id="scene-text"></div>
-
+                <div id="intro-screen">
+                    <div class="dialogue">
+                        <h2 id="scene-title"></h2>
+                        <div id="scene-text"></div>
+                    </div>
+                    <div id="options" class="options"></div>
                 </div>
 
-                <div id="options" class="options"></div>
+                <div id="overworld-screen" class="hidden">
+                    <div id="game-container">
+                        <canvas id="game-canvas" width="640" height="480"></canvas>
+                    </div>
+
+                    <div id="controls-help">
+                        <span><strong>Move:</strong> WASD / Arrow Keys</span>
+                        <span><strong>Interact:</strong> E / Enter / Space</span>
+                    </div>
+
+                    <div id="world-message" class="world-message hidden"></div>
+                </div>
 
             </main>
 
         </div>
-
     </div>
 
     <script src="game.js"></script>
-
 </body>
 </html>
