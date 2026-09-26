@@ -10,7 +10,8 @@ const gameState = {
     starter: null,
     activeDialogue: null,
     dialogueIndex: 0,
-    currentMap: "town"
+    currentMap: "town",
+    transitionCooldown: 0
 };
 
 
@@ -299,7 +300,7 @@ const maps = {
             "#.........D........#",
             "####################"
         ],
-        spawn: { x: 10, y: 9 },
+        spawn: { x: 10, y: 8 },
         exit: { x: 10, y: 10, targetMap: "town", targetX: 15, targetY: 8 },
         npcs: [
             {
@@ -451,6 +452,9 @@ function loadMap(mapId, spawnX = null, spawnY = null) {
     if (spawnX !== null) player.x = spawnX;
     if (spawnY !== null) player.y = spawnY;
 
+    // Give the player a short grace period after entering a new map.
+    gameState.transitionCooldown = 350;
+
     areaStatus.textContent = currentMap.name;
 
     closeNpcDialogue();
@@ -494,6 +498,11 @@ function gameLoop(timestamp) {
 // ============================================================
 
 function updatePlayer(delta) {
+    // Prevent a map transition from immediately triggering another transition.
+    if (gameState.transitionCooldown > 0) {
+        gameState.transitionCooldown -= delta * 16.67;
+    }
+
     let dx = 0;
     let dy = 0;
 
@@ -509,9 +518,13 @@ function updatePlayer(delta) {
         dy *= 0.7071;
     }
 
-    const newX = player.x + dx * player.speed * delta / TILE_SIZE;
-    const newY = player.y + dy * player.speed * delta / TILE_SIZE;
+    const movement = player.speed * delta / TILE_SIZE;
 
+    const newX = player.x + dx * movement;
+    const newY = player.y + dy * movement;
+
+    // Check horizontal and vertical movement independently so the player
+    // can slide along walls instead of becoming completely stuck.
     if (canMoveTo(newX, player.y)) {
         player.x = newX;
     }
@@ -528,7 +541,9 @@ function updatePlayer(delta) {
     player.x = Math.max(minX, Math.min(maxX, player.x));
     player.y = Math.max(minY, Math.min(maxY, player.y));
 
-    checkAutomaticTransitions();
+    if (gameState.transitionCooldown <= 0) {
+        checkAutomaticTransitions();
+    }
 }
 
 function canMoveTo(x, y) {
@@ -590,7 +605,7 @@ function checkAutomaticTransitions() {
         transitionTo(
             "research_center",
             10,
-            9,
+            8,
             "You enter the Entheon Research Center."
         );
         return;
@@ -903,6 +918,7 @@ function restartGame() {
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
+    gameState.transitionCooldown = 0;
 
     starterStatus.textContent = "Starter: —";
     areaStatus.textContent = "Kaleo";
