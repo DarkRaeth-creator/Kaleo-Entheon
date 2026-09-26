@@ -357,6 +357,8 @@ function restartGame() {
 
 function showWelcome() {
 
+    gameState.currentScene = "welcome";
+
     showScene(
         "Welcome to Kaleo",
         `
