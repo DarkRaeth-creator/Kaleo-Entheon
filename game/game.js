@@ -1,6 +1,6 @@
 // ============================================================
 // KALEO – WORLD OF ENTHEON
-// Step 1: Intro + Playable 2D Overworld Prototype
+// Step 2: Playable 2D Overworld + Camera
 // ============================================================
 
 const gameState = {
@@ -207,27 +207,39 @@ const ctx = canvas.getContext("2d");
 
 const TILE_SIZE = 32;
 
+// The world is now larger than the visible screen.
+// The camera follows the player as they explore it.
 const map = [
-    "####################",
-    "#..........#########",
-    "#..TT......#########",
-    "#..TT..GGG.........#",
-    "#......GGG.........#",
-    "#......GGG.........#",
-    "#..................#",
-    "#.....#####........#",
-    "#.....#...#........#",
-    "#.....#...#........#",
-    "#.....#...#........#",
-    "#.....#####........#",
-    "#..................#",
-    "#....WWWW..........#",
-    "#....WWWW..........#",
-    "#..................#",
-    "#..........TT......#",
-    "#..........TT......#",
-    "#..................#",
-    "####################"
+    "########################################",
+    "#......................................#",
+    "#......................................#",
+    "#..TT..............GGGG...............#",
+    "#..TT..............GGGG...............#",
+    "#.................GGGG................#",
+    "#.................GGGG................#",
+    "#.............#####...................#",
+    "#.............#...#...................#",
+    "#.............#...#...................#",
+    "#.............#####...................#",
+    "#......................................#",
+    "#......................................#",
+    "#....WWWW..............................#",
+    "#....WWWW..............................#",
+    "#....WWWW..............TT.............#",
+    "#......................TT.............#",
+    "#......................................#",
+    "#................GGGG..................#",
+    "#................GGGG..................#",
+    "#................GGGG..................#",
+    "#......................................#",
+    "#......................TT.............#",
+    "#......................TT.............#",
+    "#......................................#",
+    "#..........GGGG........................#",
+    "#..........GGGG........................#",
+    "#......................................#",
+    "#......................................#",
+    "########################################"
 ];
 
 const TILE = {
@@ -238,12 +250,20 @@ const TILE = {
     WALL: "#"
 };
 
+const WORLD_WIDTH = map[0].length * TILE_SIZE;
+const WORLD_HEIGHT = map.length * TILE_SIZE;
+
 const player = {
-    x: 2,
-    y: 17,
+    x: 4,
+    y: 25,
     width: 20,
     height: 24,
     speed: 3
+};
+
+const camera = {
+    x: 0,
+    y: 0
 };
 
 const keys = {};
@@ -252,16 +272,18 @@ let animationFrame = null;
 let lastTime = 0;
 
 document.addEventListener("keydown", event => {
-    keys[event.key.toLowerCase()] = true;
+    const key = event.key.toLowerCase();
+
+    keys[key] = true;
 
     if (
-        ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(event.key.toLowerCase())
+        ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)
     ) {
         event.preventDefault();
     }
 
     if (
-        ["e", "enter", " "].includes(event.key.toLowerCase()) &&
+        ["e", "enter", " "].includes(key) &&
         gameState.mode === "overworld"
     ) {
         interact();
@@ -284,7 +306,6 @@ function startOverworld() {
         "Welcome to Kaleo. Explore the area and get used to moving around."
     );
 
-    resizeCanvas();
     drawGame();
 
     cancelAnimationFrame(animationFrame);
@@ -293,17 +314,12 @@ function startOverworld() {
 }
 
 
-function resizeCanvas() {
-    // Keep the internal game resolution fixed.
-    // CSS handles the visual scaling.
-}
-
-
 function gameLoop(timestamp) {
     const delta = Math.min((timestamp - lastTime) / 16.67, 2);
     lastTime = timestamp;
 
     updatePlayer(delta);
+    updateCamera();
     drawGame();
 
     animationFrame = requestAnimationFrame(gameLoop);
@@ -337,6 +353,7 @@ function updatePlayer(delta) {
         player.y = newY;
     }
 
+    // Keep the player inside the actual world.
     player.x = Math.max(0.55, Math.min(map[0].length - 1.55, player.x));
     player.y = Math.max(0.55, Math.min(map.length - 1.55, player.y));
 }
@@ -371,6 +388,24 @@ function getTile(x, y) {
 }
 
 
+// ============================================================
+// CAMERA
+// ============================================================
+
+function updateCamera() {
+    // Center the player on screen.
+    let targetX = player.x * TILE_SIZE - canvas.width / 2;
+    let targetY = player.y * TILE_SIZE - canvas.height / 2;
+
+    // Stop the camera at the edges of the world.
+    const maxCameraX = Math.max(0, WORLD_WIDTH - canvas.width);
+    const maxCameraY = Math.max(0, WORLD_HEIGHT - canvas.height);
+
+    camera.x = Math.max(0, Math.min(maxCameraX, targetX));
+    camera.y = Math.max(0, Math.min(maxCameraY, targetY));
+}
+
+
 function interact() {
     const facing = getFacingDirection();
 
@@ -389,15 +424,14 @@ function interact() {
         return;
     }
 
-    // Temporary interaction point in the center area.
     if (
-        targetX >= 5 &&
-        targetX <= 9 &&
+        targetX >= 13 &&
+        targetX <= 17 &&
         targetY >= 7 &&
-        targetY <= 11
+        targetY <= 10
     ) {
         showWorldMessage(
-            "This area will eventually contain a building or important location."
+            "This building will eventually become an important location."
         );
         return;
     }
@@ -415,18 +449,28 @@ function getFacingDirection() {
 }
 
 
+// ============================================================
+// DRAWING
+// ============================================================
+
 function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    ctx.save();
+
+    // Everything in the world is drawn relative to the camera.
+    ctx.translate(-Math.floor(camera.x), -Math.floor(camera.y));
+
     drawMap();
     drawPlayer();
+
+    ctx.restore();
 }
 
 
 function drawMap() {
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
-
             const tile = map[y][x];
             const px = x * TILE_SIZE;
             const py = y * TILE_SIZE;
@@ -499,27 +543,22 @@ function drawPlayer() {
     const px = player.x * TILE_SIZE;
     const py = player.y * TILE_SIZE;
 
-    // Shadow
     ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
     ctx.beginPath();
     ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body
     ctx.fillStyle = "#3559a8";
     ctx.fillRect(px - 9, py - 7, 18, 18);
 
-    // Head
     ctx.fillStyle = "#f0c6a4";
     ctx.beginPath();
     ctx.arc(px, py - 11, 8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hair
     ctx.fillStyle = "#4a3025";
     ctx.fillRect(px - 7, py - 19, 14, 5);
 
-    // Eyes
     ctx.fillStyle = "#222";
     ctx.fillRect(px - 4, py - 12, 2, 2);
     ctx.fillRect(px + 2, py - 12, 2, 2);
