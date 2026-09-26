@@ -1,13 +1,15 @@
 // ============================================================
 // KALEO – WORLD OF ENTHEON
-// Step 2: Playable 2D Overworld + Camera
+// Step 3: Overworld + NPCs + Interaction
 // ============================================================
 
 const gameState = {
     mode: "intro",
     currentScene: "welcome",
     playerName: "",
-    starter: null
+    starter: null,
+    activeDialogue: null,
+    dialogueIndex: 0
 };
 
 
@@ -24,6 +26,9 @@ const overworldScreen = document.getElementById("overworld-screen");
 const starterStatus = document.getElementById("starter-status");
 const worldMessage = document.getElementById("world-message");
 
+const npcDialogue = document.getElementById("npc-dialogue");
+const npcDialogueName = document.getElementById("npc-dialogue-name");
+const npcDialogueText = document.getElementById("npc-dialogue-text");
 
 function showScene(title, text, options = []) {
     sceneTitle.textContent = title;
@@ -41,7 +46,6 @@ function showScene(title, text, options = []) {
     });
 }
 
-
 function showOpening() {
     gameState.currentScene = "opening";
 
@@ -57,7 +61,6 @@ function showOpening() {
         ]
     );
 }
-
 
 function showArrival() {
     gameState.currentScene = "arrival";
@@ -77,7 +80,6 @@ function showArrival() {
         ]
     );
 }
-
 
 function showResearchCenter() {
     gameState.currentScene = "research-center";
@@ -100,7 +102,6 @@ function showResearchCenter() {
         ]
     );
 }
-
 
 function showStarterIntroduction() {
     gameState.currentScene = "starter-introduction";
@@ -128,7 +129,6 @@ function showStarterIntroduction() {
     );
 }
 
-
 function showStarterSelection() {
     gameState.currentScene = "starter-selection";
 
@@ -149,7 +149,6 @@ function showStarterSelection() {
         ]
     );
 }
-
 
 function showStarter(name) {
     gameState.currentScene = "starter-" + name.toLowerCase();
@@ -176,7 +175,6 @@ function showStarter(name) {
         ]
     );
 }
-
 
 function chooseStarter(name) {
     gameState.starter = name;
@@ -207,8 +205,6 @@ const ctx = canvas.getContext("2d");
 
 const TILE_SIZE = 32;
 
-// The world is now larger than the visible screen.
-// The camera follows the player as they explore it.
 const map = [
     "########################################",
     "#......................................#",
@@ -266,15 +262,59 @@ const camera = {
     y: 0
 };
 
-const keys = {};
 
-let animationFrame = null;
-let lastTime = 0;
+// ============================================================
+// NPC DATA
+// ============================================================
+
+const npcs = [
+    {
+        id: "researcher",
+        name: "Researcher",
+        x: 16,
+        y: 7,
+        color: "#8b6bbd",
+        lines: [
+            "Welcome to the Entheon Research and Training Center.",
+            "There is still much we do not know about the Entheon of Kaleo.",
+            "Take your time and explore. Your journey has only just begun."
+        ]
+    },
+    {
+        id: "trainer",
+        name: "Young Trainer",
+        x: 22,
+        y: 12,
+        color: "#d26b6b",
+        lines: [
+            "Hey! You're a new trainer too, right?",
+            "I've been exploring the area around town.",
+            "Maybe we'll meet again when we're both a little stronger."
+        ]
+    },
+    {
+        id: "resident",
+        name: "Kaleo Resident",
+        x: 27,
+        y: 21,
+        color: "#6b9ed2",
+        lines: [
+            "The paths around Kaleo connect to places far beyond this area.",
+            "You should talk to people whenever you visit a new settlement.",
+            "You never know what you might learn."
+        ]
+    }
+];
+
+
+// ============================================================
+// INPUT
+// ============================================================
+
+const keys = {};
 
 document.addEventListener("keydown", event => {
     const key = event.key.toLowerCase();
-
-    keys[key] = true;
 
     if (
         ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)
@@ -282,12 +322,21 @@ document.addEventListener("keydown", event => {
         event.preventDefault();
     }
 
+    // Dialogue consumes interaction input first.
     if (
         ["e", "enter", " "].includes(key) &&
         gameState.mode === "overworld"
     ) {
-        interact();
+        if (gameState.activeDialogue) {
+            advanceDialogue();
+        } else {
+            interact();
+        }
+
+        return;
     }
+
+    keys[key] = true;
 });
 
 document.addEventListener("keyup", event => {
@@ -295,15 +344,24 @@ document.addEventListener("keyup", event => {
 });
 
 
+// ============================================================
+// GAME LOOP
+// ============================================================
+
+let animationFrame = null;
+let lastTime = 0;
+
 function startOverworld() {
     gameState.mode = "overworld";
     gameState.currentScene = "overworld";
+    gameState.activeDialogue = null;
+    gameState.dialogueIndex = 0;
 
     introScreen.classList.add("hidden");
     overworldScreen.classList.remove("hidden");
 
     showWorldMessage(
-        "Welcome to Kaleo. Explore the area and get used to moving around."
+        "Welcome to Kaleo. Explore the area and talk to people with E."
     );
 
     drawGame();
@@ -313,18 +371,24 @@ function startOverworld() {
     animationFrame = requestAnimationFrame(gameLoop);
 }
 
-
 function gameLoop(timestamp) {
     const delta = Math.min((timestamp - lastTime) / 16.67, 2);
     lastTime = timestamp;
 
-    updatePlayer(delta);
+    if (!gameState.activeDialogue) {
+        updatePlayer(delta);
+    }
+
     updateCamera();
     drawGame();
 
     animationFrame = requestAnimationFrame(gameLoop);
 }
 
+
+// ============================================================
+// MOVEMENT + COLLISION
+// ============================================================
 
 function updatePlayer(delta) {
     let dx = 0;
@@ -353,11 +417,9 @@ function updatePlayer(delta) {
         player.y = newY;
     }
 
-    // Keep the player inside the actual world.
     player.x = Math.max(0.55, Math.min(map[0].length - 1.55, player.x));
     player.y = Math.max(0.55, Math.min(map.length - 1.55, player.y));
 }
-
 
 function canMoveTo(x, y) {
     const radius = 0.28;
@@ -369,15 +431,24 @@ function canMoveTo(x, y) {
         [x + radius, y + radius]
     ];
 
-    return points.every(([px, py]) => {
+    const terrainClear = points.every(([px, py]) => {
         const tile = getTile(Math.floor(px), Math.floor(py));
 
         return tile !== TILE.WALL &&
                tile !== TILE.TREE &&
                tile !== TILE.WATER;
     });
-}
 
+    if (!terrainClear) {
+        return false;
+    }
+
+    // NPCs are solid so the player cannot simply walk through them.
+    return !npcs.some(npc => {
+        const distance = Math.hypot(x - npc.x, y - npc.y);
+        return distance < 0.65;
+    });
+}
 
 function getTile(x, y) {
     if (y < 0 || y >= map.length || x < 0 || x >= map[0].length) {
@@ -393,11 +464,9 @@ function getTile(x, y) {
 // ============================================================
 
 function updateCamera() {
-    // Center the player on screen.
     let targetX = player.x * TILE_SIZE - canvas.width / 2;
     let targetY = player.y * TILE_SIZE - canvas.height / 2;
 
-    // Stop the camera at the edges of the world.
     const maxCameraX = Math.max(0, WORLD_WIDTH - canvas.width);
     const maxCameraY = Math.max(0, WORLD_HEIGHT - canvas.height);
 
@@ -406,11 +475,26 @@ function updateCamera() {
 }
 
 
+// ============================================================
+// INTERACTION
+// ============================================================
+
 function interact() {
     const facing = getFacingDirection();
 
     const targetX = Math.floor(player.x + facing.x);
     const targetY = Math.floor(player.y + facing.y);
+
+    // First check for an NPC.
+    const npc = npcs.find(character => {
+        return Math.abs(character.x - targetX) <= 0.5 &&
+               Math.abs(character.y - targetY) <= 0.5;
+    });
+
+    if (npc) {
+        openNpcDialogue(npc);
+        return;
+    }
 
     const tile = getTile(targetX, targetY);
 
@@ -439,13 +523,56 @@ function interact() {
     showWorldMessage("There is nothing to interact with here.");
 }
 
-
 function getFacingDirection() {
     if (keys["arrowup"] || keys["w"]) return { x: 0, y: -1 };
     if (keys["arrowdown"] || keys["s"]) return { x: 0, y: 1 };
     if (keys["arrowleft"] || keys["a"]) return { x: -1, y: 0 };
 
     return { x: 1, y: 0 };
+}
+
+
+// ============================================================
+// NPC DIALOGUE
+// ============================================================
+
+function openNpcDialogue(npc) {
+    gameState.activeDialogue = npc;
+    gameState.dialogueIndex = 0;
+
+    npcDialogueName.textContent = npc.name;
+    npcDialogue.classList.remove("hidden");
+
+    updateNpcDialogueText();
+}
+
+function updateNpcDialogueText() {
+    const npc = gameState.activeDialogue;
+
+    if (!npc) return;
+
+    npcDialogueText.textContent = npc.lines[gameState.dialogueIndex];
+}
+
+function advanceDialogue() {
+    const npc = gameState.activeDialogue;
+
+    if (!npc) return;
+
+    gameState.dialogueIndex++;
+
+    if (gameState.dialogueIndex >= npc.lines.length) {
+        closeNpcDialogue();
+        return;
+    }
+
+    updateNpcDialogueText();
+}
+
+function closeNpcDialogue() {
+    gameState.activeDialogue = null;
+    gameState.dialogueIndex = 0;
+    npcDialogue.classList.add("hidden");
 }
 
 
@@ -458,15 +585,14 @@ function drawGame() {
 
     ctx.save();
 
-    // Everything in the world is drawn relative to the camera.
     ctx.translate(-Math.floor(camera.x), -Math.floor(camera.y));
 
     drawMap();
+    drawNpcs();
     drawPlayer();
 
     ctx.restore();
 }
-
 
 function drawMap() {
     for (let y = 0; y < map.length; y++) {
@@ -480,9 +606,7 @@ function drawMap() {
     }
 }
 
-
 function drawTile(tile, x, y) {
-
     if (tile === TILE.GRASS) {
         ctx.fillStyle = "#68a85a";
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -538,6 +662,43 @@ function drawTile(tile, x, y) {
     }
 }
 
+function drawNpcs() {
+    npcs.forEach(npc => {
+        const px = npc.x * TILE_SIZE;
+        const py = npc.y * TILE_SIZE;
+
+        // Shadow
+        ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+        ctx.beginPath();
+        ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body
+        ctx.fillStyle = npc.color;
+        ctx.fillRect(px - 9, py - 7, 18, 18);
+
+        // Head
+        ctx.fillStyle = "#f0c6a4";
+        ctx.beginPath();
+        ctx.arc(px, py - 11, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Hair
+        ctx.fillStyle = "#3c2a24";
+        ctx.fillRect(px - 7, py - 19, 14, 5);
+
+        // Eyes
+        ctx.fillStyle = "#222";
+        ctx.fillRect(px - 4, py - 12, 2, 2);
+        ctx.fillRect(px + 2, py - 12, 2, 2);
+
+        // Small interaction marker
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 12px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("!", px, py - 25);
+    });
+}
 
 function drawPlayer() {
     const px = player.x * TILE_SIZE;
@@ -564,7 +725,6 @@ function drawPlayer() {
     ctx.fillRect(px + 2, py - 12, 2, 2);
 }
 
-
 function showWorldMessage(message) {
     worldMessage.textContent = message;
     worldMessage.classList.remove("hidden");
@@ -586,15 +746,17 @@ function restartGame() {
     gameState.currentScene = "welcome";
     gameState.playerName = "";
     gameState.starter = null;
+    gameState.activeDialogue = null;
+    gameState.dialogueIndex = 0;
 
     starterStatus.textContent = "Starter: —";
 
+    npcDialogue.classList.add("hidden");
     overworldScreen.classList.add("hidden");
     introScreen.classList.remove("hidden");
 
     showWelcome();
 }
-
 
 function showWelcome() {
     gameState.mode = "intro";
