@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Kaleo – World of Entheon</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -20,22 +22,25 @@
 
         <main id="game-content">
 
-            <section id="game-screen">
+            <div id="game-container">
 
-                <div id="scene">
+                <canvas
+                    id="game-canvas"
+                    width="640"
+                    height="480">
+                </canvas>
 
-                    <h2 id="scene-title">Welcome to Kaleo</h2>
+            </div>
 
-                    <div id="scene-text">
-                        <p>Your journey is about to begin.</p>
-                        <p>The world of Kaleo awaits.</p>
-                    </div>
+            <div id="dialogue-box" class="hidden">
 
-                    <div id="options"></div>
+                <div id="dialogue-name"></div>
 
-                </div>
+                <div id="dialogue-text"></div>
 
-            </section>
+                <div id="dialogue-options"></div>
+
+            </div>
 
         </main>
 
