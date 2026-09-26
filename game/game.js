@@ -1,6 +1,6 @@
 // ============================================================
 // KALEO – WORLD OF ENTHEON
-// Step 3: Overworld + NPCs + Interaction
+// Step 4: Buildings + Interior Maps + Map Transitions
 // ============================================================
 
 const gameState = {
@@ -9,12 +9,13 @@ const gameState = {
     playerName: "",
     starter: null,
     activeDialogue: null,
-    dialogueIndex: 0
+    dialogueIndex: 0,
+    currentMap: "town"
 };
 
 
 // ============================================================
-// INTRO SCREEN
+// SCREEN ELEMENTS
 // ============================================================
 
 const sceneTitle = document.getElementById("scene-title");
@@ -24,11 +25,17 @@ const optionsContainer = document.getElementById("options");
 const introScreen = document.getElementById("intro-screen");
 const overworldScreen = document.getElementById("overworld-screen");
 const starterStatus = document.getElementById("starter-status");
+const areaStatus = document.getElementById("area-status");
 const worldMessage = document.getElementById("world-message");
 
 const npcDialogue = document.getElementById("npc-dialogue");
 const npcDialogueName = document.getElementById("npc-dialogue-name");
 const npcDialogueText = document.getElementById("npc-dialogue-text");
+
+
+// ============================================================
+// INTRO SCENE SYSTEM
+// ============================================================
 
 function showScene(title, text, options = []) {
     sceneTitle.textContent = title;
@@ -197,57 +204,154 @@ function chooseStarter(name) {
 
 
 // ============================================================
-// 2D OVERWORLD
+// MAP DATA
 // ============================================================
 
-const canvas = document.getElementById("game-canvas");
-const ctx = canvas.getContext("2d");
-
 const TILE_SIZE = 32;
-
-const map = [
-    "########################################",
-    "#......................................#",
-    "#......................................#",
-    "#..TT..............GGGG...............#",
-    "#..TT..............GGGG...............#",
-    "#.................GGGG................#",
-    "#.................GGGG................#",
-    "#.............#####...................#",
-    "#.............#...#...................#",
-    "#.............#...#...................#",
-    "#.............#####...................#",
-    "#......................................#",
-    "#......................................#",
-    "#....WWWW..............................#",
-    "#....WWWW..............................#",
-    "#....WWWW..............TT.............#",
-    "#......................TT.............#",
-    "#......................................#",
-    "#................GGGG..................#",
-    "#................GGGG..................#",
-    "#................GGGG..................#",
-    "#......................................#",
-    "#......................TT.............#",
-    "#......................TT.............#",
-    "#......................................#",
-    "#..........GGGG........................#",
-    "#..........GGGG........................#",
-    "#......................................#",
-    "#......................................#",
-    "########################################"
-];
 
 const TILE = {
     GRASS: ".",
     TREE: "T",
     WATER: "W",
     PATH: "G",
-    WALL: "#"
+    WALL: "#",
+    DOOR: "D"
 };
 
-const WORLD_WIDTH = map[0].length * TILE_SIZE;
-const WORLD_HEIGHT = map.length * TILE_SIZE;
+const maps = {
+    town: {
+        name: "Kaleo",
+        data: [
+            "########################################",
+            "#......................................#",
+            "#......................................#",
+            "#..TT..............GGGG...............#",
+            "#..TT..............GGGG...............#",
+            "#.................GGGG................#",
+            "#.................GGGG................#",
+            "#.............#####D..................#",
+            "#.............#...#...................#",
+            "#.............#...#...................#",
+            "#.............#####...................#",
+            "#......................................#",
+            "#......................................#",
+            "#....WWWW..............................#",
+            "#....WWWW..............................#",
+            "#....WWWW..............TT.............#",
+            "#......................TT.............#",
+            "#......................................#",
+            "#................GGGG..................#",
+            "#................GGGG..................#",
+            "#................GGGG..................#",
+            "#......................................#",
+            "#......................TT.............#",
+            "#......................TT.............#",
+            "#......................................#",
+            "#..........GGGG........................#",
+            "#..........GGGG........................#",
+            "#......................................#",
+            "#......................................#",
+            "########################################"
+        ],
+        spawn: { x: 4, y: 25 },
+        exit: null,
+        npcs: [
+            {
+                id: "trainer",
+                name: "Young Trainer",
+                x: 22,
+                y: 12,
+                color: "#d26b6b",
+                lines: [
+                    "Hey! You're a new trainer too, right?",
+                    "I've been exploring the area around town.",
+                    "Maybe we'll meet again when we're both a little stronger."
+                ]
+            },
+            {
+                id: "resident",
+                name: "Kaleo Resident",
+                x: 27,
+                y: 21,
+                color: "#6b9ed2",
+                lines: [
+                    "The paths around Kaleo connect to places far beyond this area.",
+                    "You should talk to people whenever you visit a new settlement.",
+                    "You never know what you might learn."
+                ]
+            }
+        ]
+    },
+
+    research_center: {
+        name: "Entheon Research Center",
+        data: [
+            "####################",
+            "#..................#",
+            "#..TT..............#",
+            "#..TT..............#",
+            "#..................#",
+            "#.....####.........#",
+            "#.....#..#.........#",
+            "#.....#..#.........#",
+            "#.....####.........#",
+            "#..................#",
+            "#.........D........#",
+            "####################"
+        ],
+        spawn: { x: 10, y: 9 },
+        exit: { x: 10, y: 10, targetMap: "town", targetX: 15, targetY: 8 },
+        npcs: [
+            {
+                id: "researcher",
+                name: "Researcher",
+                x: 6,
+                y: 4,
+                color: "#8b6bbd",
+                lines: [
+                    "Welcome to the Entheon Research Center.",
+                    "There is still much we do not know about the Entheon of Kaleo.",
+                    "Take your time and explore. Your journey has only just begun."
+                ]
+            },
+            {
+                id: "assistant",
+                name: "Research Assistant",
+                x: 14,
+                y: 4,
+                color: "#5d9f9b",
+                lines: [
+                    "Most of our work involves observing Entheon in their natural habitats.",
+                    "The more trainers explore, the more we learn.",
+                    "Perhaps your journey will teach us something new."
+                ]
+            }
+        ]
+    }
+};
+
+let currentMap = maps.town;
+
+function getMapWidth() {
+    return currentMap.data[0].length;
+}
+
+function getMapHeight() {
+    return currentMap.data.length;
+}
+
+function getWorldWidth() {
+    return getMapWidth() * TILE_SIZE;
+}
+
+function getWorldHeight() {
+    return getMapHeight() * TILE_SIZE;
+}
+
+
+// ============================================================
+// PLAYER + CAMERA
+// ============================================================
 
 const player = {
     x: 4,
@@ -264,47 +368,12 @@ const camera = {
 
 
 // ============================================================
-// NPC DATA
+// CURRENT MAP NPCS
 // ============================================================
 
-const npcs = [
-    {
-        id: "researcher",
-        name: "Researcher",
-        x: 16,
-        y: 7,
-        color: "#8b6bbd",
-        lines: [
-            "Welcome to the Entheon Research and Training Center.",
-            "There is still much we do not know about the Entheon of Kaleo.",
-            "Take your time and explore. Your journey has only just begun."
-        ]
-    },
-    {
-        id: "trainer",
-        name: "Young Trainer",
-        x: 22,
-        y: 12,
-        color: "#d26b6b",
-        lines: [
-            "Hey! You're a new trainer too, right?",
-            "I've been exploring the area around town.",
-            "Maybe we'll meet again when we're both a little stronger."
-        ]
-    },
-    {
-        id: "resident",
-        name: "Kaleo Resident",
-        x: 27,
-        y: 21,
-        color: "#6b9ed2",
-        lines: [
-            "The paths around Kaleo connect to places far beyond this area.",
-            "You should talk to people whenever you visit a new settlement.",
-            "You never know what you might learn."
-        ]
-    }
-];
+function getNpcs() {
+    return currentMap.npcs;
+}
 
 
 // ============================================================
@@ -322,7 +391,6 @@ document.addEventListener("keydown", event => {
         event.preventDefault();
     }
 
-    // Dialogue consumes interaction input first.
     if (
         ["e", "enter", " "].includes(key) &&
         gameState.mode === "overworld"
@@ -345,17 +413,17 @@ document.addEventListener("keyup", event => {
 
 
 // ============================================================
-// GAME LOOP
+// START / MAP LOADING
 // ============================================================
-
-let animationFrame = null;
-let lastTime = 0;
 
 function startOverworld() {
     gameState.mode = "overworld";
     gameState.currentScene = "overworld";
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
+    gameState.currentMap = "town";
+
+    loadMap("town", 4, 25);
 
     introScreen.classList.add("hidden");
     overworldScreen.classList.remove("hidden");
@@ -370,6 +438,41 @@ function startOverworld() {
     lastTime = performance.now();
     animationFrame = requestAnimationFrame(gameLoop);
 }
+
+function loadMap(mapId, spawnX = null, spawnY = null) {
+    if (!maps[mapId]) {
+        console.error("Unknown map:", mapId);
+        return;
+    }
+
+    currentMap = maps[mapId];
+    gameState.currentMap = mapId;
+
+    if (spawnX !== null) player.x = spawnX;
+    if (spawnY !== null) player.y = spawnY;
+
+    areaStatus.textContent = currentMap.name;
+
+    closeNpcDialogue();
+    updateCamera();
+    drawGame();
+}
+
+function transitionTo(mapId, x, y, message) {
+    loadMap(mapId, x, y);
+
+    if (message) {
+        showWorldMessage(message);
+    }
+}
+
+
+// ============================================================
+// GAME LOOP
+// ============================================================
+
+let animationFrame = null;
+let lastTime = 0;
 
 function gameLoop(timestamp) {
     const delta = Math.min((timestamp - lastTime) / 16.67, 2);
@@ -417,8 +520,15 @@ function updatePlayer(delta) {
         player.y = newY;
     }
 
-    player.x = Math.max(0.55, Math.min(map[0].length - 1.55, player.x));
-    player.y = Math.max(0.55, Math.min(map.length - 1.55, player.y));
+    const minX = 0.55;
+    const maxX = getMapWidth() - 1.55;
+    const minY = 0.55;
+    const maxY = getMapHeight() - 1.55;
+
+    player.x = Math.max(minX, Math.min(maxX, player.x));
+    player.y = Math.max(minY, Math.min(maxY, player.y));
+
+    checkAutomaticTransitions();
 }
 
 function canMoveTo(x, y) {
@@ -443,19 +553,57 @@ function canMoveTo(x, y) {
         return false;
     }
 
-    // NPCs are solid so the player cannot simply walk through them.
-    return !npcs.some(npc => {
+    return !getNpcs().some(npc => {
         const distance = Math.hypot(x - npc.x, y - npc.y);
         return distance < 0.65;
     });
 }
 
 function getTile(x, y) {
-    if (y < 0 || y >= map.length || x < 0 || x >= map[0].length) {
+    if (
+        y < 0 ||
+        y >= currentMap.data.length ||
+        x < 0 ||
+        x >= currentMap.data[0].length
+    ) {
         return TILE.WALL;
     }
 
-    return map[y][x];
+    return currentMap.data[y][x];
+}
+
+
+// ============================================================
+// MAP TRANSITIONS
+// ============================================================
+
+function checkAutomaticTransitions() {
+    const tileX = Math.floor(player.x);
+    const tileY = Math.floor(player.y);
+    const tile = getTile(tileX, tileY);
+
+    if (tile !== TILE.DOOR) {
+        return;
+    }
+
+    if (gameState.currentMap === "town") {
+        transitionTo(
+            "research_center",
+            10,
+            9,
+            "You enter the Entheon Research Center."
+        );
+        return;
+    }
+
+    if (gameState.currentMap === "research_center") {
+        transitionTo(
+            "town",
+            15,
+            8,
+            "You step back outside into Kaleo."
+        );
+    }
 }
 
 
@@ -467,8 +615,8 @@ function updateCamera() {
     let targetX = player.x * TILE_SIZE - canvas.width / 2;
     let targetY = player.y * TILE_SIZE - canvas.height / 2;
 
-    const maxCameraX = Math.max(0, WORLD_WIDTH - canvas.width);
-    const maxCameraY = Math.max(0, WORLD_HEIGHT - canvas.height);
+    const maxCameraX = Math.max(0, getWorldWidth() - canvas.width);
+    const maxCameraY = Math.max(0, getWorldHeight() - canvas.height);
 
     camera.x = Math.max(0, Math.min(maxCameraX, targetX));
     camera.y = Math.max(0, Math.min(maxCameraY, targetY));
@@ -485,8 +633,7 @@ function interact() {
     const targetX = Math.floor(player.x + facing.x);
     const targetY = Math.floor(player.y + facing.y);
 
-    // First check for an NPC.
-    const npc = npcs.find(character => {
+    const npc = getNpcs().find(character => {
         return Math.abs(character.x - targetX) <= 0.5 &&
                Math.abs(character.y - targetY) <= 0.5;
     });
@@ -508,15 +655,12 @@ function interact() {
         return;
     }
 
-    if (
-        targetX >= 13 &&
-        targetX <= 17 &&
-        targetY >= 7 &&
-        targetY <= 10
-    ) {
-        showWorldMessage(
-            "This building will eventually become an important location."
-        );
+    if (tile === TILE.DOOR) {
+        if (gameState.currentMap === "town") {
+            showWorldMessage("The entrance leads into the Entheon Research Center.");
+        } else {
+            showWorldMessage("The exit leads back into Kaleo.");
+        }
         return;
     }
 
@@ -580,6 +724,9 @@ function closeNpcDialogue() {
 // DRAWING
 // ============================================================
 
+const canvas = document.getElementById("game-canvas");
+const ctx = canvas.getContext("2d");
+
 function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -595,9 +742,9 @@ function drawGame() {
 }
 
 function drawMap() {
-    for (let y = 0; y < map.length; y++) {
-        for (let x = 0; x < map[y].length; x++) {
-            const tile = map[y][x];
+    for (let y = 0; y < currentMap.data.length; y++) {
+        for (let x = 0; x < currentMap.data[y].length; x++) {
+            const tile = currentMap.data[y][x];
             const px = x * TILE_SIZE;
             const py = y * TILE_SIZE;
 
@@ -660,39 +807,46 @@ function drawTile(tile, x, y) {
         ctx.strokeStyle = "#696771";
         ctx.strokeRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
     }
+
+    else if (tile === TILE.DOOR) {
+        ctx.fillStyle = "#754d32";
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+        ctx.fillStyle = "#b9824e";
+        ctx.fillRect(x + 5, y + 4, TILE_SIZE - 10, TILE_SIZE - 4);
+
+        ctx.fillStyle = "#e0bd68";
+        ctx.beginPath();
+        ctx.arc(x + 22, y + 18, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 function drawNpcs() {
-    npcs.forEach(npc => {
+    getNpcs().forEach(npc => {
         const px = npc.x * TILE_SIZE;
         const py = npc.y * TILE_SIZE;
 
-        // Shadow
         ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
         ctx.beginPath();
         ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Body
         ctx.fillStyle = npc.color;
         ctx.fillRect(px - 9, py - 7, 18, 18);
 
-        // Head
         ctx.fillStyle = "#f0c6a4";
         ctx.beginPath();
         ctx.arc(px, py - 11, 8, 0, Math.PI * 2);
         ctx.fill();
 
-        // Hair
         ctx.fillStyle = "#3c2a24";
         ctx.fillRect(px - 7, py - 19, 14, 5);
 
-        // Eyes
         ctx.fillStyle = "#222";
         ctx.fillRect(px - 4, py - 12, 2, 2);
         ctx.fillRect(px + 2, py - 12, 2, 2);
 
-        // Small interaction marker
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 12px Arial";
         ctx.textAlign = "center";
@@ -748,8 +902,10 @@ function restartGame() {
     gameState.starter = null;
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
+    gameState.currentMap = "town";
 
     starterStatus.textContent = "Starter: —";
+    areaStatus.textContent = "Kaleo";
 
     npcDialogue.classList.add("hidden");
     overworldScreen.classList.add("hidden");
