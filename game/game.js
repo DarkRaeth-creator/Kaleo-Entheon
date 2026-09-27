@@ -45,6 +45,7 @@ const gameState = {
     transitionCooldown: 0,
     encounterCooldown: 0,
     battle: null,
+    trainerBattle: null,
     evolutionPromptOpen: false
 };
 
@@ -371,8 +372,17 @@ const maps = {
                 lines: [
                     "Hey! You're a new trainer too, right?",
                     "I've been exploring the area around town.",
-                    "Maybe we'll meet again when we're both a little stronger."
-                ]
+                    "Let's see how your Entheon handles a real trainer battle!"
+                ],
+                battle: {
+                    reward: 120,
+                    team: [
+                        { species: "Orrin", level: 3 },
+                        { species: "Brindlew", level: 4 }
+                    ],
+                    victory: "Not bad! I'll have to train harder next time.",
+                    defeat: "Looks like I need a lot more practice..."
+                }
             },
             {
                 id: "resident",
@@ -1654,15 +1664,17 @@ function renderBattle(message = null) {
         });
     }
 
+    const trainerBattle = battle.type === "trainer";
     const totalCrystals = getTotalCrystalCount();
-    battleUI.captureButton.disabled =
+    battleUI.captureButton.disabled = trainerBattle ||
         battle.locked ||
         !battle.playerTurn ||
         battle.wild.hp <= 0 ||
         totalCrystals <= 0;
 
-    battleUI.captureButton.textContent =
-        `Capture (${totalCrystals})`;
+    battleUI.captureButton.textContent = trainerBattle
+        ? "Capture unavailable"
+        : `Capture (${totalCrystals})`;
 
     if (battleUI.partyButton) {
         battleUI.partyButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
@@ -1671,7 +1683,7 @@ function renderBattle(message = null) {
         battleUI.inventoryButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
     }
 
-    battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
+    battleUI.runButton.disabled = trainerBattle || battle.locked || !battle.playerTurn;
 }
 
 function useMove(move) {
@@ -1687,10 +1699,14 @@ function useMove(move) {
     if (battle.wild.hp <= 0) {
         battle.outcome = "defeat";
         renderBattle(
-            `${battle.player.name} used ${move.name}! It dealt ${damage} damage. The wild ${battle.wild.name} was defeated!`
+            `${battle.player.name} used ${move.name}! It dealt ${damage} damage. ${battle.type === "trainer" ? `The trainer's ${battle.wild.name} was defeated!` : `The wild ${battle.wild.name} was defeated!`}`
         );
 
-        setTimeout(() => endWildEncounter("The battle is over."), 1100);
+        if (battle.type === "trainer") {
+            setTimeout(() => handleTrainerCreatureDefeat(), 1100);
+        } else {
+            setTimeout(() => endWildEncounter("The battle is over."), 1100);
+        }
         return;
     }
 
@@ -1705,10 +1721,7 @@ function wildBattleAttack() {
     const battle = gameState.battle;
     if (!battle || battle.wild.hp <= 0) return;
 
-    const move = battle.wild.moves[
-        Math.floor(Math.random() * battle.wild.moves.length)
-    ];
-
+    const move = battle.wild.moves[Math.floor(Math.random() * battle.wild.moves.length)];
     const damage = getDamageForMove(battle.wild, battle.player, move);
     battle.player.hp = Math.max(0, battle.player.hp - damage);
 
@@ -1727,20 +1740,18 @@ function wildBattleAttack() {
 
         if (!hasReplacement) {
             renderBattle(
-                `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted! Your whole party is unable to battle.`
+                `${battle.type === "trainer" ? `The trainer's ${battle.wild.name}` : `The wild ${battle.wild.name}`} used ${move.name}! ${battle.player.name} fainted! Your whole party is unable to battle.`
             );
-            setTimeout(() => endWildEncounter("Your party needs to recover."), 1300);
+            setTimeout(() => battle.type === "trainer" ? endTrainerBattle(false) : endWildEncounter("Your party needs to recover."), 1300);
             return;
         }
 
         battle.forceSwitch = true;
         renderBattle(
-            `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted! Choose another Entheon.`
+            `${battle.type === "trainer" ? `The trainer's ${battle.wild.name}` : `The wild ${battle.wild.name}`} used ${move.name}! ${battle.player.name} fainted! Choose another Entheon.`
         );
 
-        setTimeout(() => {
-            openPartyScreen(true, true);
-        }, 700);
+        setTimeout(() => openPartyScreen(true, true), 700);
         return;
     }
 
@@ -1749,8 +1760,136 @@ function wildBattleAttack() {
     battle.showMoves = false;
 
     renderBattle(
-        `The wild ${battle.wild.name} used ${move.name}! It dealt ${damage} damage.`
+        `${battle.type === "trainer" ? `The trainer's ${battle.wild.name}` : `The wild ${battle.wild.name}`} used ${move.name}! It dealt ${damage} damage.`
     );
+}
+
+function startTrainerBattle(npc) {
+    const team = Array.isArray(npc.battle?.team) ? npc.battle.team : [];
+    if (!team.length) return;
+
+    let activeMember = gameState.party[gameState.activePartyIndex];
+    if (!activeMember || activeMember.currentHp <= 0) {
+        const replacementIndex = gameState.party.findIndex(member => member.currentHp > 0);
+        if (replacementIndex < 0) {
+            showWorldMessage("Your entire party needs to recover before you can battle this trainer.");
+            return;
+        }
+        gameState.activePartyIndex = replacementIndex;
+        activeMember = gameState.party[replacementIndex];
+    }
+
+    const first = createCreature(team[0].species, team[0].level);
+    gameState.trainerBattle = {
+        npc,
+        team,
+        index: 0,
+        reward: Number(npc.battle.reward || 0),
+        won: false
+    };
+
+    gameState.mode = "battle";
+    gameState.battle = {
+        type: "trainer",
+        trainer: npc,
+        player: {
+            creature: activeMember,
+            name: activeMember.species,
+            level: activeMember.level,
+            hp: activeMember.currentHp,
+            maxHp: activeMember.maxHp,
+            stats: { ...activeMember.stats },
+            moves: activeMember.moves.map(move => ({ ...move }))
+        },
+        wild: {
+            creature: first,
+            name: first.species,
+            level: first.level,
+            hp: first.currentHp,
+            maxHp: first.maxHp,
+            stats: { ...first.stats },
+            moves: first.moves.map(move => ({ ...move }))
+        },
+        playerTurn: true,
+        locked: false,
+        showMoves: false,
+        forceSwitch: false,
+        outcome: null
+    };
+
+    battleScreen.classList.remove("hidden");
+    overworldScreen.classList.add("hidden");
+    renderBattle(`${npc.name} challenges you! ${npc.name} sent out ${first.species}!`);
+}
+
+function handleTrainerCreatureDefeat() {
+    const battle = gameState.battle;
+    const trainerBattle = gameState.trainerBattle;
+    if (!battle || battle.type !== "trainer" || !trainerBattle) return;
+
+    trainerBattle.index += 1;
+    if (trainerBattle.index >= trainerBattle.team.length) {
+        trainerBattle.won = true;
+        battle.locked = true;
+        renderBattle(`${trainerBattle.npc.name} has no more Entheon! You won the battle!`);
+        setTimeout(() => endTrainerBattle(true), 1100);
+        return;
+    }
+
+    const nextData = trainerBattle.team[trainerBattle.index];
+    const next = createCreature(nextData.species, nextData.level);
+    battle.wild = {
+        creature: next,
+        name: next.species,
+        level: next.level,
+        hp: next.currentHp,
+        maxHp: next.maxHp,
+        stats: { ...next.stats },
+        moves: next.moves.map(move => ({ ...move }))
+    };
+    battle.outcome = null;
+    battle.locked = false;
+    battle.playerTurn = true;
+    battle.showMoves = false;
+    renderBattle(`${trainerBattle.npc.name} sent out ${next.species}!`);
+}
+
+function endTrainerBattle(victory) {
+    const finished = gameState.battle;
+    const trainerBattle = gameState.trainerBattle;
+    if (!finished || !trainerBattle) return;
+
+    const activeMember = gameState.party[gameState.activePartyIndex];
+    if (activeMember) {
+        activeMember.currentHp = Math.min(activeMember.maxHp, finished.player.hp);
+        if (victory) {
+            const xpGain = trainerBattle.team.reduce((sum, entry) => sum + 35 + entry.level * 14, 0);
+            const result = awardExperience(activeMember, xpGain);
+            const levelText = result.levels.length ? ` ${activeMember.species} reached Level ${result.levels.join(", ")}!` : "";
+            gameState.vale += trainerBattle.reward;
+            gameState.trainerBattle = null;
+            gameState.battle = null;
+            gameState.mode = "overworld";
+            battleScreen.classList.add("hidden");
+            overworldScreen.classList.remove("hidden");
+            gameState.encounterCooldown = 1200;
+            renderParty();
+            showWorldMessage(`${trainerBattle.npc.name} was defeated! You received ${trainerBattle.reward} Vale and ${xpGain} XP.${levelText}`);
+            drawGame();
+            if (activeMember.pendingEvolution) setTimeout(() => createEvolutionPrompt(activeMember), 900);
+            return;
+        }
+    }
+
+    gameState.trainerBattle = null;
+    gameState.battle = null;
+    gameState.mode = "overworld";
+    battleScreen.classList.add("hidden");
+    overworldScreen.classList.remove("hidden");
+    gameState.encounterCooldown = 1200;
+    renderParty();
+    showWorldMessage("Your party needs to recover before continuing.");
+    drawGame();
 }
 
 function calculateCaptureChance(battle) {
@@ -1972,6 +2111,7 @@ function selectCrystalForCapture(crystalId) {
 
 function battleCapture(crystalId) {
     const battle = gameState.battle;
+    if (battle?.type === "trainer") return;
     const crystal = getCrystalInventory()[crystalId];
 
     if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0 || !crystal || crystal.quantity <= 0) {
@@ -2336,7 +2476,11 @@ function advanceDialogue() {
             gameState.starterAvailable = true;
             showWorldMessage("The researcher has introduced you. The three starter Entheon are ready for you to meet.");
         } else if (interaction === "trainer") {
-            showWorldMessage("This trainer is ready for a battle system that will be connected in the next development step.");
+            if (npc.battle) {
+                startTrainerBattle(npc);
+            } else {
+                showWorldMessage("This trainer does not have a battle team yet.");
+            }
         } else if (interaction === "merchant") {
             openMerchantShop(npc);
         }
