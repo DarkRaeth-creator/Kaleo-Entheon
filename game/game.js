@@ -64,6 +64,8 @@ const partyDetail = document.getElementById("party-detail");
 const crystalScreen = document.getElementById("crystal-screen");
 const crystalList = document.getElementById("crystal-list");
 const crystalCloseButton = document.getElementById("crystal-close-button");
+const captureEffect = document.getElementById("capture-effect");
+const battleCreatureVisual = document.getElementById("battle-creature-visual");
 
 
 // ============================================================
@@ -1224,7 +1226,7 @@ function renderBattle(message = null) {
         totalCrystals <= 0;
 
     battleUI.captureButton.textContent =
-        `Resonate (${totalCrystals})`;
+        `Capture (${totalCrystals})`;
 
     if (battleUI.partyButton) {
         battleUI.partyButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
@@ -1385,29 +1387,80 @@ function battleCapture(crystalId) {
 
     const chance = calculateCaptureChance(battle, crystal);
     const success = Math.random() < chance;
+    const wildName = battle.wild.name;
+    const wildLevel = battle.wild.level;
+    const crystalName = crystal.name;
 
-    if (success) {
-        const captured = {
-            species: battle.wild.name,
-            level: battle.wild.level,
-            maxHp: battle.wild.maxHp,
-            currentHp: battle.wild.hp,
-            moves: battle.wild.moves.map(move => ({ ...move }))
-        };
+    renderBattle(`You hold out the ${crystalName}. The crystal begins to resonate with ${wildName}...`);
+    playCaptureResonance(success, () => {
+        const currentBattle = gameState.battle;
+        if (!currentBattle || currentBattle.wild.name !== wildName) return;
 
-        gameState.party.push(captured);
-        gameState.selectedPartyIndex = gameState.party.length - 1;
-        renderParty();
-        renderBattle(`You used a ${crystal.name}. The resonance succeeded! ${battle.wild.name} joined your party.`);
+        if (success) {
+            const captured = {
+                species: currentBattle.wild.name,
+                level: wildLevel,
+                maxHp: currentBattle.wild.maxHp,
+                currentHp: currentBattle.wild.hp,
+                moves: currentBattle.wild.moves.map(move => ({ ...move }))
+            };
 
-        setTimeout(() => {
-            endWildEncounter(`${battle.wild.name} joined your party. ${crystal.name}s remaining: ${crystal.quantity}.`);
-        }, 1100);
+            gameState.party.push(captured);
+            gameState.selectedPartyIndex = gameState.party.length - 1;
+            renderParty();
+            renderBattle(`The resonance succeeded! ${wildName} was absorbed into the ${crystalName}.`);
+
+            setTimeout(() => {
+                endWildEncounter(`${wildName} joined your party. ${crystalName}s remaining: ${crystal.quantity}.`);
+            }, 1000);
+            return;
+        }
+
+        currentBattle.playerTurn = false;
+        renderBattle(`The resonance failed! ${wildName} resisted the ${crystalName} and reformed.`);
+        setTimeout(wildBattleAttack, 850);
+    });
+}
+
+function playCaptureResonance(success, onComplete) {
+    if (!captureEffect || !battleCreatureVisual) {
+        onComplete();
         return;
     }
 
-    renderBattle(`You used a ${crystal.name}. The resonance failed! ${battle.wild.name} broke free.`);
-    setTimeout(wildBattleAttack, 750);
+    // A capture animation is purely visual. The underlying battle creature
+    // remains intact until the result is resolved, so a failed resonance can
+    // never leave a partially-rendered Entheon behind.
+    captureEffect.classList.remove("hidden", "capture-success", "capture-failure");
+    battleCreatureVisual.classList.remove("capture-targeting", "capture-absorbing", "capture-reformed");
+
+    requestAnimationFrame(() => {
+        battleCreatureVisual.classList.add("capture-targeting");
+    });
+
+    setTimeout(() => {
+        battleCreatureVisual.classList.add("capture-absorbing");
+    }, 550);
+
+    setTimeout(() => {
+        captureEffect.classList.add(success ? "capture-success" : "capture-failure");
+    }, 1050);
+
+    setTimeout(() => {
+        if (success) {
+            battleCreatureVisual.classList.add("capture-absorbing");
+        } else {
+            battleCreatureVisual.classList.remove("capture-targeting", "capture-absorbing");
+            battleCreatureVisual.classList.add("capture-reformed");
+        }
+    }, 1450);
+
+    setTimeout(() => {
+        captureEffect.classList.add("hidden");
+        captureEffect.classList.remove("capture-success", "capture-failure");
+        battleCreatureVisual.classList.remove("capture-targeting", "capture-absorbing", "capture-reformed");
+        onComplete();
+    }, success ? 2050 : 1950);
 }
 
 function calculateCaptureChance(battle, crystal = null) {
