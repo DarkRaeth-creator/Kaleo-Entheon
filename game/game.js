@@ -20,6 +20,9 @@ const gameState = {
     activePartyIndex: 0,
     selectedPartyIndex: 0,
     captureDevices: 5,
+    crystals: {
+        capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 }
+    },
     partyScreenBattleMode: false,
     partyScreenForced: false,
     activeDialogue: null,
@@ -58,6 +61,9 @@ const partyScreen = document.getElementById("party-screen");
 const partyCloseButton = document.getElementById("party-close-button");
 const partyScreenList = document.getElementById("party-screen-list");
 const partyDetail = document.getElementById("party-detail");
+const crystalScreen = document.getElementById("crystal-screen");
+const crystalList = document.getElementById("crystal-list");
+const crystalCloseButton = document.getElementById("crystal-close-button");
 
 
 // ============================================================
@@ -827,7 +833,7 @@ battleUI.fightButton.addEventListener("click", () => {
     renderBattle();
 });
 
-battleUI.captureButton.addEventListener("click", battleCapture);
+battleUI.captureButton.addEventListener("click", openCrystalScreen);
 if (battleUI.partyButton) {
     battleUI.partyButton.addEventListener("click", (event) => {
         event.preventDefault();
@@ -1210,14 +1216,15 @@ function renderBattle(message = null) {
         });
     }
 
+    const totalCrystals = getTotalCrystalCount();
     battleUI.captureButton.disabled =
         battle.locked ||
         !battle.playerTurn ||
         battle.wild.hp <= 0 ||
-        gameState.captureDevices <= 0;
+        totalCrystals <= 0;
 
     battleUI.captureButton.textContent =
-        `Capture (${gameState.captureDevices})`;
+        `Resonate (${totalCrystals})`;
 
     if (battleUI.partyButton) {
         battleUI.partyButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
@@ -1314,24 +1321,69 @@ function calculateCaptureChance(battle) {
     return Math.min(0.85, Math.max(0.20, 0.20 + missingHp * 0.65));
 }
 
-function battleCapture() {
-    const battle = gameState.battle;
+function getCrystalInventory() {
+    if (!gameState.crystals) {
+        gameState.crystals = {
+            capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: gameState.captureDevices || 0 }
+        };
+    }
+    return gameState.crystals;
+}
 
-    if (
-        !battle ||
-        battle.locked ||
-        !battle.playerTurn ||
-        battle.wild.hp <= 0 ||
-        gameState.captureDevices <= 0
-    ) {
+function getTotalCrystalCount() {
+    return Object.values(getCrystalInventory()).reduce((sum, crystal) => sum + Math.max(0, crystal.quantity || 0), 0);
+}
+
+function renderCrystalList() {
+    if (!crystalList) return;
+    const crystals = Object.values(getCrystalInventory());
+    crystalList.innerHTML = crystals.length ? crystals.map(crystal => `
+        <button type="button" class="crystal-card${crystal.quantity <= 0 ? " empty" : ""}"
+                data-crystal-id="${crystal.id}" ${crystal.quantity <= 0 ? "disabled" : ""}>
+            <div class="crystal-icon">◇</div>
+            <div class="crystal-info">
+                <strong>${crystal.name}</strong>
+                <span>${crystal.grade} grade</span>
+            </div>
+            <div class="crystal-quantity">×${crystal.quantity}</div>
+        </button>
+    `).join("") : '<div class="crystal-empty">You do not have any capture crystals.</div>';
+
+    crystalList.querySelectorAll("[data-crystal-id]").forEach(button => {
+        button.addEventListener("click", () => selectCrystalForCapture(button.dataset.crystalId));
+    });
+}
+
+function openCrystalScreen() {
+    const battle = gameState.battle;
+    if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0 || getTotalCrystalCount() <= 0) return;
+    renderCrystalList();
+    crystalScreen.classList.remove("hidden");
+}
+
+function closeCrystalScreen() {
+    if (crystalScreen) crystalScreen.classList.add("hidden");
+}
+
+function selectCrystalForCapture(crystalId) {
+    closeCrystalScreen();
+    battleCapture(crystalId);
+}
+
+function battleCapture(crystalId) {
+    const battle = gameState.battle;
+    const crystal = getCrystalInventory()[crystalId];
+
+    if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0 || !crystal || crystal.quantity <= 0) {
         return;
     }
 
     battle.locked = true;
     battle.showMoves = false;
-    gameState.captureDevices--;
+    crystal.quantity--;
+    gameState.captureDevices = getTotalCrystalCount();
 
-    const chance = calculateCaptureChance(battle);
+    const chance = calculateCaptureChance(battle, crystal);
     const success = Math.random() < chance;
 
     if (success) {
@@ -1346,25 +1398,23 @@ function battleCapture() {
         gameState.party.push(captured);
         gameState.selectedPartyIndex = gameState.party.length - 1;
         renderParty();
-
-        renderBattle(
-            `You captured ${battle.wild.name}! It has been added to your party.`
-        );
+        renderBattle(`You used a ${crystal.name}. The resonance succeeded! ${battle.wild.name} joined your party.`);
 
         setTimeout(() => {
-            endWildEncounter(
-                `${battle.wild.name} joined your party. Capture devices remaining: ${gameState.captureDevices}.`
-            );
+            endWildEncounter(`${battle.wild.name} joined your party. ${crystal.name}s remaining: ${crystal.quantity}.`);
         }, 1100);
-
         return;
     }
 
-    renderBattle(
-        `The capture failed! ${battle.wild.name} broke free.`
-    );
-
+    renderBattle(`You used a ${crystal.name}. The resonance failed! ${battle.wild.name} broke free.`);
     setTimeout(wildBattleAttack, 750);
+}
+
+function calculateCaptureChance(battle, crystal = null) {
+    const hpRatio = battle.wild.hp / battle.wild.maxHp;
+    const missingHp = 1 - hpRatio;
+    const crystalModifier = crystal?.captureModifier || 1.0;
+    return Math.min(0.95, Math.max(0.05, (0.20 + missingHp * 0.65) * crystalModifier));
 }
 
 function battleRun() {

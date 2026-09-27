@@ -448,3 +448,44 @@ body {
 /* Party is a top-level overlay so it works both in the overworld and during battles. */
 .party-screen { pointer-events: auto; }
 .party-screen.hidden { display: none !important; }
+
+
+/* ============================================================
+   CAPTURE CRYSTAL SELECTION
+   ============================================================ */
+.crystal-screen {
+    position: absolute;
+    inset: 8px;
+    z-index: 70;
+    background: #252530;
+    border: 3px solid #111118;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.55);
+    overflow: auto;
+}
+.crystal-screen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #41414f;
+}
+.crystal-screen-header h2 { margin: 0; font-size: 24px; }
+.crystal-screen-header p { margin: 5px 0 0; color: #bdbdc8; font-size: 13px; }
+.crystal-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.crystal-card {
+    display: flex; align-items: center; gap: 12px; min-height: 78px;
+    padding: 12px; background: #30303d; color: #fff;
+    border: 2px solid #555565; border-radius: 9px; cursor: pointer; text-align: left;
+}
+.crystal-card:hover { background: #393947; border-color: #a6c8ff; }
+.crystal-card.empty { opacity: .45; cursor: not-allowed; }
+.crystal-icon { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 50%; background: #181820; font-size: 26px; }
+.crystal-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.crystal-info span { color: #bdbdc8; font-size: 12px; }
+.crystal-quantity { font-weight: 800; color: #a6c8ff; }
+.crystal-empty { padding: 30px; text-align: center; color: #bdbdc8; }
+@media (max-width: 700px) { .crystal-list { grid-template-columns: 1fr; } }
