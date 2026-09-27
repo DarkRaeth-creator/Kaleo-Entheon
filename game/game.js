@@ -47,6 +47,9 @@ const npcDialogueText = document.getElementById("npc-dialogue-text");
 
 const battleScreen = document.getElementById("battle-screen");
 
+const partyPanel = document.getElementById("party-panel");
+const partyList = document.getElementById("party-list");
+
 
 // ============================================================
 // INTRO SCENE SYSTEM
@@ -816,16 +819,16 @@ battleUI.runButton.addEventListener("click", battleRun);
 
 
 function renderParty() {
-    if (!gameUI.partyPanel || !gameUI.partyList) return;
+    if (!partyPanel || !partyList) return;
 
     if (!gameState.party || gameState.party.length === 0) {
-        gameUI.partyPanel.classList.add("hidden");
-        gameUI.partyList.innerHTML = "";
+        partyPanel.classList.add("hidden");
+        partyList.innerHTML = "";
         return;
     }
 
-    gameUI.partyPanel.classList.remove("hidden");
-    gameUI.partyList.innerHTML = gameState.party.map((member, index) => {
+    partyPanel.classList.remove("hidden");
+    partyList.innerHTML = gameState.party.map((member, index) => {
         const hp = Math.max(0, member.currentHp);
         const maxHp = Math.max(1, member.maxHp);
         const hpPercent = Math.max(0, Math.min(100, hp / maxHp * 100));
