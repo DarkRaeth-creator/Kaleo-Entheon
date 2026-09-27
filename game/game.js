@@ -829,6 +829,7 @@ battleUI.fightButton.addEventListener("click", () => {
 
 battleUI.captureButton.addEventListener("click", battleCapture);
 battleUI.partyButton?.addEventListener("click", () => openPartyScreen(true, false));
+partyButton?.addEventListener("click", () => openPartyScreen(false, false));
 battleUI.runButton.addEventListener("click", battleRun);
 
 
