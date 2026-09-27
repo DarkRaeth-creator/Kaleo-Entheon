@@ -15,6 +15,7 @@ const gameState = {
     gender: null,
     starter: null,
     starterAvailable: false,
+    starterData: null,
     activeDialogue: null,
     dialogueIndex: 0,
     currentMap: "town",
@@ -189,6 +190,22 @@ function chooseStarter(name) {
     if (gameState.currentMap !== "research_center") return;
 
     gameState.starter = name;
+
+    const speciesData = speciesBattleData[name];
+    if (!speciesData) {
+        console.error("No battle data exists for starter:", name);
+        return;
+    }
+
+    // Store the actual chosen Entheon outside the battle object so its HP
+    // and future progression can persist from one encounter to the next.
+    gameState.starterData = {
+        level: speciesData.level,
+        maxHp: speciesData.maxHp,
+        currentHp: speciesData.maxHp,
+        moves: speciesData.moves.map(move => ({ ...move }))
+    };
+
     starterStatus.textContent = "Starter: " + name;
 
     const starterNpc = getNpcs().find(npc => npc.type === "starter" && npc.species === name);
@@ -690,6 +707,26 @@ function checkAutomaticTransitions() {
 // ============================================================
 
 const speciesBattleData = {
+    // Starter moves currently unlocked at Level 5.
+    // These follow the established species move pools.
+    Nimblet: {
+        level: 5,
+        maxHp: 40,
+        moves: [
+            { name: "Tackle", category: "Physical", power: 40, damage: 7, effect: "—" },
+            { name: "Scratch", category: "Physical", power: 40, damage: 8, effect: "—" },
+            { name: "Quick Attack", category: "Physical", power: 40, damage: 7, effect: "Priority attack" }
+        ]
+    },
+    Pipiri: {
+        level: 5,
+        maxHp: 40,
+        moves: [
+            { name: "Tackle", category: "Physical", power: 40, damage: 7, effect: "—" },
+            { name: "Water Pulse", category: "Special", power: 60, damage: 10, effect: "Chance to Confuse" },
+            { name: "Aqua Jet", category: "Physical", power: 40, damage: 7, effect: "Priority attack" }
+        ]
+    },
     Morrowe: {
         level: 5,
         maxHp: 40,
@@ -725,7 +762,11 @@ const battleUI = {
 };
 
 battleUI.fightButton.addEventListener("click", () => {
-    battleUI.moves.scrollIntoView({ block: "nearest" });
+    const battle = gameState.battle;
+    if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0) return;
+
+    battle.showMoves = true;
+    renderBattle();
 });
 
 battleUI.runButton.addEventListener("click", battleRun);
@@ -733,16 +774,24 @@ battleUI.runButton.addEventListener("click", battleRun);
 function startWildEncounter() {
     const wildSpecies = "Orrin";
     const wildData = speciesBattleData[wildSpecies];
-    const playerSpecies = gameState.starter || "Morrowe";
-    const playerData = speciesBattleData[playerSpecies] || speciesBattleData.Morrowe;
+
+    // There is no default starter anymore. A battle can only begin
+    // after the player has actually received an Entheon.
+    if (!gameState.starter || !gameState.starterData) {
+        showWorldMessage("You need an Entheon partner before entering tall grass.");
+        gameState.encounterCooldown = 1200;
+        return;
+    }
+
+    const playerData = gameState.starterData;
 
     gameState.mode = "battle";
 
     gameState.battle = {
         player: {
-            name: playerSpecies,
+            name: gameState.starter,
             level: playerData.level,
-            hp: playerData.maxHp,
+            hp: playerData.currentHp,
             maxHp: playerData.maxHp,
             moves: playerData.moves
         },
@@ -754,7 +803,8 @@ function startWildEncounter() {
             moves: wildData.moves
         },
         playerTurn: true,
-        locked: false
+        locked: false,
+        showMoves: false
     };
 
     battleScreen.classList.remove("hidden");
@@ -785,21 +835,28 @@ function renderBattle(message = null) {
 
     battleUI.moves.innerHTML = "";
 
-    battle.player.moves.forEach(move => {
-        const button = document.createElement("button");
-        button.className = "move-button";
-        button.disabled = !battle.playerTurn || battle.locked || battle.wild.hp <= 0;
+    // Fight is the primary battle menu. The move list is only visible
+    // after the player clicks Fight, just like the intended battle flow.
+    battleUI.moves.classList.toggle("hidden", !battle.showMoves);
+    battleUI.fightButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
 
-        button.innerHTML = `
-            <span class="move-name">${move.name}</span>
-            <span class="move-meta">${move.category} · Power ${move.power}</span>
-        `;
+    if (battle.showMoves) {
+        battle.player.moves.forEach(move => {
+            const button = document.createElement("button");
+            button.className = "move-button";
+            button.disabled = !battle.playerTurn || battle.locked || battle.wild.hp <= 0;
 
-        button.title = move.effect;
-        button.addEventListener("click", () => useMove(move));
+            button.innerHTML = `
+                <span class="move-name">${move.name}</span>
+                <span class="move-meta">${move.category} · Power ${move.power}</span>
+            `;
 
-        battleUI.moves.appendChild(button);
-    });
+            button.title = move.effect;
+            button.addEventListener("click", () => useMove(move));
+
+            battleUI.moves.appendChild(button);
+        });
+    }
 
     battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
 }
@@ -809,6 +866,7 @@ function useMove(move) {
     if (!battle || !battle.playerTurn || battle.locked || battle.wild.hp <= 0) return;
 
     battle.locked = true;
+    battle.showMoves = false;
 
     const damage = move.damage;
     battle.wild.hp = Math.max(0, battle.wild.hp - damage);
@@ -851,6 +909,7 @@ function wildBattleAttack() {
 
     battle.playerTurn = true;
     battle.locked = false;
+    battle.showMoves = false;
 
     renderBattle(
         `The wild ${battle.wild.name} used ${move.name}! It dealt ${damage} damage.`
@@ -862,6 +921,7 @@ function battleRun() {
     if (!battle || battle.locked || !battle.playerTurn) return;
 
     battle.locked = true;
+    battle.showMoves = false;
     battleUI.runButton.disabled = true;
 
     battleUI.message.textContent = "You got away safely.";
@@ -870,6 +930,16 @@ function battleRun() {
 }
 
 function endWildEncounter(message) {
+    // Preserve the starter's HP between encounters. If it fainted, restore
+    // it for now so the prototype cannot leave the player permanently stuck.
+    if (gameState.battle?.player && gameState.starterData) {
+        gameState.starterData.currentHp = gameState.battle.player.hp;
+
+        if (gameState.starterData.currentHp <= 0) {
+            gameState.starterData.currentHp = gameState.starterData.maxHp;
+        }
+    }
+
     gameState.mode = "overworld";
     gameState.battle = null;
     gameState.encounterCooldown = 1500;
@@ -1291,6 +1361,7 @@ function restartGame() {
     gameState.gender = null;
     gameState.starter = null;
     gameState.starterAvailable = false;
+    gameState.starterData = null;
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
