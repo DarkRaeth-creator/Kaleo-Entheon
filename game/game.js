@@ -8,22 +8,6 @@
 // BATTLE STATE
 // ------------------------------------------------------------
 
-const battleState = {
-    active: false,
-    player: {
-        name: "Morrowe",
-        hp: 40,
-        maxHp: 40
-    },
-    wild: {
-        name: "Wild Entheon",
-        hp: 30,
-        maxHp: 30
-    },
-    playerTurn: true,
-    message: ""
-};
-
 const gameState = {
     mode: "intro",
     currentScene: "welcome",
@@ -57,14 +41,6 @@ const npcDialogueName = document.getElementById("npc-dialogue-name");
 const npcDialogueText = document.getElementById("npc-dialogue-text");
 
 const battleScreen = document.getElementById("battle-screen");
-const battleWildName = document.getElementById("battle-wild-name");
-const battleWildHp = document.getElementById("battle-wild-hp");
-const battleMessage = document.getElementById("battle-message");
-const battleFightButton = document.getElementById("battle-fight");
-const battleRunButton = document.getElementById("battle-run");
-
-battleFightButton.addEventListener("click", battleFight);
-battleRunButton.addEventListener("click", battleRun);
 
 
 // ============================================================
@@ -1226,5 +1202,3 @@ function showWelcome() {
 // ============================================================
 
 showWelcome();
-
-

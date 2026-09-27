@@ -6,11 +6,9 @@
     <title>Kaleo – World of Entheon</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <div id="game">
         <div class="game-window">
-
             <header class="game-header">
                 <div>
                     <h1>Kaleo</h1>
@@ -24,7 +22,6 @@
             </header>
 
             <main class="game-screen">
-
                 <div id="intro-screen">
                     <div class="dialogue">
                         <h2 id="scene-title"></h2>
@@ -52,74 +49,46 @@
                     </div>
                 </div>
 
+                <div id="battle-screen" class="battle-screen hidden">
+                    <div class="battle-field">
+                        <div class="battle-opponent">
+                            <div class="battle-creature-card">
+                                <div class="battle-creature-title">
+                                    <strong id="battle-wild-name">Wild Entheon</strong>
+                                    <span id="battle-wild-level">Lv. 3</span>
+                                </div>
+                                <div class="battle-hp-text"><span>HP</span> <span id="battle-wild-hp">30 / 30</span></div>
+                                <div class="hp-bar"><div id="battle-hp-fill" class="hp-fill"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="battle-creature-placeholder">ENTHEON</div>
+
+                        <div class="battle-player-card">
+                            <div class="battle-creature-card">
+                                <div class="battle-creature-title">
+                                    <strong id="battle-player-name">Morrowe</strong>
+                                    <span id="battle-player-level">Lv. 5</span>
+                                </div>
+                                <div class="battle-hp-text"><span>HP</span> <span id="battle-player-hp">40 / 40</span></div>
+                                <div class="hp-bar"><div id="battle-player-hp-fill" class="hp-fill"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="battle-message" class="battle-message">A wild Entheon appeared!</div>
+
+                    <div class="battle-actions">
+                        <button id="battle-fight" class="battle-action-button" type="button">Fight</button>
+                        <button id="battle-run" class="battle-action-button" type="button">Run</button>
+                    </div>
+
+                    <div id="battle-moves" class="battle-moves"></div>
+                </div>
             </main>
-
         </div>
     </div>
 
-    <div id="battle-screen" class="hidden">
-        <div class="battle-panel">
-
-            <div class="battle-status-card wild-card">
-                <div class="battle-name-row">
-                    <strong id="battle-wild-name">Wild Orrin</strong>
-                    <span id="battle-wild-level">Lv. 3</span>
-                </div>
-                <div class="hp-label">HP <span id="battle-wild-hp">30 / 30</span></div>
-                <div class="hp-bar"><div class="hp-fill" id="battle-hp-fill"></div></div>
-            </div>
-
-            <div class="battle-arena">
-                <div class="battle-creature-art wild-art" id="battle-wild-art">
-                    <div class="creature-shadow"></div>
-                    <div class="creature-body">
-                        <div class="creature-ear left"></div>
-                        <div class="creature-ear right"></div>
-                        <div class="creature-eye left"></div>
-                        <div class="creature-eye right"></div>
-                        <div class="creature-tail"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="battle-player-row">
-                <div class="battle-creature-art player-art" id="battle-player-art">
-                    <div class="creature-shadow"></div>
-                    <div class="creature-body">
-                        <div class="creature-ear left"></div>
-                        <div class="creature-ear right"></div>
-                        <div class="creature-eye left"></div>
-                        <div class="creature-eye right"></div>
-                        <div class="creature-tail"></div>
-                    </div>
-                </div>
-
-                <div class="battle-status-card player-card">
-                    <div class="battle-name-row">
-                        <strong id="battle-player-name">Morrowe</strong>
-                        <span id="battle-player-level">Lv. 5</span>
-                    </div>
-                    <div class="hp-label">HP <span id="battle-player-hp">40 / 40</span></div>
-                    <div class="hp-bar"><div class="hp-fill" id="battle-player-hp-fill"></div></div>
-                </div>
-            </div>
-
-            <div class="battle-message" id="battle-message">A wild Orrin appeared!</div>
-
-            <div class="battle-controls">
-                <div class="battle-command-panel">
-                    <div class="battle-command-title">What will Morrowe do?</div>
-                    <div class="battle-moves" id="battle-moves"></div>
-                </div>
-
-                <div class="battle-main-actions">
-                    <button id="battle-fight" class="option-button">Fight</button>
-                    <button id="battle-run" class="option-button">Run</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="game.js?v=8"></script>
+    <script src="game.js"></script>
 </body>
 </html>
