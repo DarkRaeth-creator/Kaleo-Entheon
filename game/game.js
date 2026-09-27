@@ -23,6 +23,11 @@ const gameState = {
     crystals: {
         capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 }
     },
+    items: {
+        recoveryTonic: { id: "recoveryTonic", name: "Recovery Tonic", description: "Restores 25 HP to one Entheon.", quantity: 3, kind: "heal", amount: 25 },
+        revivalTonic: { id: "revivalTonic", name: "Revival Tonic", description: "Revives a fainted Entheon at 50% of its maximum HP.", quantity: 1, kind: "revive", amount: 0.5 }
+    },
+    pendingItemId: null,
     partyScreenBattleMode: false,
     partyScreenForced: false,
     activeDialogue: null,
@@ -65,6 +70,10 @@ const partyDetail = document.getElementById("party-detail");
 const crystalScreen = document.getElementById("crystal-screen");
 const crystalList = document.getElementById("crystal-list");
 const crystalCloseButton = document.getElementById("crystal-close-button");
+const inventoryScreen = document.getElementById("inventory-screen");
+const inventoryList = document.getElementById("inventory-list");
+const inventoryCloseButton = document.getElementById("inventory-close-button");
+const inventoryTarget = document.getElementById("inventory-target");
 function setCaptureStatus(text) {
     const battleArea =
         document.getElementById("battle-screen") ||
@@ -1114,6 +1123,7 @@ const battleUI = {
     fightButton: document.getElementById("battle-fight"),
     captureButton: document.getElementById("battle-capture"),
     partyButton: document.getElementById("battle-party"),
+    inventoryButton: document.getElementById("battle-inventory"),
     runButton: document.getElementById("battle-run")
 };
 
@@ -1126,12 +1136,37 @@ battleUI.fightButton.addEventListener("click", () => {
 });
 
 battleUI.captureButton.addEventListener("click", openCrystalScreen);
+if (battleUI.inventoryButton) {
+    battleUI.inventoryButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!gameState.battle || gameState.battle.locked || !gameState.battle.playerTurn || gameState.battle.wild.hp <= 0) return;
+        openInventory(true);
+    });
+}
 if (battleUI.partyButton) {
     battleUI.partyButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
         if (!gameState.battle || gameState.battle.locked || !gameState.battle.playerTurn) return;
         openPartyScreen(true, false);
+    });
+}
+
+const inventoryButton = document.getElementById("inventory-button");
+if (inventoryButton) {
+    inventoryButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openInventory(false);
+    });
+}
+
+if (inventoryCloseButton) {
+    inventoryCloseButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeInventory();
     });
 }
 
@@ -1587,6 +1622,9 @@ function renderBattle(message = null) {
     if (battleUI.partyButton) {
         battleUI.partyButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
     }
+    if (battleUI.inventoryButton) {
+        battleUI.inventoryButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
+    }
 
     battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
 }
@@ -1678,6 +1716,160 @@ function calculateCaptureChance(battle) {
 
     // 20% at full HP, rising to 85% at 0 HP.
     return Math.min(0.85, Math.max(0.20, 0.20 + missingHp * 0.65));
+}
+
+function getItemInventory() {
+    if (!gameState.items) gameState.items = {};
+    return gameState.items;
+}
+
+function getUsableItemEntries() {
+    return Object.values(getItemInventory()).filter(item => (item.quantity || 0) > 0);
+}
+
+function renderInventoryList() {
+    if (!inventoryList) return;
+    const items = getUsableItemEntries();
+    const crystals = Object.values(getCrystalInventory());
+    const itemHtml = items.length ? items.map(item => `
+        <button type="button" class="inventory-card" data-item-id="${item.id}">
+            <div class="inventory-icon">✦</div>
+            <div class="inventory-info">
+                <strong>${item.name}</strong>
+                <span>${item.description}</span>
+            </div>
+            <div class="inventory-quantity">×${item.quantity}</div>
+        </button>
+    `).join("") : '<div class="inventory-empty">You do not have any usable items.</div>';
+
+    const crystalHtml = crystals.length ? crystals.map(crystal => `
+        <div class="inventory-card inventory-resource">
+            <div class="inventory-icon">◇</div>
+            <div class="inventory-info">
+                <strong>${crystal.name}</strong>
+                <span>${crystal.grade} grade · Capture equipment</span>
+            </div>
+            <div class="inventory-quantity">×${crystal.quantity}</div>
+        </div>
+    `).join("") : '<div class="inventory-empty">No capture crystals.</div>';
+
+    inventoryList.innerHTML = `
+        <div class="inventory-section-title">Consumables</div>
+        ${itemHtml}
+        <div class="inventory-section-title">Capture Crystals</div>
+        ${crystalHtml}
+    `;
+
+    inventoryList.querySelectorAll("[data-item-id]").forEach(button => {
+        button.addEventListener("click", () => beginItemUse(button.dataset.itemId));
+    });
+}
+
+function renderInventoryTargets(itemId) {
+    if (!inventoryTarget) return;
+    const item = getItemInventory()[itemId];
+    if (!item) return;
+    inventoryTarget.classList.remove("hidden");
+    inventoryTarget.innerHTML = `
+        <div class="inventory-target-title">Choose an Entheon</div>
+        <div class="inventory-target-list">
+            ${gameState.party.map((member, index) => {
+                const fainted = member.currentHp <= 0;
+                const invalid = item.kind === "heal" ? fainted || member.currentHp >= member.maxHp : !fainted;
+                return `<button type="button" class="inventory-target-button" data-target-index="${index}" ${invalid ? "disabled" : ""}>
+                    <strong>${member.species}</strong><span>Lv. ${member.level} · ${Math.max(0, member.currentHp)} / ${member.maxHp} HP</span>
+                </button>`;
+            }).join("")}
+        </div>
+        <button type="button" class="ui-small-button inventory-cancel-target" id="inventory-target-cancel">Cancel</button>
+    `;
+    inventoryTarget.querySelectorAll("[data-target-index]").forEach(button => {
+        button.addEventListener("click", () => useItemOnParty(itemId, Number(button.dataset.targetIndex)));
+    });
+    document.getElementById("inventory-target-cancel")?.addEventListener("click", () => {
+        gameState.pendingItemId = null;
+        inventoryTarget.classList.add("hidden");
+        inventoryTarget.innerHTML = "";
+    });
+}
+
+function openInventory(battleMode = false) {
+    if (gameState.party.length === 0) {
+        showWorldMessage("You don't have any Entheon yet.");
+        return;
+    }
+    if (battleMode) {
+        const battle = gameState.battle;
+        if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0) return;
+    }
+    gameState.pendingItemId = null;
+    gameState.inventoryBattleMode = battleMode;
+    renderInventoryList();
+    if (inventoryTarget) {
+        inventoryTarget.classList.add("hidden");
+        inventoryTarget.innerHTML = "";
+    }
+    inventoryScreen.classList.remove("hidden");
+}
+
+function closeInventory() {
+    if (inventoryScreen) inventoryScreen.classList.add("hidden");
+    gameState.pendingItemId = null;
+    gameState.inventoryBattleMode = false;
+    if (inventoryTarget) {
+        inventoryTarget.classList.add("hidden");
+        inventoryTarget.innerHTML = "";
+    }
+}
+
+function beginItemUse(itemId) {
+    const item = getItemInventory()[itemId];
+    if (!item || item.quantity <= 0) return;
+    gameState.pendingItemId = itemId;
+    renderInventoryTargets(itemId);
+}
+
+function useItemOnParty(itemId, targetIndex) {
+    const item = getItemInventory()[itemId];
+    const target = gameState.party[targetIndex];
+    if (!item || !target || item.quantity <= 0) return;
+
+    let changed = false;
+    let message = "";
+    if (item.kind === "heal") {
+        if (target.currentHp <= 0 || target.currentHp >= target.maxHp) return;
+        const before = target.currentHp;
+        target.currentHp = Math.min(target.maxHp, target.currentHp + item.amount);
+        const healed = target.currentHp - before;
+        message = `You used a ${item.name} on ${target.species}. It restored ${healed} HP.`;
+        changed = healed > 0;
+    } else if (item.kind === "revive") {
+        if (target.currentHp > 0) return;
+        target.currentHp = Math.max(1, Math.floor(target.maxHp * item.amount));
+        message = `You used a ${item.name} on ${target.species}. ${target.species} was revived!`;
+        changed = true;
+    }
+
+    if (!changed) return;
+    item.quantity--;
+    renderParty();
+
+    const battleMode = !!gameState.inventoryBattleMode;
+    closeInventory();
+
+    if (battleMode && gameState.battle) {
+        const battle = gameState.battle;
+        battle.locked = true;
+        battle.showMoves = false;
+        const active = gameState.party[gameState.activePartyIndex];
+        battle.player.hp = active.currentHp;
+        battle.player.maxHp = active.maxHp;
+        battle.player.stats = { ...active.stats };
+        renderBattle(message);
+        setTimeout(() => wildBattleAttack(), 750);
+    } else {
+        showWorldMessage(message);
+    }
 }
 
 function getCrystalInventory() {
@@ -2354,6 +2546,13 @@ function restartGame() {
     gameState.activePartyIndex = 0;
     gameState.selectedPartyIndex = 0;
     gameState.captureDevices = 5;
+    gameState.crystals = { capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 } };
+    gameState.items = {
+        recoveryTonic: { id: "recoveryTonic", name: "Recovery Tonic", description: "Restores 25 HP to one Entheon.", quantity: 3, kind: "heal", amount: 25 },
+        revivalTonic: { id: "revivalTonic", name: "Revival Tonic", description: "Revives a fainted Entheon at 50% of its maximum HP.", quantity: 1, kind: "revive", amount: 0.5 }
+    };
+    gameState.pendingItemId = null;
+    gameState.inventoryBattleMode = false;
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";

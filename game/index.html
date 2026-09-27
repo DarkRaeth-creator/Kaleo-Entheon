@@ -39,7 +39,8 @@
                         <span><strong>Move:</strong> WASD / Arrow Keys</span>
                         <span><strong>Interact:</strong> E / Enter / Space</span>
                     
-                        <button id="party-button" class="ui-small-button" type="button">Party</button></div>
+                        <button id="party-button" class="ui-small-button" type="button">Party</button>
+                        <button id="inventory-button" class="ui-small-button" type="button">Inventory</button></div>
 
                     <div id="world-message" class="world-message hidden"></div>
 
@@ -69,6 +70,19 @@
                         </div>
                         <div id="crystal-list" class="crystal-list"></div>
                     </section>
+
+
+<section id="inventory-screen" class="inventory-screen hidden" aria-label="Inventory">
+    <div class="inventory-screen-header">
+        <div>
+            <h2>Your Inventory</h2>
+            <p>Items and capture equipment currently carried.</p>
+        </div>
+        <button id="inventory-close-button" class="ui-small-button" type="button">Close</button>
+    </div>
+    <div id="inventory-list" class="inventory-list"></div>
+    <div id="inventory-target" class="inventory-target hidden"></div>
+</section>
 
 <section id="party-screen" class="party-screen hidden" aria-label="Entheon Party Screen">
                         <div class="party-screen-header">
@@ -126,6 +140,7 @@
                         <button id="battle-fight" class="battle-action-button" type="button">Fight</button>
                         <button id="battle-capture" class="battle-action-button" type="button">Capture (5)</button>
                         <button id="battle-party" class="battle-action-button" type="button">Party</button>
+                        <button id="battle-inventory" class="battle-action-button" type="button">Inventory</button>
                         <button id="battle-run" class="battle-action-button" type="button">Run</button>
                     </div>
 
@@ -136,6 +151,6 @@
     </div>
 
     <script src="world-data.js"></script>
-    <script src="game.js?v=20260927-16"></script>
+    <script src="game.js?v=20260927-17"></script>
 </body>
 </html>
