@@ -703,10 +703,13 @@ function checkAutomaticTransitions() {
     }
 
     if (gameState.currentMap === "research_center") {
+        // The Research Center door is on the east side of the building in town.
+        // Place the player immediately to the right of that door so they spawn
+        // outside the building instead of inside its collision boundary.
         transitionTo(
             "town",
-            15,
-            8,
+            20,
+            7,
             "You step back outside into Kaleo."
         );
     }
