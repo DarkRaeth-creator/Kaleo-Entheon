@@ -2244,6 +2244,28 @@ function openNpcDialogue(npc) {
     gameState.activeDialogue = npc;
     gameState.dialogueIndex = 0;
 
+    // The researcher has been contacted, so the starter Entheon are now
+    // available. This intentionally happens when the conversation starts,
+    // rather than relying on the final dialogue keypress being registered.
+    // It also makes the interaction robust if the player closes the dialogue
+    // before advancing through every line.
+    if ((npc.interaction || npc.type) === "professor") {
+        gameState.starterAvailable = true;
+    }
+
+    npcDialogueName.textContent = npc.name;
+    npcDialogue.classList.remove("hidden");
+
+    updateNpcDialogueText();
+}
+
+function openStarterDialogue(npc) {
+    // Starter NPCs are world objects, not the old intro-screen scene.
+    // Use the same dialogue system as every other NPC and identify the
+    // species directly from npc.species.
+    gameState.activeDialogue = npc;
+    gameState.dialogueIndex = 0;
+
     npcDialogueName.textContent = npc.name;
     npcDialogue.classList.remove("hidden");
 
@@ -2272,7 +2294,7 @@ function advanceDialogue() {
 
     if (gameState.dialogueIndex >= lineCount) {
         if (npc.type === "starter" || npc.interaction === "starter") {
-            const species = npc.starterSpecies;
+            const species = npc.species || npc.starterSpecies;
             closeNpcDialogue();
             showStarterConfirmation(species);
             return;
