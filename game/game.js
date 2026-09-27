@@ -13,6 +13,7 @@ const gameState = {
     currentScene: "welcome",
     playerName: "",
     starter: null,
+    party: [],
     activeDialogue: null,
     dialogueIndex: 0,
     currentMap: "town",
@@ -195,6 +196,21 @@ function showStarter(name) {
 
 function chooseStarter(name) {
     gameState.starter = name;
+
+    const starterData = speciesBattleData[name] || {
+        level: 5,
+        maxHp: 40,
+        moves: speciesBattleData.Morrowe.moves
+    };
+
+    gameState.party = [{
+        name,
+        level: starterData.level,
+        hp: starterData.maxHp,
+        maxHp: starterData.maxHp,
+        moves: starterData.moves
+    }];
+
     starterStatus.textContent = "Starter: " + name;
 
     showScene(
@@ -687,29 +703,33 @@ const battleUI = {
     runButton: document.getElementById("battle-run")
 };
 
-battleUI.fightButton.addEventListener("click", () => {
-    battleUI.moves.classList.remove("hidden");
-    battleUI.fightButton.classList.add("hidden");
-});
+battleUI.fightButton.addEventListener("click", showMoveSelection);
 
 battleUI.runButton.addEventListener("click", battleRun);
 
 function startWildEncounter() {
     const wildSpecies = "Orrin";
     const wildData = speciesBattleData[wildSpecies];
-    const playerSpecies = gameState.starter || "Morrowe";
-    const playerData = speciesBattleData[playerSpecies] || speciesBattleData.Morrowe;
 
-    gameState.mode = "battle";
+    if (!gameState.party.length) {
+        const playerSpecies = gameState.starter || "Morrowe";
+        const playerData = speciesBattleData[playerSpecies] || speciesBattleData.Morrowe;
 
-    gameState.battle = {
-        player: {
+        gameState.party.push({
             name: playerSpecies,
             level: playerData.level,
             hp: playerData.maxHp,
             maxHp: playerData.maxHp,
             moves: playerData.moves
-        },
+        });
+    }
+
+    const player = gameState.party[0];
+
+    gameState.mode = "battle";
+
+    gameState.battle = {
+        player,
         wild: {
             name: wildSpecies,
             level: wildData.level,
@@ -723,11 +743,14 @@ function startWildEncounter() {
 
     battleScreen.classList.remove("hidden");
     overworldScreen.classList.add("hidden");
+
     battleUI.moves.classList.add("hidden");
     battleUI.fightButton.classList.remove("hidden");
+    battleUI.fightButton.disabled = false;
     battleUI.runButton.classList.remove("hidden");
+    battleUI.runButton.disabled = false;
 
-    renderBattle();
+    renderBattle("A wild Entheon appeared!");
 }
 
 function renderBattle(message = null) {
@@ -768,7 +791,19 @@ function renderBattle(message = null) {
         battleUI.moves.appendChild(button);
     });
 
-    battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
+    battleUI.fightButton.disabled =
+        battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
+
+    battleUI.runButton.disabled =
+        battle.locked || !battle.playerTurn;
+}
+
+function showMoveSelection() {
+    const battle = gameState.battle;
+    if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0) return;
+
+    battleUI.fightButton.classList.add("hidden");
+    battleUI.moves.classList.remove("hidden");
 }
 
 function useMove(move) {
@@ -776,6 +811,10 @@ function useMove(move) {
     if (!battle || !battle.playerTurn || battle.locked || battle.wild.hp <= 0) return;
 
     battle.locked = true;
+    battleUI.moves.classList.add("hidden");
+    battleUI.fightButton.classList.remove("hidden");
+    battleUI.fightButton.disabled = true;
+    battleUI.runButton.disabled = true;
 
     const damage = move.damage;
     battle.wild.hp = Math.max(0, battle.wild.hp - damage);
@@ -812,12 +851,19 @@ function wildBattleAttack() {
             `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted!`
         );
 
-        setTimeout(() => endWildEncounter(`${battle.player.name} needs to recover.`), 1100);
+        setTimeout(() => endWildEncounter(
+            `${battle.player.name} has fainted. You need to heal before battling again.`
+        ), 1100);
         return;
     }
 
     battle.playerTurn = true;
     battle.locked = false;
+
+    battleUI.moves.classList.add("hidden");
+    battleUI.fightButton.classList.remove("hidden");
+    battleUI.fightButton.disabled = false;
+    battleUI.runButton.disabled = false;
 
     renderBattle(
         `The wild ${battle.wild.name} used ${move.name}! It dealt ${damage} damage.`
@@ -830,6 +876,8 @@ function battleRun() {
 
     battle.locked = true;
     battleUI.runButton.disabled = true;
+    battleUI.fightButton.disabled = true;
+    battleUI.moves.classList.add("hidden");
 
     battleUI.message.textContent = "You got away safely.";
 
@@ -845,7 +893,9 @@ function endWildEncounter(message) {
     overworldScreen.classList.remove("hidden");
     battleUI.moves.classList.add("hidden");
     battleUI.fightButton.classList.remove("hidden");
+    battleUI.fightButton.disabled = false;
     battleUI.runButton.classList.remove("hidden");
+    battleUI.runButton.disabled = false;
 
     showWorldMessage(message);
     drawGame();
