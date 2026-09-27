@@ -431,3 +431,16 @@ body {
 .party-switch-button { width: 100%; margin-top: 18px; padding: 11px 14px; border: 2px solid #667b9d; border-radius: 7px; background: #34445d; color: #fff; font-weight: 800; cursor: pointer; }
 .party-switch-button:hover:not(:disabled) { background: #415675; }
 .party-switch-button:disabled { opacity: .55; cursor: default; }
+
+/* Battle party action uses the same visual treatment as the other battle commands. */
+.battle-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+@media (max-width: 700px) {
+    .battle-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+}

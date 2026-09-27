@@ -20,6 +20,8 @@ const gameState = {
     activePartyIndex: 0,
     selectedPartyIndex: 0,
     captureDevices: 5,
+    partyScreenBattleMode: false,
+    partyScreenForced: false,
     activeDialogue: null,
     dialogueIndex: 0,
     currentMap: "town",
@@ -813,6 +815,7 @@ const battleUI = {
     moves: document.getElementById("battle-moves"),
     fightButton: document.getElementById("battle-fight"),
     captureButton: document.getElementById("battle-capture"),
+    partyButton: document.getElementById("battle-party"),
     runButton: document.getElementById("battle-run")
 };
 
@@ -825,6 +828,7 @@ battleUI.fightButton.addEventListener("click", () => {
 });
 
 battleUI.captureButton.addEventListener("click", battleCapture);
+battleUI.partyButton?.addEventListener("click", () => openPartyScreen(true, false));
 battleUI.runButton.addEventListener("click", battleRun);
 
 
@@ -959,39 +963,81 @@ function switchActivePartyMember(index) {
     if (!member) return;
     if (index === gameState.activePartyIndex) return;
     if (member.currentHp <= 0) {
-        showWorldMessage(`${member.species} has no HP and cannot be selected right now.`);
+        if (!gameState.partyScreenForced) {
+            showWorldMessage(`${member.species} has no HP and cannot be selected right now.`);
+        }
         return;
     }
 
+    const oldIndex = gameState.activePartyIndex;
     gameState.activePartyIndex = index;
     gameState.selectedPartyIndex = index;
     gameState.starter = member.species;
     gameState.starterData = member;
+
+    if (gameState.battle && gameState.partyScreenBattleMode) {
+        const battle = gameState.battle;
+        battle.player = {
+            name: member.species,
+            level: member.level,
+            hp: member.currentHp,
+            maxHp: member.maxHp,
+            moves: member.moves
+        };
+        battle.showMoves = false;
+        battle.forceSwitch = false;
+        battle.locked = true;
+
+        const forcedSwitch = gameState.partyScreenForced;
+        renderParty();
+        gameState.partyScreenForced = false;
+        closePartyScreen();
+
+        battle.playerTurn = true;
+        battle.locked = false;
+        battle.forceSwitch = false;
+        renderBattle(`${member.species} was sent into battle!`);
+
+        // A voluntary switch uses the player's turn. A forced switch happens
+        // after the opponent's attack, so the replacement gets the next turn.
+        if (!forcedSwitch) {
+            setTimeout(wildBattleAttack, 750);
+        }
+        return;
+    }
+
     renderParty();
     showWorldMessage(`${member.species} is now your active Entheon.`);
 }
 
-function openPartyScreen() {
+function openPartyScreen(battleMode = false, forced = false) {
     if (!gameState.party || gameState.party.length === 0) {
         showWorldMessage("You don't have any Entheon in your party yet.");
         return;
     }
 
+    gameState.partyScreenBattleMode = battleMode;
+    gameState.partyScreenForced = forced;
     gameState.selectedPartyIndex = gameState.activePartyIndex;
     renderPartyScreen();
     partyScreen.classList.remove("hidden");
+
+    if (partyCloseButton) {
+        partyCloseButton.textContent = forced ? "Choose Entheon" : "Close";
+        partyCloseButton.disabled = forced;
+        partyCloseButton.classList.toggle("hidden", forced);
+    }
 }
 
 function closePartyScreen() {
+    if (gameState.partyScreenForced) return;
     partyScreen.classList.add("hidden");
-}
-
-if (partyButton) {
-    partyButton.addEventListener("click", openPartyScreen);
-}
-
-if (partyCloseButton) {
-    partyCloseButton.addEventListener("click", closePartyScreen);
+    gameState.partyScreenBattleMode = false;
+    if (partyCloseButton) {
+        partyCloseButton.textContent = "Close";
+        partyCloseButton.disabled = false;
+        partyCloseButton.classList.remove("hidden");
+    }
 }
 
 function getEncounterPool() {
@@ -1085,7 +1131,8 @@ function startWildEncounter() {
         },
         playerTurn: true,
         locked: false,
-        showMoves: false
+        showMoves: false,
+        forceSwitch: false
     };
 
     battleScreen.classList.remove("hidden");
@@ -1148,6 +1195,10 @@ function renderBattle(message = null) {
     battleUI.captureButton.textContent =
         `Capture (${gameState.captureDevices})`;
 
+    if (battleUI.partyButton) {
+        battleUI.partyButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
+    }
+
     battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
 }
 
@@ -1189,11 +1240,34 @@ function wildBattleAttack() {
     battle.player.hp = Math.max(0, battle.player.hp - damage);
 
     if (battle.player.hp <= 0) {
-        renderBattle(
-            `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted!`
+        const fainted = gameState.party[gameState.activePartyIndex];
+        if (fainted) fainted.currentHp = 0;
+
+        const hasReplacement = gameState.party.some((member, index) =>
+            index !== gameState.activePartyIndex && member.currentHp > 0
         );
 
-        setTimeout(() => endWildEncounter(`${battle.player.name} needs to recover.`), 1100);
+        battle.player.hp = 0;
+        battle.locked = true;
+        battle.playerTurn = false;
+        battle.showMoves = false;
+
+        if (!hasReplacement) {
+            renderBattle(
+                `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted! Your whole party is unable to battle.`
+            );
+            setTimeout(() => endWildEncounter("Your party needs to recover."), 1300);
+            return;
+        }
+
+        battle.forceSwitch = true;
+        renderBattle(
+            `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted! Choose another Entheon.`
+        );
+
+        setTimeout(() => {
+            openPartyScreen(true, true);
+        }, 700);
         return;
     }
 
@@ -1300,6 +1374,14 @@ function endWildEncounter(message) {
 
     gameState.mode = "overworld";
     gameState.battle = null;
+    gameState.partyScreenBattleMode = false;
+    gameState.partyScreenForced = false;
+    partyScreen.classList.add("hidden");
+    if (partyCloseButton) {
+        partyCloseButton.textContent = "Close";
+        partyCloseButton.disabled = false;
+        partyCloseButton.classList.remove("hidden");
+    }
     gameState.encounterCooldown = 1500;
 
     battleScreen.classList.add("hidden");
