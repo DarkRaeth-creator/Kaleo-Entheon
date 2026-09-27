@@ -12,8 +12,9 @@ const gameState = {
     mode: "intro",
     currentScene: "welcome",
     playerName: "",
+    gender: null,
     starter: null,
-    party: [],
+    starterAvailable: false,
     activeDialogue: null,
     dialogueIndex: 0,
     currentMap: "town",
@@ -65,86 +66,76 @@ function showScene(title, text, options = []) {
 }
 
 function showOpening() {
-    gameState.currentScene = "opening";
+    showCharacterChoice();
+}
+
+function showCharacterChoice() {
+    gameState.currentScene = "character-choice";
 
     showScene(
-        "Kaleo",
+        "Choose Your Character",
         `
-        <p>You have arrived in Kaleo.</p>
-        <p>Today is the beginning of your journey.</p>
-        <p>The world of Kaleo awaits.</p>
+        <p>Before your journey begins, decide who you will be in Kaleo.</p>
+        <p>Your choice changes your trainer's appearance in the overworld.</p>
         `,
         [
-            { text: "Begin", action: showArrival }
+            { text: "Boy", action: () => chooseGender("boy") },
+            { text: "Girl", action: () => chooseGender("girl") }
         ]
     );
+}
+
+function chooseGender(gender) {
+    gameState.gender = gender;
+    showNameEntry();
+}
+
+function showNameEntry() {
+    gameState.currentScene = "name-entry";
+
+    sceneTitle.textContent = "What's Your Name?";
+    sceneText.innerHTML = `
+        <p>What should people call you in Kaleo?</p>
+        <input id="player-name-input" class="name-input" maxlength="12" autocomplete="off" placeholder="Enter your name">
+    `;
+    optionsContainer.innerHTML = "";
+
+    const input = document.getElementById("player-name-input");
+    const button = document.createElement("button");
+    button.className = "option-button";
+    button.textContent = "Confirm Name";
+    button.addEventListener("click", confirmPlayerName);
+    optionsContainer.appendChild(button);
+
+    input.focus();
+    input.addEventListener("keydown", event => {
+        if (event.key === "Enter") confirmPlayerName();
+    });
+}
+
+function confirmPlayerName() {
+    const input = document.getElementById("player-name-input");
+    const name = input ? input.value.trim() : "";
+
+    if (!name) {
+        input?.focus();
+        return;
+    }
+
+    gameState.playerName = name;
+    startOverworld();
 }
 
 function showArrival() {
-    gameState.currentScene = "arrival";
-
-    showScene(
-        "Arrival",
-        `
-        <p>
-        You stand at the beginning of a journey into a world
-        filled with unexplored regions, settlements, forests,
-        mountains, rivers and the creatures known as Entheon.
-        </p>
-        <p>Somewhere ahead lies the path you have chosen to follow.</p>
-        `,
-        [
-            { text: "Continue", action: showResearchCenter }
-        ]
-    );
+    startOverworld();
 }
 
 function showResearchCenter() {
-    gameState.currentScene = "research-center";
-
-    showScene(
-        "Entheon Research and Training Center",
-        `
-        <p>
-        You stand inside the local Entheon Research and Training Center.
-        </p>
-        <p>
-        Around you are displays, research equipment and information
-        about the creatures that inhabit Kaleo.
-        </p>
-        <p>Beyond the large windows lies the world outside.</p>
-        <p>Your journey is about to truly begin.</p>
-        `,
-        [
-            { text: "Continue", action: showStarterIntroduction }
-        ]
-    );
+    startOverworld();
 }
 
 function showStarterIntroduction() {
-    gameState.currentScene = "starter-introduction";
-
-    showScene(
-        "Your First Entheon",
-        `
-        <p>
-        Before you can begin exploring Kaleo, there is one important
-        decision you must make.
-        </p>
-        <p>You must choose your first Entheon.</p>
-        <p>
-        Several young Entheon have been selected as suitable
-        companions for new trainers.
-        </p>
-        <p>Each one is different.</p>
-        <p>
-        Your first companion will be the beginning of your own story in Kaleo.
-        </p>
-        `,
-        [
-            { text: "Meet the starters", action: showStarterSelection }
-        ]
-    );
+    startOverworld();
 }
 
 function showStarterSelection() {
@@ -195,38 +186,25 @@ function showStarter(name) {
 }
 
 function chooseStarter(name) {
+    if (gameState.currentMap !== "research_center") return;
+
     gameState.starter = name;
-
-    const starterData = speciesBattleData[name] || {
-        level: 5,
-        maxHp: 40,
-        moves: speciesBattleData.Morrowe.moves
-    };
-
-    gameState.party = [{
-        name,
-        level: starterData.level,
-        hp: starterData.maxHp,
-        maxHp: starterData.maxHp,
-        moves: starterData.moves
-    }];
-
     starterStatus.textContent = "Starter: " + name;
 
-    showScene(
-        "A New Partnership",
-        `
-        <p>You have chosen <strong>${name}</strong>.</p>
-        <p>
-        This Entheon will accompany you as you begin your journey through Kaleo.
-        </p>
-        <p>Your adventure begins now.</p>
-        `,
-        [
-            { text: "Enter Kaleo", action: startOverworld }
+    const starterNpc = getNpcs().find(npc => npc.type === "starter" && npc.species === name);
+    if (starterNpc) starterNpc.chosen = true;
+
+    openNpcDialogue({
+        id: "starter-choice",
+        type: "message",
+        name: name,
+        lines: [
+            `${name} is now your partner.`,
+            `You received ${name}! Your journey through Kaleo can begin.`
         ]
-    );
+    });
 }
+
 
 
 // ============================================================
@@ -331,20 +309,62 @@ const maps = {
         npcs: [
             {
                 id: "researcher",
+                type: "researcher",
                 name: "Researcher",
                 x: 6,
                 y: 4,
                 color: "#8b6bbd",
                 lines: [
                     "Welcome to the Entheon Research Center.",
-                    "There is still much we do not know about the Entheon of Kaleo.",
-                    "Take your time and explore. Your journey has only just begun."
+                    "Today is an important day. You are ready to begin your journey through Kaleo.",
+                    "I have three young Entheon here who are ready to meet a new trainer.",
+                    "When you are ready, take a look at them and choose the companion you connect with."
+                ]
+            },
+            {
+                id: "starter-nimblet",
+                type: "starter",
+                species: "Nimblet",
+                name: "Nimblet",
+                x: 9,
+                y: 4,
+                color: "#d3a65f",
+                lines: [
+                    "Nimblet watches you curiously.",
+                    "It seems comfortable around you."
+                ]
+            },
+            {
+                id: "starter-pipiri",
+                type: "starter",
+                species: "Pipiri",
+                name: "Pipiri",
+                x: 11,
+                y: 4,
+                color: "#78a9d8",
+                lines: [
+                    "Pipiri looks up at you.",
+                    "It gives a small, energetic chirp."
+                ]
+            },
+            {
+                id: "starter-morrowe",
+                type: "starter",
+                species: "Morrowe",
+                name: "Morrowe",
+                x: 13,
+                y: 4,
+                color: "#6e5b82",
+                lines: [
+                    "Morrowe studies you quietly.",
+                    "There is something calm and watchful about it."
                 ]
             },
             {
                 id: "assistant",
+                type: "npc",
                 name: "Research Assistant",
-                x: 14,
+                x: 16,
                 y: 4,
                 color: "#5d9f9b",
                 lines: [
@@ -450,6 +470,7 @@ function startOverworld() {
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
     gameState.encounterCooldown = 0;
+    gameState.battle = null;
 
     loadMap("town", 4, 25);
 
@@ -457,7 +478,7 @@ function startOverworld() {
     overworldScreen.classList.remove("hidden");
 
     showWorldMessage(
-        "Welcome to Kaleo. Explore the area and talk to people with E."
+        `Welcome to Kaleo, ${gameState.playerName}. Visit the Entheon Research Center to begin your journey.`
     );
 
     drawGame();
@@ -703,33 +724,28 @@ const battleUI = {
     runButton: document.getElementById("battle-run")
 };
 
-battleUI.fightButton.addEventListener("click", showMoveSelection);
+battleUI.fightButton.addEventListener("click", () => {
+    battleUI.moves.scrollIntoView({ block: "nearest" });
+});
 
 battleUI.runButton.addEventListener("click", battleRun);
 
 function startWildEncounter() {
     const wildSpecies = "Orrin";
     const wildData = speciesBattleData[wildSpecies];
+    const playerSpecies = gameState.starter || "Morrowe";
+    const playerData = speciesBattleData[playerSpecies] || speciesBattleData.Morrowe;
 
-    if (!gameState.party.length) {
-        const playerSpecies = gameState.starter || "Morrowe";
-        const playerData = speciesBattleData[playerSpecies] || speciesBattleData.Morrowe;
+    gameState.mode = "battle";
 
-        gameState.party.push({
+    gameState.battle = {
+        player: {
             name: playerSpecies,
             level: playerData.level,
             hp: playerData.maxHp,
             maxHp: playerData.maxHp,
             moves: playerData.moves
-        });
-    }
-
-    const player = gameState.party[0];
-
-    gameState.mode = "battle";
-
-    gameState.battle = {
-        player,
+        },
         wild: {
             name: wildSpecies,
             level: wildData.level,
@@ -744,13 +760,7 @@ function startWildEncounter() {
     battleScreen.classList.remove("hidden");
     overworldScreen.classList.add("hidden");
 
-    battleUI.moves.classList.add("hidden");
-    battleUI.fightButton.classList.remove("hidden");
-    battleUI.fightButton.disabled = false;
-    battleUI.runButton.classList.remove("hidden");
-    battleUI.runButton.disabled = false;
-
-    renderBattle("A wild Entheon appeared!");
+    renderBattle();
 }
 
 function renderBattle(message = null) {
@@ -791,19 +801,7 @@ function renderBattle(message = null) {
         battleUI.moves.appendChild(button);
     });
 
-    battleUI.fightButton.disabled =
-        battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
-
-    battleUI.runButton.disabled =
-        battle.locked || !battle.playerTurn;
-}
-
-function showMoveSelection() {
-    const battle = gameState.battle;
-    if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0) return;
-
-    battleUI.fightButton.classList.add("hidden");
-    battleUI.moves.classList.remove("hidden");
+    battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
 }
 
 function useMove(move) {
@@ -811,10 +809,6 @@ function useMove(move) {
     if (!battle || !battle.playerTurn || battle.locked || battle.wild.hp <= 0) return;
 
     battle.locked = true;
-    battleUI.moves.classList.add("hidden");
-    battleUI.fightButton.classList.remove("hidden");
-    battleUI.fightButton.disabled = true;
-    battleUI.runButton.disabled = true;
 
     const damage = move.damage;
     battle.wild.hp = Math.max(0, battle.wild.hp - damage);
@@ -851,19 +845,12 @@ function wildBattleAttack() {
             `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted!`
         );
 
-        setTimeout(() => endWildEncounter(
-            `${battle.player.name} has fainted. You need to heal before battling again.`
-        ), 1100);
+        setTimeout(() => endWildEncounter(`${battle.player.name} needs to recover.`), 1100);
         return;
     }
 
     battle.playerTurn = true;
     battle.locked = false;
-
-    battleUI.moves.classList.add("hidden");
-    battleUI.fightButton.classList.remove("hidden");
-    battleUI.fightButton.disabled = false;
-    battleUI.runButton.disabled = false;
 
     renderBattle(
         `The wild ${battle.wild.name} used ${move.name}! It dealt ${damage} damage.`
@@ -876,8 +863,6 @@ function battleRun() {
 
     battle.locked = true;
     battleUI.runButton.disabled = true;
-    battleUI.fightButton.disabled = true;
-    battleUI.moves.classList.add("hidden");
 
     battleUI.message.textContent = "You got away safely.";
 
@@ -891,11 +876,6 @@ function endWildEncounter(message) {
 
     battleScreen.classList.add("hidden");
     overworldScreen.classList.remove("hidden");
-    battleUI.moves.classList.add("hidden");
-    battleUI.fightButton.classList.remove("hidden");
-    battleUI.fightButton.disabled = false;
-    battleUI.runButton.classList.remove("hidden");
-    battleUI.runButton.disabled = false;
 
     showWorldMessage(message);
     drawGame();
@@ -935,7 +915,30 @@ function interact() {
         .sort((a, b) => a.distance - b.distance);
 
     if (nearbyNpcs.length > 0) {
-        openNpcDialogue(nearbyNpcs[0].npc);
+        const npc = nearbyNpcs[0].npc;
+
+        if (npc.type === "researcher") {
+            openNpcDialogue(npc);
+            gameState.starterAvailable = true;
+            return;
+        }
+
+        if (npc.type === "starter") {
+            if (!gameState.starterAvailable) {
+                showWorldMessage("The Entheon is waiting for the researcher to introduce you.");
+                return;
+            }
+
+            if (gameState.starter) {
+                showWorldMessage(`You already chose ${gameState.starter}.`);
+                return;
+            }
+
+            openStarterDialogue(npc);
+            return;
+        }
+
+        openNpcDialogue(npc);
         return;
     }
 
@@ -978,6 +981,21 @@ function getFacingDirection() {
 }
 
 
+function openStarterDialogue(starterNpc) {
+    gameState.activeDialogue = {
+        id: starterNpc.id,
+        type: "starter",
+        name: starterNpc.name,
+        lines: starterNpc.lines,
+        starterSpecies: starterNpc.species
+    };
+    gameState.dialogueIndex = 0;
+
+    npcDialogueName.textContent = starterNpc.name;
+    npcDialogue.classList.remove("hidden");
+    updateNpcDialogueText();
+}
+
 // ============================================================
 // NPC DIALOGUE
 // ============================================================
@@ -1008,6 +1026,13 @@ function advanceDialogue() {
     gameState.dialogueIndex++;
 
     if (gameState.dialogueIndex >= npc.lines.length) {
+        if (npc.type === "starter") {
+            const species = npc.starterSpecies;
+            closeNpcDialogue();
+            showStarterConfirmation(species);
+            return;
+        }
+
         closeNpcDialogue();
         return;
     }
@@ -1015,10 +1040,42 @@ function advanceDialogue() {
     updateNpcDialogueText();
 }
 
+function showStarterConfirmation(species) {
+    gameState.activeDialogue = {
+        id: "starter-confirmation",
+        type: "starter-confirmation",
+        name: species,
+        lines: [`Would you like ${species} to become your first Entheon?`]
+    };
+
+    npcDialogueName.textContent = species;
+    npcDialogueText.textContent = `Would you like ${species} to become your first Entheon?`;
+    npcDialogue.classList.remove("hidden");
+
+    const existing = npcDialogue.querySelector(".starter-choice-actions");
+    existing?.remove();
+
+    const actions = document.createElement("div");
+    actions.className = "starter-choice-actions";
+    actions.innerHTML = `
+        <button class="option-button" type="button">Choose ${species}</button>
+        <button class="option-button" type="button">Not yet</button>
+    `;
+
+    actions.children[0].addEventListener("click", () => {
+        closeNpcDialogue();
+        chooseStarter(species);
+    });
+    actions.children[1].addEventListener("click", () => closeNpcDialogue());
+
+    npcDialogue.appendChild(actions);
+}
+
 function closeNpcDialogue() {
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     npcDialogue.classList.add("hidden");
+    npcDialogue.querySelector(".starter-choice-actions")?.remove();
 }
 
 
@@ -1149,6 +1206,21 @@ function drawNpcs() {
         ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
         ctx.fill();
 
+        if (npc.type === "starter") {
+            ctx.fillStyle = npc.color;
+            ctx.beginPath();
+            ctx.arc(px, py - 4, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#222";
+            ctx.fillRect(px - 5, py - 7, 3, 3);
+            ctx.fillRect(px + 2, py - 7, 3, 3);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 10px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(npc.name, px, py - 22);
+            return;
+        }
+
         ctx.fillStyle = npc.color;
         ctx.fillRect(px - 9, py - 7, 18, 18);
 
@@ -1180,7 +1252,7 @@ function drawPlayer() {
     ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#3559a8";
+    ctx.fillStyle = gameState.gender === "girl" ? "#b24f83" : "#3559a8";
     ctx.fillRect(px - 9, py - 7, 18, 18);
 
     ctx.fillStyle = "#f0c6a4";
@@ -1216,7 +1288,9 @@ function restartGame() {
     gameState.mode = "intro";
     gameState.currentScene = "welcome";
     gameState.playerName = "";
+    gameState.gender = null;
     gameState.starter = null;
+    gameState.starterAvailable = false;
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
@@ -1247,7 +1321,7 @@ function showWelcome() {
         [
             {
                 text: "Begin your journey",
-                action: showOpening
+                action: showCharacterChoice
             }
         ]
     );
