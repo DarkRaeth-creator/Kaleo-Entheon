@@ -300,7 +300,7 @@ const maps = {
             "#.........D........#",
             "####################"
         ],
-        spawn: { x: 10, y: 8 },
+        spawn: { x: 12, y: 9 },
         exit: { x: 10, y: 10, targetMap: "town", targetX: 15, targetY: 8 },
         npcs: [
             {
@@ -359,7 +359,7 @@ const player = {
     y: 25,
     width: 20,
     height: 24,
-    speed: 3
+    speed: 4
 };
 
 const camera = {
@@ -448,6 +448,11 @@ function loadMap(mapId, spawnX = null, spawnY = null) {
 
     currentMap = maps[mapId];
     gameState.currentMap = mapId;
+
+    // Clear held movement keys when changing maps.
+    Object.keys(keys).forEach(key => {
+        keys[key] = false;
+    });
 
     if (spawnX !== null) player.x = spawnX;
     if (spawnY !== null) player.y = spawnY;
@@ -604,8 +609,8 @@ function checkAutomaticTransitions() {
     if (gameState.currentMap === "town") {
         transitionTo(
             "research_center",
-            10,
-            8,
+            12,
+            9,
             "You enter the Entheon Research Center."
         );
         return;
