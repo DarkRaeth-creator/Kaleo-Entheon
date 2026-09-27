@@ -30,7 +30,8 @@ const gameState = {
     currentMap: "town",
     transitionCooldown: 0,
     encounterCooldown: 0,
-    battle: null
+    battle: null,
+    evolutionPromptOpen: false
 };
 
 
@@ -784,6 +785,32 @@ function checkAutomaticTransitions() {
 // WILD ENCOUNTERS + BATTLE SYSTEM
 // ============================================================
 
+const DEV_EVOLUTION_TEST = true;
+
+// Canonical level-based evolution requirements currently documented for Kaleo.
+// The framework is intentionally structured so later methods (items, bond,
+// time of day, etc.) can be added without replacing the evolution system.
+const evolutionData = {
+    Nimblet: { evolvesInto: "Nymbril", method: "level", level: 16 },
+    Nymbril: { evolvesInto: "Nymbrake", method: "level", level: 36 },
+    Pipiri: { evolvesInto: "Pirello", method: "level", level: 17 },
+    Pirello: { evolvesInto: "Piravelle", method: "level", level: 36 },
+    Morrowe: { evolvesInto: "Morveth", method: "level", level: 18 },
+    Morveth: { evolvesInto: "Morvayne", method: "level", level: 40 },
+    Kivvi: { evolvesInto: "Kivara", method: "level", level: 16 },
+    Kivara: { evolvesInto: "Kivarune", method: "level", level: 36 },
+    Brindlew: { evolvesInto: "Brindrel", method: "level", level: 17 },
+    Brindrel: { evolvesInto: "Brinderv", method: "level", level: 36 },
+    Sovel: { evolvesInto: "Sovelle", method: "level", level: 18 },
+    Sovelle: { evolvesInto: "Sovaryn", method: "level", level: 38 },
+    Tarnit: { evolvesInto: "Tarnelle", method: "level", level: 16 },
+    Tarnelle: { evolvesInto: "Tarnovar", method: "level", level: 36 },
+    Quiblet: { evolvesInto: "Quivane", method: "level", level: 17 },
+    Quivane: { evolvesInto: "Quivaryn", method: "level", level: 36 },
+    Elnu: { evolvesInto: "Elvara", method: "level", level: 18 },
+    Elvara: { evolvesInto: "Elvarin", method: "level", level: 36 }
+};
+
 const speciesBattleData = {
     // Prototype numeric statistics. The canonical reference establishes
     // Base Statistics as part of species data, but does not currently give
@@ -846,6 +873,127 @@ const speciesBattleData = {
         ]
     }
 };
+
+function ensureEvolutionSpeciesData(targetSpecies, sourceSpecies) {
+    if (speciesBattleData[targetSpecies]) return speciesBattleData[targetSpecies];
+
+    const source = speciesBattleData[sourceSpecies];
+    if (!source) return null;
+
+    // Prototype fallback for species whose final numeric stat/move data has
+    // not yet been authored. This lets the evolution framework be tested
+    // without pretending these provisional values are canonical.
+    speciesBattleData[targetSpecies] = {
+        level: source.level,
+        baseStats: {
+            hp: source.baseStats.hp + 4,
+            attack: source.baseStats.attack + 4,
+            defense: source.baseStats.defense + 4,
+            specialAttack: source.baseStats.specialAttack + 4,
+            specialDefense: source.baseStats.specialDefense + 4,
+            speed: source.baseStats.speed + 4
+        },
+        moves: source.moves.map(move => ({ ...move }))
+    };
+
+    return speciesBattleData[targetSpecies];
+}
+
+function getEvolutionRequirement(member) {
+    const rule = evolutionData[member?.species];
+    if (!rule || rule.method !== "level") return null;
+    if ((member.level || 1) < rule.level) return null;
+    return rule;
+}
+
+function markEvolutionEligibility(member) {
+    const rule = getEvolutionRequirement(member);
+    if (!rule) return false;
+    member.pendingEvolution = {
+        evolvesInto: rule.evolvesInto,
+        method: rule.method,
+        requirement: rule.level
+    };
+    return true;
+}
+
+function evolveCreature(member) {
+    if (!member?.pendingEvolution) return false;
+
+    const targetSpecies = member.pendingEvolution.evolvesInto;
+    const previousSpecies = member.species;
+    const previousMaxHp = Math.max(1, member.maxHp || 1);
+    const hpRatio = Math.max(0, Math.min(1, (member.currentHp ?? previousMaxHp) / previousMaxHp));
+
+    ensureEvolutionSpeciesData(targetSpecies, previousSpecies);
+    if (!speciesBattleData[targetSpecies]) return false;
+
+    member.species = targetSpecies;
+    member.stats = calculateCreatureStats(targetSpecies, member.level);
+    member.maxHp = member.stats.hp;
+    member.currentHp = member.currentHp <= 0 ? 0 : Math.max(1, Math.round(member.maxHp * hpRatio));
+    member.moves = getMoveSetForLevel(targetSpecies, member.level);
+    member.pendingEvolution = null;
+
+    gameState.starter = gameState.activePartyIndex >= 0 && gameState.party[gameState.activePartyIndex] === member
+        ? targetSpecies
+        : gameState.starter;
+    if (gameState.starterData === member) gameState.starterData = member;
+
+    return true;
+}
+
+function createEvolutionPrompt(member) {
+    if (!member?.pendingEvolution || gameState.evolutionPromptOpen) return;
+
+    gameState.evolutionPromptOpen = true;
+    const target = member.pendingEvolution.evolvesInto;
+
+    const overlay = document.createElement("div");
+    overlay.className = "evolution-prompt-overlay";
+    overlay.id = "evolution-prompt-overlay";
+    overlay.innerHTML = `
+        <div class="evolution-prompt">
+            <div class="evolution-prompt-kicker">EVOLUTION READY</div>
+            <h2>${member.species} is ready to evolve!</h2>
+            <p>${member.species} can evolve into <strong>${target}</strong>.</p>
+            <div class="evolution-prompt-actions">
+                <button type="button" id="evolution-confirm" class="option-button">Evolve</button>
+                <button type="button" id="evolution-delay" class="option-button">Later</button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+
+    document.getElementById("evolution-confirm").addEventListener("click", () => {
+        const oldSpecies = member.species;
+        const evolved = evolveCreature(member);
+        closeEvolutionPrompt();
+        if (evolved) {
+            renderParty();
+            renderPartyScreen();
+            showWorldMessage(`${oldSpecies} evolved into ${member.species}!`);
+        }
+    });
+
+    document.getElementById("evolution-delay").addEventListener("click", () => {
+        closeEvolutionPrompt();
+        showWorldMessage(`${member.species} will remain in its current form for now.`);
+        renderParty();
+        renderPartyScreen();
+    });
+}
+
+function closeEvolutionPrompt() {
+    const overlay = document.getElementById("evolution-prompt-overlay");
+    if (overlay) overlay.remove();
+    gameState.evolutionPromptOpen = false;
+}
+
+function openPendingEvolution(member) {
+    if (!member) return;
+    if (!member.pendingEvolution) markEvolutionEligibility(member);
+    if (member.pendingEvolution) createEvolutionPrompt(member);
+}
 
 const MAX_LEVEL = 100;
 
@@ -932,6 +1080,10 @@ function awardExperience(member, amount) {
         member.maxHp = stats.hp;
         member.currentHp = member.maxHp;
         member.moves = getMoveSetForLevel(member.species, member.level);
+    }
+
+    if (levels.length > 0) {
+        markEvolutionEligibility(member);
     }
 
     member.xpToNext = xpRequiredForLevel(member.level);
@@ -1131,11 +1283,40 @@ function renderPartyScreen() {
         <button type="button" id="party-switch-button" class="party-switch-button"
                 ${gameState.selectedPartyIndex === gameState.activePartyIndex || member.currentHp <= 0 ? "disabled" : ""}>
             ${member.currentHp <= 0 ? "Fainted" : gameState.selectedPartyIndex === gameState.activePartyIndex ? "Active Entheon" : `Switch to ${member.species}`}
-        </button>`;
+        </button>
+        ${member.pendingEvolution ? `
+            <button type="button" id="party-evolution-button" class="party-evolution-button">
+                Ready to evolve into ${member.pendingEvolution.evolvesInto}
+            </button>` : ""}
+        ${DEV_EVOLUTION_TEST && evolutionData[member.species] ? `
+            <button type="button" id="dev-evolution-button" class="party-dev-button">
+                DEV: Make Evolution Available
+            </button>` : ""}`;
 
     const switchButton = document.getElementById("party-switch-button");
     if (switchButton) {
         switchButton.addEventListener("click", () => switchActivePartyMember(gameState.selectedPartyIndex));
+    }
+
+    const evolutionButton = document.getElementById("party-evolution-button");
+    if (evolutionButton) {
+        evolutionButton.addEventListener("click", () => openPendingEvolution(member));
+    }
+
+    const devEvolutionButton = document.getElementById("dev-evolution-button");
+    if (devEvolutionButton) {
+        devEvolutionButton.addEventListener("click", () => {
+            const rule = evolutionData[member.species];
+            if (!rule) return;
+            member.level = Math.max(member.level, rule.level);
+            ensureEvolutionSpeciesData(rule.evolvesInto, member.species);
+            ensureCreatureProgressionData(member);
+            member.xp = 0;
+            markEvolutionEligibility(member);
+            renderParty();
+            renderPartyScreen();
+            openPendingEvolution(member);
+        });
     }
 }
 
@@ -1706,6 +1887,11 @@ function endWildEncounter(message) {
 
     showWorldMessage(message);
     drawGame();
+
+    const activeMember = gameState.party[gameState.activePartyIndex];
+    if (activeMember?.pendingEvolution) {
+        setTimeout(() => createEvolutionPrompt(activeMember), 900);
+    }
 }
 
 // ============================================================
@@ -2174,6 +2360,10 @@ function restartGame() {
     gameState.transitionCooldown = 0;
     gameState.encounterCooldown = 0;
     gameState.battle = null;
+    gameState.evolutionPromptOpen = false;
+
+    const evolutionOverlay = document.getElementById("evolution-prompt-overlay");
+    if (evolutionOverlay) evolutionOverlay.remove();
 
     // Reset world-state changes made during the previous playthrough.
     Object.values(maps).forEach(map => {

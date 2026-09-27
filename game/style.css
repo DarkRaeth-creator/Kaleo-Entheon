@@ -640,3 +640,81 @@ body {
     box-shadow: 0 8px 24px rgba(0,0,0,.45);
     pointer-events: none;
 }
+
+/* ============================================================
+   EVOLUTION
+   ============================================================ */
+.evolution-prompt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(10, 10, 18, .78);
+}
+
+.evolution-prompt {
+    width: min(520px, 100%);
+    background: #24242f;
+    border: 2px solid #555565;
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    text-align: center;
+}
+
+.evolution-prompt-kicker {
+    color: #9ec8ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    margin-bottom: 8px;
+}
+
+.evolution-prompt h2 {
+    margin: 0 0 10px;
+    font-size: 26px;
+}
+
+.evolution-prompt p {
+    margin: 0;
+    color: #c8c8d2;
+    line-height: 1.5;
+}
+
+.evolution-prompt-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.party-evolution-button {
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid #6d9fd8;
+    background: #2d3c55;
+    color: #fff;
+    border-radius: 7px;
+    padding: 11px 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.party-dev-button {
+    width: 100%;
+    margin-top: 8px;
+    border: 1px dashed #888895;
+    background: transparent;
+    color: #aaaab5;
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+@media (max-width: 700px) {
+    .evolution-prompt-actions { grid-template-columns: 1fr; }
+}
