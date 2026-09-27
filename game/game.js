@@ -868,17 +868,11 @@ function renderPartyScreen() {
 
     if (!gameState.party || gameState.party.length === 0) {
         partyScreenList.innerHTML = "";
-        partyDetail.innerHTML = `
-            <div class="party-detail-empty">
-                Your party is empty.
-            </div>`;
+        partyDetail.innerHTML = '<div class="party-detail-empty">Your party is empty.</div>';
         return;
     }
 
-    if (
-        gameState.selectedPartyIndex < 0 ||
-        gameState.selectedPartyIndex >= gameState.party.length
-    ) {
+    if (gameState.selectedPartyIndex < 0 || gameState.selectedPartyIndex >= gameState.party.length) {
         gameState.selectedPartyIndex = 0;
     }
 
@@ -890,10 +884,9 @@ function renderPartyScreen() {
         const selected = index === gameState.selectedPartyIndex;
 
         return `
-            <button
-                type="button"
-                class="party-screen-card${active ? " active" : ""}${selected ? " selected" : ""}${hp <= 0 ? " fainted" : ""}"
-                data-party-index="${index}">
+            <button type="button"
+                    class="party-screen-card${active ? " active" : ""}${selected ? " selected" : ""}${hp <= 0 ? " fainted" : ""}"
+                    data-party-index="${index}">
                 <div class="party-screen-card-number">${index + 1}</div>
                 <div class="party-screen-card-main">
                     <div class="party-screen-card-title">
@@ -929,7 +922,6 @@ function renderPartyScreen() {
                 ? '<span class="party-detail-active">Current Entheon</span>'
                 : ""}
         </div>
-
         <div class="party-detail-stat">
             <div class="party-detail-stat-label">
                 <span>HP</span>
@@ -939,7 +931,6 @@ function renderPartyScreen() {
                 <div class="party-hp-fill" style="width:${Math.max(0, Math.min(100, member.currentHp / Math.max(1, member.maxHp) * 100))}%"></div>
             </div>
         </div>
-
         <div class="party-detail-section">
             <h3>Moves</h3>
             <div class="party-detail-moves">
@@ -951,8 +942,7 @@ function renderPartyScreen() {
                         </div>`).join("")
                     : '<div class="party-detail-empty">No moves recorded.</div>'}
             </div>
-        </div>
-    `;
+        </div>`;
 }
 
 function openPartyScreen() {
@@ -976,6 +966,218 @@ if (partyButton) {
 
 if (partyCloseButton) {
     partyCloseButton.addEventListener("click", closePartyScreen);
+}
+
+function getEncounterPool() {
+    // The pool belongs to the current map, so future routes can define their
+    // own species without changing the battle code. Starters are explicitly
+    // excluded as a safety rule even if one is accidentally added to a pool.
+    return (currentMap.encounters || []).filter(entry => {
+        return speciesBattleData[entry.species];
+    });
+}
+
+function chooseWeightedEncounter(pool) {
+    const totalWeight = pool.reduce((sum, entry) => sum + Math.max(0, entry.weight || 0), 0);
+    if (totalWeight <= 0) return pool[Math.floor(Math.random() * pool.length)];
+
+    let roll = Math.random() * totalWeight;
+    for (const entry of pool) {
+        roll -= Math.max(0, entry.weight || 0);
+        if (roll < 0) return entry;
+    }
+
+    return pool[pool.length - 1];
+}
+
+function randomInt(min, max) {
+    const low = Math.min(min, max);
+    const high = Math.max(min, max);
+    return Math.floor(Math.random() * (high - low + 1)) + low;
+}
+
+function calculateScaledHp(baseHp, baseLevel, level) {
+    const scale = Math.max(0, level - baseLevel);
+    return baseHp + scale * 3;
+}
+
+function startWildEncounter() {
+    // There is no default starter anymore. A battle can only begin
+    // after the player has actually received an Entheon.
+    if (!gameState.starter || !gameState.starterData) {
+        showWorldMessage("You need an Entheon partner before entering tall grass.");
+        gameState.encounterCooldown = 1200;
+        return;
+    }
+
+    const encounterPool = getEncounterPool();
+    if (encounterPool.length === 0) {
+        showWorldMessage("No wild Entheon are currently defined for this area.");
+        gameState.encounterCooldown = 1200;
+        return;
+    }
+
+    const encounter = chooseWeightedEncounter(encounterPool);
+    const wildSpecies = encounter.species;
+    const wildData = speciesBattleData[wildSpecies];
+
+    if (!wildData) {
+        console.error("Encounter species has no battle data:", wildSpecies);
+        gameState.encounterCooldown = 1200;
+        return;
+    }
+
+    const playerData = gameState.starterData;
+    const wildLevel = randomInt(encounter.minLevel, encounter.maxLevel);
+
+    gameState.mode = "battle";
+
+    gameState.battle = {
+        player: {
+            name: gameState.starter,
+            level: playerData.level,
+            hp: playerData.currentHp,
+            maxHp: playerData.maxHp,
+            moves: playerData.moves
+        },
+        wild: {
+            name: wildSpecies,
+            level: wildLevel,
+            hp: calculateScaledHp(wildData.maxHp, wildData.level, wildLevel),
+            maxHp: calculateScaledHp(wildData.maxHp, wildData.level, wildLevel),
+            moves: wildData.moves
+        },
+        playerTurn: true,
+        locked: false,
+        showMoves: false
+    };
+
+    battleScreen.classList.remove("hidden");
+    overworldScreen.classList.add("hidden");
+
+    renderBattle();
+}
+
+function renderBattle(message = null) {
+    const battle = gameState.battle;
+    if (!battle) return;
+
+    battleUI.wildName.textContent = `Wild ${battle.wild.name}`;
+    battleUI.wildLevel.textContent = `Lv. ${battle.wild.level}`;
+    battleUI.wildHp.textContent = `${battle.wild.hp} / ${battle.wild.maxHp}`;
+    battleUI.wildHpFill.style.width =
+        `${Math.max(0, battle.wild.hp / battle.wild.maxHp * 100)}%`;
+
+    battleUI.playerName.textContent = battle.player.name;
+    battleUI.playerLevel.textContent = `Lv. ${battle.player.level}`;
+    battleUI.playerHp.textContent = `${battle.player.hp} / ${battle.player.maxHp}`;
+    battleUI.playerHpFill.style.width =
+        `${Math.max(0, battle.player.hp / battle.player.maxHp * 100)}%`;
+
+    if (message !== null) {
+        battleUI.message.textContent = message;
+    }
+
+    battleUI.moves.innerHTML = "";
+
+    // Fight is the primary battle menu. The move list is only visible
+    // after the player clicks Fight, just like the intended battle flow.
+    battleUI.moves.classList.toggle("hidden", !battle.showMoves);
+    battleUI.fightButton.disabled = battle.locked || !battle.playerTurn || battle.wild.hp <= 0;
+
+    if (battle.showMoves) {
+        battle.player.moves.forEach(move => {
+            const button = document.createElement("button");
+            button.className = "move-button";
+            button.disabled = !battle.playerTurn || battle.locked || battle.wild.hp <= 0;
+
+            button.innerHTML = `
+                <span class="move-name">${move.name}</span>
+                <span class="move-meta">${move.category} · Power ${move.power}</span>
+            `;
+
+            button.title = move.effect;
+            button.addEventListener("click", () => useMove(move));
+
+            battleUI.moves.appendChild(button);
+        });
+    }
+
+    battleUI.captureButton.disabled =
+        battle.locked ||
+        !battle.playerTurn ||
+        battle.wild.hp <= 0 ||
+        gameState.captureDevices <= 0;
+
+    battleUI.captureButton.textContent =
+        `Capture (${gameState.captureDevices})`;
+
+    battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
+}
+
+function useMove(move) {
+    const battle = gameState.battle;
+    if (!battle || !battle.playerTurn || battle.locked || battle.wild.hp <= 0) return;
+
+    battle.locked = true;
+    battle.showMoves = false;
+
+    const damage = move.damage;
+    battle.wild.hp = Math.max(0, battle.wild.hp - damage);
+
+    if (battle.wild.hp <= 0) {
+        renderBattle(
+            `${battle.player.name} used ${move.name}! The wild ${battle.wild.name} was defeated!`
+        );
+
+        setTimeout(() => endWildEncounter("The battle is over."), 1100);
+        return;
+    }
+
+    renderBattle(
+        `${battle.player.name} used ${move.name}! It dealt ${damage} damage.`
+    );
+
+    setTimeout(wildBattleAttack, 750);
+}
+
+function wildBattleAttack() {
+    const battle = gameState.battle;
+    if (!battle || battle.wild.hp <= 0) return;
+
+    const move = battle.wild.moves[
+        Math.floor(Math.random() * battle.wild.moves.length)
+    ];
+
+    const damage = move.damage;
+    battle.player.hp = Math.max(0, battle.player.hp - damage);
+
+    if (battle.player.hp <= 0) {
+        renderBattle(
+            `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted!`
+        );
+
+        setTimeout(() => endWildEncounter(`${battle.player.name} needs to recover.`), 1100);
+        return;
+    }
+
+    battle.playerTurn = true;
+    battle.locked = false;
+    battle.showMoves = false;
+
+    renderBattle(
+        `The wild ${battle.wild.name} used ${move.name}! It dealt ${damage} damage.`
+    );
+}
+
+function calculateCaptureChance(battle) {
+    // Prototype capture formula. This is deliberately simple for now and will
+    // be replaced when the full item/stat system is implemented.
+    const hpRatio = battle.wild.hp / battle.wild.maxHp;
+    const missingHp = 1 - hpRatio;
+
+    // 20% at full HP, rising to 85% at 0 HP.
+    return Math.min(0.85, Math.max(0.20, 0.20 + missingHp * 0.65));
 }
 
 function battleCapture() {
@@ -1054,9 +1256,8 @@ function endWildEncounter(message) {
             gameState.starterData.currentHp = gameState.starterData.maxHp;
         }
 
-        const activeMember = gameState.party[gameState.activePartyIndex];
-        if (activeMember) {
-            activeMember.currentHp = gameState.starterData.currentHp;
+        if (gameState.party[0]) {
+            gameState.party[0].currentHp = gameState.starterData.currentHp;
         }
         renderParty();
     }
@@ -1484,6 +1685,8 @@ function restartGame() {
     gameState.starterAvailable = false;
     gameState.starterData = null;
     gameState.party = [];
+    gameState.activePartyIndex = 0;
+    gameState.selectedPartyIndex = 0;
     gameState.captureDevices = 5;
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
