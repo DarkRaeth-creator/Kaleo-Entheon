@@ -211,9 +211,9 @@ function chooseStarter(name) {
     const starterNpc = currentMap.npcs.find(npc => npc.type === "starter" && npc.species === name);
     if (starterNpc) starterNpc.chosen = true;
 
-    // The chosen starter is removed from the research-center world state.
-    // The other two remain available as world characters until we decide how
-    // the permanent research-center presentation should work.
+    // The two starters that were not selected remain visible for the moment,
+    // but the chosen starter is removed from the research-center world state.
+    // This makes the selection physically persistent rather than only changing UI text.
 
     openNpcDialogue({
         id: "starter-choice",
@@ -255,7 +255,7 @@ const maps = {
             "#..TT..............GGGG...............#",
             "#.................GGGG................#",
             "#.................GGGG................#",
-            "#.............####D....................#",
+            "#.............#####D..................#",
             "#.............#...#...................#",
             "#.............#...#...................#",
             "#.............#####...................#",
@@ -281,12 +281,9 @@ const maps = {
         ],
         spawn: { x: 4, y: 25 },
         exit: null,
-        // Temporary encounter probabilities for the current starting area.
-        // Species eligibility comes from Westmere's canonical regional list;
-        // the exact habitat tables will be expanded as individual routes are built.
         encounters: [
-            { species: "Nimblet", minLevel: 2, maxLevel: 3, weight: 2 },
-            { species: "Brindlew", minLevel: 2, maxLevel: 3, weight: 98 }
+            { species: "Orrin", minLevel: 2, maxLevel: 3, weight: 60 },
+            { species: "Brindlew", minLevel: 2, maxLevel: 3, weight: 40 }
         ],
         npcs: [
             {
@@ -333,7 +330,7 @@ const maps = {
             "####################"
         ],
         spawn: { x: 12, y: 9 },
-        exit: { x: 10, y: 10, targetMap: "town", targetX: 18, targetY: 6 },
+        exit: { x: 10, y: 10, targetMap: "town", targetX: 15, targetY: 8 },
         npcs: [
             {
                 id: "researcher",
@@ -703,9 +700,9 @@ function checkAutomaticTransitions() {
     }
 
     if (gameState.currentMap === "research_center") {
-        // The Research Center door is on the east side of the building in town.
-        // Place the player immediately to the right of that door so they spawn
-        // outside the building instead of inside its collision boundary.
+        // The Research Center door is at town tile (19, 7).
+        // Place the player one tile to its right so they appear outside
+        // the building rather than inside its collision boundary.
         transitionTo(
             "town",
             20,
@@ -797,8 +794,9 @@ function getEncounterPool() {
     // The pool belongs to the current map, so future routes can define their
     // own species without changing the battle code. Starters are explicitly
     // excluded as a safety rule even if one is accidentally added to a pool.
+    const starters = new Set(["Nimblet", "Pipiri", "Morrowe"]);
     return (currentMap.encounters || []).filter(entry => {
-        return speciesBattleData[entry.species];
+        return !starters.has(entry.species) && speciesBattleData[entry.species];
     });
 }
 
