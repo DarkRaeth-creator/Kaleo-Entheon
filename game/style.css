@@ -297,3 +297,106 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
+
+
+/* ------------------------------------------------------------
+   TURN-BASED BATTLE
+   ------------------------------------------------------------ */
+
+.hidden {
+    display: none !important;
+}
+
+.battle-screen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: center;
+    min-height: 390px;
+}
+
+.battle-status {
+    background: #181820;
+    border: 2px solid #41414f;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.wild-status {
+    grid-column: 2;
+}
+
+.player-status {
+    grid-column: 1;
+}
+
+.hp-bar {
+    height: 12px;
+    background: #30303a;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.hp-fill {
+    height: 100%;
+    background: #65b85a;
+    transition: width 0.25s ease;
+}
+
+.battle-creature {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.wild-creature {
+    grid-column: 2;
+    grid-row: 2;
+    background: #5f91c5;
+}
+
+.player-creature {
+    grid-column: 1;
+    grid-row: 2;
+    background: #4e8b62;
+}
+
+.battle-message {
+    grid-column: 1 / -1;
+    background: #181820;
+    border: 2px solid #41414f;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.battle-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.battle-result {
+    padding: 30px;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .battle-screen {
+        grid-template-columns: 1fr;
+    }
+
+    .wild-status,
+    .player-status,
+    .wild-creature,
+    .player-creature,
+    .battle-message,
+    .battle-actions {
+        grid-column: 1;
+    }
+}

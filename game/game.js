@@ -3,6 +3,27 @@
 // Step 4: Buildings + Interior Maps + Map Transitions
 // ============================================================
 
+
+// ------------------------------------------------------------
+// BATTLE STATE
+// ------------------------------------------------------------
+
+const battleState = {
+    active: false,
+    player: {
+        name: "Morrowe",
+        hp: 40,
+        maxHp: 40
+    },
+    wild: {
+        name: "Wild Entheon",
+        hp: 30,
+        maxHp: 30
+    },
+    playerTurn: true,
+    message: ""
+};
+
 const gameState = {
     mode: "intro",
     currentScene: "welcome",
@@ -1065,3 +1086,147 @@ function showWelcome() {
 // ============================================================
 
 showWelcome();
+
+
+// ------------------------------------------------------------
+// TURN-BASED BATTLE SYSTEM
+// ------------------------------------------------------------
+
+function startBattle() {
+    battleState.active = true;
+    battleState.player.name = gameState.starter || "Morrowe";
+    battleState.player.hp = battleState.player.maxHp;
+    battleState.wild.hp = battleState.wild.maxHp;
+    battleState.playerTurn = true;
+    battleState.message = `A wild ${battleState.wild.name} appeared!`;
+
+    renderBattle();
+}
+
+function renderBattle() {
+    const canvas = document.getElementById("game-canvas");
+    const dialogue = document.getElementById("dialogue-box");
+
+    if (!canvas || !dialogue) return;
+
+    canvas.classList.add("hidden");
+
+    dialogue.classList.remove("hidden");
+    dialogue.innerHTML = `
+        <div class="battle-screen">
+            <div class="battle-status wild-status">
+                <strong>${battleState.wild.name}</strong>
+                <div>HP: ${battleState.wild.hp} / ${battleState.wild.maxHp}</div>
+                <div class="hp-bar"><div class="hp-fill" style="width:${Math.max(0, battleState.wild.hp / battleState.wild.maxHp * 100)}%"></div></div>
+            </div>
+
+            <div class="battle-creature wild-creature">${battleState.wild.name.replace("Wild ", "").toUpperCase()}</div>
+
+            <div class="battle-creature player-creature">${battleState.player.name.toUpperCase()}</div>
+
+            <div class="battle-status player-status">
+                <strong>${battleState.player.name}</strong>
+                <div>HP: ${battleState.player.hp} / ${battleState.player.maxHp}</div>
+                <div class="hp-bar"><div class="hp-fill" style="width:${Math.max(0, battleState.player.hp / battleState.player.maxHp * 100)}%"></div></div>
+            </div>
+
+            <div class="battle-message">${battleState.message}</div>
+
+            <div class="battle-actions">
+                ${
+                    battleState.playerTurn && battleState.wild.hp > 0 && battleState.player.hp > 0
+                    ? `<button class="option-button" data-battle-action="attack">Fight</button>
+                       <button class="option-button" data-battle-action="run">Run</button>`
+                    : ""
+                }
+            </div>
+        </div>
+    `;
+
+    dialogue.querySelectorAll("[data-battle-action]").forEach(button => {
+        button.addEventListener("click", () => {
+            const action = button.dataset.battleAction;
+
+            if (action === "attack") {
+                playerAttack();
+            } else if (action === "run") {
+                endBattle("You got away safely.");
+            }
+        });
+    });
+}
+
+function playerAttack() {
+    if (!battleState.playerTurn || !battleState.active) return;
+
+    const damage = 8;
+    battleState.wild.hp = Math.max(0, battleState.wild.hp - damage);
+
+    if (battleState.wild.hp <= 0) {
+        battleState.message = `Your ${battleState.player.name} defeated the wild Entheon!`;
+        battleState.playerTurn = false;
+        renderBattle();
+
+        setTimeout(() => {
+            endBattle(`The wild Entheon was defeated.`);
+        }, 1000);
+
+        return;
+    }
+
+    battleState.message = `${battleState.player.name} attacked for ${damage} damage!`;
+    battleState.playerTurn = false;
+    renderBattle();
+
+    setTimeout(wildAttack, 650);
+}
+
+function wildAttack() {
+    if (!battleState.active || battleState.wild.hp <= 0) return;
+
+    const damage = 5;
+    battleState.player.hp = Math.max(0, battleState.player.hp - damage);
+
+    if (battleState.player.hp <= 0) {
+        battleState.message = `${battleState.player.name} fainted!`;
+        battleState.playerTurn = false;
+        renderBattle();
+
+        setTimeout(() => {
+            endBattle(`${battleState.player.name} needs to recover.`);
+        }, 1000);
+
+        return;
+    }
+
+    battleState.message = `The wild Entheon attacked for ${damage} damage!`;
+    battleState.playerTurn = true;
+    renderBattle();
+}
+
+function endBattle(message) {
+    battleState.active = false;
+    battleState.playerTurn = true;
+
+    const canvas = document.getElementById("game-canvas");
+    const dialogue = document.getElementById("dialogue-box");
+
+    if (dialogue) {
+        dialogue.classList.remove("hidden");
+        dialogue.innerHTML = `
+            <div class="battle-result">
+                <h2>Battle Over</h2>
+                <p>${message}</p>
+                <button class="option-button" id="return-to-world">Return to Kaleo</button>
+            </div>
+        `;
+
+        document.getElementById("return-to-world").addEventListener("click", () => {
+            dialogue.classList.add("hidden");
+            canvas.classList.remove("hidden");
+            encounterCooldown = 1000;
+            gameLoop();
+        });
+    }
+}
+
