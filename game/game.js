@@ -942,7 +942,33 @@ function renderPartyScreen() {
                         </div>`).join("")
                     : '<div class="party-detail-empty">No moves recorded.</div>'}
             </div>
-        </div>`;
+        </div>
+        <button type="button" id="party-switch-button" class="party-switch-button"
+                ${gameState.selectedPartyIndex === gameState.activePartyIndex || member.currentHp <= 0 ? "disabled" : ""}>
+            ${member.currentHp <= 0 ? "Fainted" : gameState.selectedPartyIndex === gameState.activePartyIndex ? "Active Entheon" : `Switch to ${member.species}`}
+        </button>`;
+
+    const switchButton = document.getElementById("party-switch-button");
+    if (switchButton) {
+        switchButton.addEventListener("click", () => switchActivePartyMember(gameState.selectedPartyIndex));
+    }
+}
+
+function switchActivePartyMember(index) {
+    const member = (gameState.party || [])[index];
+    if (!member) return;
+    if (index === gameState.activePartyIndex) return;
+    if (member.currentHp <= 0) {
+        showWorldMessage(`${member.species} has no HP and cannot be selected right now.`);
+        return;
+    }
+
+    gameState.activePartyIndex = index;
+    gameState.selectedPartyIndex = index;
+    gameState.starter = member.species;
+    gameState.starterData = member;
+    renderParty();
+    showWorldMessage(`${member.species} is now your active Entheon.`);
 }
 
 function openPartyScreen() {
@@ -1027,14 +1053,24 @@ function startWildEncounter() {
         return;
     }
 
-    const playerData = gameState.starterData;
+    const activeMember = gameState.party[gameState.activePartyIndex] || gameState.party[0];
+    if (!activeMember) {
+        showWorldMessage("You need an Entheon partner before entering tall grass.");
+        gameState.encounterCooldown = 1200;
+        return;
+    }
+
+    gameState.starter = activeMember.species;
+    gameState.starterData = activeMember;
+
+    const playerData = activeMember;
     const wildLevel = randomInt(encounter.minLevel, encounter.maxLevel);
 
     gameState.mode = "battle";
 
     gameState.battle = {
         player: {
-            name: gameState.starter,
+            name: activeMember.species,
             level: playerData.level,
             hp: playerData.currentHp,
             maxHp: playerData.maxHp,
@@ -1247,17 +1283,17 @@ function battleRun() {
 }
 
 function endWildEncounter(message) {
-    // Preserve the starter's HP between encounters. If it fainted, restore
-    // it for now so the prototype cannot leave the player permanently stuck.
-    if (gameState.battle?.player && gameState.starterData) {
-        gameState.starterData.currentHp = gameState.battle.player.hp;
-
-        if (gameState.starterData.currentHp <= 0) {
-            gameState.starterData.currentHp = gameState.starterData.maxHp;
-        }
-
-        if (gameState.party[0]) {
-            gameState.party[0].currentHp = gameState.starterData.currentHp;
+    // Preserve the active Entheon's HP between encounters. If it fainted,
+    // restore it for now so the prototype cannot leave the player permanently stuck.
+    if (gameState.battle?.player) {
+        const activeMember = gameState.party[gameState.activePartyIndex];
+        if (activeMember) {
+            activeMember.currentHp = gameState.battle.player.hp;
+            if (activeMember.currentHp <= 0) {
+                activeMember.currentHp = activeMember.maxHp;
+            }
+            gameState.starterData = activeMember;
+            gameState.starter = activeMember.species;
         }
         renderParty();
     }

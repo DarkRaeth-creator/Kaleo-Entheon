@@ -427,3 +427,7 @@ body {
     .party-screen-body { grid-template-columns: 1fr; }
     .party-screen-list { grid-template-columns: 1fr; }
 }
+
+.party-switch-button { width: 100%; margin-top: 18px; padding: 11px 14px; border: 2px solid #667b9d; border-radius: 7px; background: #34445d; color: #fff; font-weight: 800; cursor: pointer; }
+.party-switch-button:hover:not(:disabled) { background: #415675; }
+.party-switch-button:disabled { opacity: .55; cursor: default; }
