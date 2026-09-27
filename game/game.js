@@ -673,58 +673,198 @@ function checkAutomaticTransitions() {
 
 
 // ============================================================
-// WILD ENCOUNTERS / TEMPORARY BATTLE
+// WILD ENCOUNTERS + BATTLE SYSTEM
 // ============================================================
 
+const speciesBattleData = {
+    Morrowe: {
+        level: 5,
+        maxHp: 40,
+        moves: [
+            { name: "Scratch", category: "Physical", power: 40, damage: 8, effect: "—" },
+            { name: "Bite", category: "Physical", power: 60, damage: 10, effect: "Chance to Flinch" },
+            { name: "Shadow Claw", category: "Physical", power: 55, damage: 11, effect: "Increased critical-hit chance" }
+        ]
+    },
+    Orrin: {
+        level: 3,
+        maxHp: 30,
+        moves: [
+            { name: "Tackle", category: "Physical", power: 40, damage: 5, effect: "—" },
+            { name: "Scratch", category: "Physical", power: 40, damage: 5, effect: "—" }
+        ]
+    }
+};
+
+const battleUI = {
+    wildName: document.getElementById("battle-wild-name"),
+    wildLevel: document.getElementById("battle-wild-level"),
+    wildHp: document.getElementById("battle-wild-hp"),
+    wildHpFill: document.getElementById("battle-hp-fill"),
+    playerName: document.getElementById("battle-player-name"),
+    playerLevel: document.getElementById("battle-player-level"),
+    playerHp: document.getElementById("battle-player-hp"),
+    playerHpFill: document.getElementById("battle-player-hp-fill"),
+    message: document.getElementById("battle-message"),
+    moves: document.getElementById("battle-moves"),
+    fightButton: document.getElementById("battle-fight"),
+    runButton: document.getElementById("battle-run")
+};
+
+battleUI.fightButton.addEventListener("click", () => {
+    battleUI.moves.scrollIntoView({ block: "nearest" });
+});
+
+battleUI.runButton.addEventListener("click", battleRun);
+
 function startWildEncounter() {
+    const wildSpecies = "Orrin";
+    const wildData = speciesBattleData[wildSpecies];
+    const playerSpecies = gameState.starter || "Morrowe";
+    const playerData = speciesBattleData[playerSpecies] || speciesBattleData.Morrowe;
+
     gameState.mode = "battle";
+
     gameState.battle = {
-        wildName: "Wild Entheon",
-        wildHp: 30,
-        wildMaxHp: 30
+        player: {
+            name: playerSpecies,
+            level: playerData.level,
+            hp: playerData.maxHp,
+            maxHp: playerData.maxHp,
+            moves: playerData.moves
+        },
+        wild: {
+            name: wildSpecies,
+            level: wildData.level,
+            hp: wildData.maxHp,
+            maxHp: wildData.maxHp,
+            moves: wildData.moves
+        },
+        playerTurn: true,
+        locked: false
     };
 
     battleScreen.classList.remove("hidden");
     overworldScreen.classList.add("hidden");
-    updateBattleScreen();
+
+    renderBattle();
 }
 
-function updateBattleScreen() {
-    if (!gameState.battle) return;
+function renderBattle(message = null) {
+    const battle = gameState.battle;
+    if (!battle) return;
 
-    battleWildName.textContent = gameState.battle.wildName;
-    battleWildHp.textContent = `${gameState.battle.wildHp} / ${gameState.battle.wildMaxHp}`;
-    battleMessage.textContent = `A wild ${gameState.battle.wildName} appeared!`;
+    battleUI.wildName.textContent = `Wild ${battle.wild.name}`;
+    battleUI.wildLevel.textContent = `Lv. ${battle.wild.level}`;
+    battleUI.wildHp.textContent = `${battle.wild.hp} / ${battle.wild.maxHp}`;
+    battleUI.wildHpFill.style.width =
+        `${Math.max(0, battle.wild.hp / battle.wild.maxHp * 100)}%`;
+
+    battleUI.playerName.textContent = battle.player.name;
+    battleUI.playerLevel.textContent = `Lv. ${battle.player.level}`;
+    battleUI.playerHp.textContent = `${battle.player.hp} / ${battle.player.maxHp}`;
+    battleUI.playerHpFill.style.width =
+        `${Math.max(0, battle.player.hp / battle.player.maxHp * 100)}%`;
+
+    if (message !== null) {
+        battleUI.message.textContent = message;
+    }
+
+    battleUI.moves.innerHTML = "";
+
+    battle.player.moves.forEach(move => {
+        const button = document.createElement("button");
+        button.className = "move-button";
+        button.disabled = !battle.playerTurn || battle.locked || battle.wild.hp <= 0;
+
+        button.innerHTML = `
+            <span class="move-name">${move.name}</span>
+            <span class="move-meta">${move.category} · Power ${move.power}</span>
+        `;
+
+        button.title = move.effect;
+        button.addEventListener("click", () => useMove(move));
+
+        battleUI.moves.appendChild(button);
+    });
+
+    battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
 }
 
-function battleFight() {
-    if (!gameState.battle) return;
+function useMove(move) {
+    const battle = gameState.battle;
+    if (!battle || !battle.playerTurn || battle.locked || battle.wild.hp <= 0) return;
 
-    gameState.battle.wildHp = Math.max(0, gameState.battle.wildHp - 10);
+    battle.locked = true;
 
-    if (gameState.battle.wildHp === 0) {
-        battleMessage.textContent = `The wild ${gameState.battle.wildName} was defeated!`;
-        setTimeout(endWildEncounter, 1000);
+    const damage = move.damage;
+    battle.wild.hp = Math.max(0, battle.wild.hp - damage);
+
+    if (battle.wild.hp <= 0) {
+        renderBattle(
+            `${battle.player.name} used ${move.name}! The wild ${battle.wild.name} was defeated!`
+        );
+
+        setTimeout(() => endWildEncounter("The battle is over."), 1100);
         return;
     }
 
-    battleMessage.textContent = `Your ${gameState.starter || "Entheon"} attacked!`;
-    updateBattleScreen();
-    battleMessage.textContent = `Your ${gameState.starter || "Entheon"} attacked! The wild Entheon has ${gameState.battle.wildHp} HP left.`;
+    renderBattle(
+        `${battle.player.name} used ${move.name}! It dealt ${damage} damage.`
+    );
+
+    setTimeout(wildBattleAttack, 750);
+}
+
+function wildBattleAttack() {
+    const battle = gameState.battle;
+    if (!battle || battle.wild.hp <= 0) return;
+
+    const move = battle.wild.moves[
+        Math.floor(Math.random() * battle.wild.moves.length)
+    ];
+
+    const damage = move.damage;
+    battle.player.hp = Math.max(0, battle.player.hp - damage);
+
+    if (battle.player.hp <= 0) {
+        renderBattle(
+            `The wild ${battle.wild.name} used ${move.name}! ${battle.player.name} fainted!`
+        );
+
+        setTimeout(() => endWildEncounter(`${battle.player.name} needs to recover.`), 1100);
+        return;
+    }
+
+    battle.playerTurn = true;
+    battle.locked = false;
+
+    renderBattle(
+        `The wild ${battle.wild.name} used ${move.name}! It dealt ${damage} damage.`
+    );
 }
 
 function battleRun() {
-    battleMessage.textContent = "You got away safely.";
-    setTimeout(endWildEncounter, 500);
+    const battle = gameState.battle;
+    if (!battle || battle.locked || !battle.playerTurn) return;
+
+    battle.locked = true;
+    battleUI.runButton.disabled = true;
+
+    battleUI.message.textContent = "You got away safely.";
+
+    setTimeout(() => endWildEncounter("You returned to the route."), 650);
 }
 
-function endWildEncounter() {
+function endWildEncounter(message) {
     gameState.mode = "overworld";
     gameState.battle = null;
     gameState.encounterCooldown = 1500;
+
     battleScreen.classList.add("hidden");
     overworldScreen.classList.remove("hidden");
-    showWorldMessage("You returned to the route.");
+
+    showWorldMessage(message);
     drawGame();
 }
 
@@ -1087,146 +1227,4 @@ function showWelcome() {
 
 showWelcome();
 
-
-// ------------------------------------------------------------
-// TURN-BASED BATTLE SYSTEM
-// ------------------------------------------------------------
-
-function startBattle() {
-    battleState.active = true;
-    battleState.player.name = gameState.starter || "Morrowe";
-    battleState.player.hp = battleState.player.maxHp;
-    battleState.wild.hp = battleState.wild.maxHp;
-    battleState.playerTurn = true;
-    battleState.message = `A wild ${battleState.wild.name} appeared!`;
-
-    renderBattle();
-}
-
-function renderBattle() {
-    const canvas = document.getElementById("game-canvas");
-    const dialogue = document.getElementById("dialogue-box");
-
-    if (!canvas || !dialogue) return;
-
-    canvas.classList.add("hidden");
-
-    dialogue.classList.remove("hidden");
-    dialogue.innerHTML = `
-        <div class="battle-screen">
-            <div class="battle-status wild-status">
-                <strong>${battleState.wild.name}</strong>
-                <div>HP: ${battleState.wild.hp} / ${battleState.wild.maxHp}</div>
-                <div class="hp-bar"><div class="hp-fill" style="width:${Math.max(0, battleState.wild.hp / battleState.wild.maxHp * 100)}%"></div></div>
-            </div>
-
-            <div class="battle-creature wild-creature">${battleState.wild.name.replace("Wild ", "").toUpperCase()}</div>
-
-            <div class="battle-creature player-creature">${battleState.player.name.toUpperCase()}</div>
-
-            <div class="battle-status player-status">
-                <strong>${battleState.player.name}</strong>
-                <div>HP: ${battleState.player.hp} / ${battleState.player.maxHp}</div>
-                <div class="hp-bar"><div class="hp-fill" style="width:${Math.max(0, battleState.player.hp / battleState.player.maxHp * 100)}%"></div></div>
-            </div>
-
-            <div class="battle-message">${battleState.message}</div>
-
-            <div class="battle-actions">
-                ${
-                    battleState.playerTurn && battleState.wild.hp > 0 && battleState.player.hp > 0
-                    ? `<button class="option-button" data-battle-action="attack">Fight</button>
-                       <button class="option-button" data-battle-action="run">Run</button>`
-                    : ""
-                }
-            </div>
-        </div>
-    `;
-
-    dialogue.querySelectorAll("[data-battle-action]").forEach(button => {
-        button.addEventListener("click", () => {
-            const action = button.dataset.battleAction;
-
-            if (action === "attack") {
-                playerAttack();
-            } else if (action === "run") {
-                endBattle("You got away safely.");
-            }
-        });
-    });
-}
-
-function playerAttack() {
-    if (!battleState.playerTurn || !battleState.active) return;
-
-    const damage = 8;
-    battleState.wild.hp = Math.max(0, battleState.wild.hp - damage);
-
-    if (battleState.wild.hp <= 0) {
-        battleState.message = `Your ${battleState.player.name} defeated the wild Entheon!`;
-        battleState.playerTurn = false;
-        renderBattle();
-
-        setTimeout(() => {
-            endBattle(`The wild Entheon was defeated.`);
-        }, 1000);
-
-        return;
-    }
-
-    battleState.message = `${battleState.player.name} attacked for ${damage} damage!`;
-    battleState.playerTurn = false;
-    renderBattle();
-
-    setTimeout(wildAttack, 650);
-}
-
-function wildAttack() {
-    if (!battleState.active || battleState.wild.hp <= 0) return;
-
-    const damage = 5;
-    battleState.player.hp = Math.max(0, battleState.player.hp - damage);
-
-    if (battleState.player.hp <= 0) {
-        battleState.message = `${battleState.player.name} fainted!`;
-        battleState.playerTurn = false;
-        renderBattle();
-
-        setTimeout(() => {
-            endBattle(`${battleState.player.name} needs to recover.`);
-        }, 1000);
-
-        return;
-    }
-
-    battleState.message = `The wild Entheon attacked for ${damage} damage!`;
-    battleState.playerTurn = true;
-    renderBattle();
-}
-
-function endBattle(message) {
-    battleState.active = false;
-    battleState.playerTurn = true;
-
-    const canvas = document.getElementById("game-canvas");
-    const dialogue = document.getElementById("dialogue-box");
-
-    if (dialogue) {
-        dialogue.classList.remove("hidden");
-        dialogue.innerHTML = `
-            <div class="battle-result">
-                <h2>Battle Over</h2>
-                <p>${message}</p>
-                <button class="option-button" id="return-to-world">Return to Kaleo</button>
-            </div>
-        `;
-
-        document.getElementById("return-to-world").addEventListener("click", () => {
-            dialogue.classList.add("hidden");
-            canvas.classList.remove("hidden");
-            encounterCooldown = 1000;
-            gameLoop();
-        });
-    }
-}
 

@@ -400,3 +400,243 @@ body {
         grid-column: 1;
     }
 }
+
+
+/* ============================================================
+   STEP 8 – BATTLE UI
+   ============================================================ */
+
+.battle-panel {
+    width: min(900px, 100%);
+    min-height: 650px;
+    background: #252530;
+    border: 4px solid #111118;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+}
+
+.battle-status-card {
+    background: #181820;
+    border: 2px solid #41414f;
+    border-radius: 10px;
+    padding: 12px 16px;
+    width: min(360px, 48%);
+}
+
+.wild-card {
+    margin-left: auto;
+}
+
+.player-card {
+    margin-left: auto;
+    width: min(360px, 48%);
+}
+
+.battle-name-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+    font-size: 17px;
+}
+
+.battle-name-row span {
+    color: #bdbdc8;
+    font-size: 13px;
+}
+
+.battle-arena {
+    min-height: 235px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.battle-player-row {
+    min-height: 135px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.battle-creature-art {
+    position: relative;
+    width: 210px;
+    height: 150px;
+}
+
+.creature-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    width: 130px;
+    height: 24px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: rgba(0,0,0,.28);
+    filter: blur(2px);
+}
+
+.creature-body {
+    position: absolute;
+    left: 50%;
+    top: 35px;
+    width: 105px;
+    height: 72px;
+    transform: translateX(-50%);
+    border-radius: 52% 48% 45% 45%;
+    background: #24202e;
+    border: 3px solid #5a4b68;
+    box-shadow: 0 10px 18px rgba(0,0,0,.25);
+}
+
+.creature-ear {
+    position: absolute;
+    top: -27px;
+    width: 32px;
+    height: 42px;
+    background: #24202e;
+    border: 3px solid #5a4b68;
+    transform: rotate(18deg);
+    border-radius: 70% 30% 60% 40%;
+}
+
+.creature-ear.left { left: 10px; }
+.creature-ear.right { right: 10px; transform: rotate(-18deg); }
+
+.creature-eye {
+    position: absolute;
+    top: 28px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d9c6ff;
+    box-shadow: 0 0 8px rgba(217,198,255,.7);
+}
+
+.creature-eye.left { left: 28px; }
+.creature-eye.right { right: 28px; }
+
+.creature-tail {
+    position: absolute;
+    right: -38px;
+    bottom: 4px;
+    width: 55px;
+    height: 28px;
+    border: 8px solid #30273c;
+    border-left: 0;
+    border-radius: 0 60% 60% 0;
+    transform: rotate(-18deg);
+}
+
+.player-art .creature-body {
+    transform: translateX(-50%) scale(.86);
+}
+
+.player-art .creature-tail {
+    right: -30px;
+}
+
+.battle-message {
+    background: #181820;
+    border: 2px solid #41414f;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 8px 0 14px;
+    min-height: 58px;
+    line-height: 1.45;
+}
+
+.battle-controls {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 14px;
+}
+
+.battle-command-panel {
+    background: #181820;
+    border: 2px solid #41414f;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.battle-command-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.battle-moves {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.move-button {
+    min-height: 62px;
+    padding: 10px;
+    background: #353542;
+    color: #fff;
+    border: 2px solid #555565;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.move-button:hover:not(:disabled) {
+    background: #454554;
+    border-color: #77778a;
+}
+
+.move-button:disabled {
+    opacity: .45;
+    cursor: default;
+}
+
+.move-name {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.move-meta {
+    color: #bdbdc8;
+    font-size: 11px;
+}
+
+.battle-main-actions {
+    display: grid;
+    gap: 8px;
+    align-content: stretch;
+}
+
+.battle-main-actions .option-button {
+    margin: 0;
+}
+
+@media (max-width: 700px) {
+    .battle-panel {
+        min-height: 100%;
+        border-radius: 0;
+        border-width: 0;
+        padding: 15px;
+    }
+
+    .battle-status-card,
+    .player-card {
+        width: 70%;
+    }
+
+    .battle-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .battle-player-row {
+        min-height: 120px;
+    }
+
+    .battle-moves {
+        grid-template-columns: 1fr 1fr;
+    }
+}
