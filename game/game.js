@@ -1,6 +1,6 @@
 // ============================================================
 // KALEO – WORLD OF ENTHEON
-// Step 4: Buildings + Interior Maps + Map Transitions
+// Step 5: Capture System + Party Foundation
 // ============================================================
 
 
@@ -16,6 +16,8 @@ const gameState = {
     starter: null,
     starterAvailable: false,
     starterData: null,
+    party: [],
+    captureDevices: 5,
     activeDialogue: null,
     dialogueIndex: 0,
     currentMap: "town",
@@ -200,11 +202,23 @@ function chooseStarter(name) {
     // Store the actual chosen Entheon outside the battle object so its HP
     // and future progression can persist from one encounter to the next.
     gameState.starterData = {
+        species: name,
         level: speciesData.level,
         maxHp: speciesData.maxHp,
         currentHp: speciesData.maxHp,
         moves: speciesData.moves.map(move => ({ ...move }))
     };
+
+    // Begin the party structure with the chosen starter. The active battle
+    // system still uses starterData for now; the full party/switching system
+    // will be layered on top of this later.
+    gameState.party = [{
+        species: name,
+        level: speciesData.level,
+        maxHp: speciesData.maxHp,
+        currentHp: speciesData.maxHp,
+        moves: speciesData.moves.map(move => ({ ...move }))
+    }];
 
     starterStatus.textContent = "Starter: " + name;
 
@@ -784,6 +798,7 @@ const battleUI = {
     message: document.getElementById("battle-message"),
     moves: document.getElementById("battle-moves"),
     fightButton: document.getElementById("battle-fight"),
+    captureButton: document.getElementById("battle-capture"),
     runButton: document.getElementById("battle-run")
 };
 
@@ -795,6 +810,7 @@ battleUI.fightButton.addEventListener("click", () => {
     renderBattle();
 });
 
+battleUI.captureButton.addEventListener("click", battleCapture);
 battleUI.runButton.addEventListener("click", battleRun);
 
 function getEncounterPool() {
@@ -932,6 +948,15 @@ function renderBattle(message = null) {
         });
     }
 
+    battleUI.captureButton.disabled =
+        battle.locked ||
+        !battle.playerTurn ||
+        battle.wild.hp <= 0 ||
+        gameState.captureDevices <= 0;
+
+    battleUI.captureButton.textContent =
+        `Capture (${gameState.captureDevices})`;
+
     battleUI.runButton.disabled = battle.locked || !battle.playerTurn;
 }
 
@@ -990,6 +1015,67 @@ function wildBattleAttack() {
     );
 }
 
+function calculateCaptureChance(battle) {
+    // Prototype capture formula. This is deliberately simple for now and will
+    // be replaced when the full item/stat system is implemented.
+    const hpRatio = battle.wild.hp / battle.wild.maxHp;
+    const missingHp = 1 - hpRatio;
+
+    // 20% at full HP, rising to 85% at 0 HP.
+    return Math.min(0.85, Math.max(0.20, 0.20 + missingHp * 0.65));
+}
+
+function battleCapture() {
+    const battle = gameState.battle;
+
+    if (
+        !battle ||
+        battle.locked ||
+        !battle.playerTurn ||
+        battle.wild.hp <= 0 ||
+        gameState.captureDevices <= 0
+    ) {
+        return;
+    }
+
+    battle.locked = true;
+    battle.showMoves = false;
+    gameState.captureDevices--;
+
+    const chance = calculateCaptureChance(battle);
+    const success = Math.random() < chance;
+
+    if (success) {
+        const captured = {
+            species: battle.wild.name,
+            level: battle.wild.level,
+            maxHp: battle.wild.maxHp,
+            currentHp: battle.wild.hp,
+            moves: battle.wild.moves.map(move => ({ ...move }))
+        };
+
+        gameState.party.push(captured);
+
+        renderBattle(
+            `You captured ${battle.wild.name}! It has been added to your party.`
+        );
+
+        setTimeout(() => {
+            endWildEncounter(
+                `${battle.wild.name} joined your party. Capture devices remaining: ${gameState.captureDevices}.`
+            );
+        }, 1100);
+
+        return;
+    }
+
+    renderBattle(
+        `The capture failed! ${battle.wild.name} broke free.`
+    );
+
+    setTimeout(wildBattleAttack, 750);
+}
+
 function battleRun() {
     const battle = gameState.battle;
     if (!battle || battle.locked || !battle.playerTurn) return;
@@ -1011,6 +1097,10 @@ function endWildEncounter(message) {
 
         if (gameState.starterData.currentHp <= 0) {
             gameState.starterData.currentHp = gameState.starterData.maxHp;
+        }
+
+        if (gameState.party[0]) {
+            gameState.party[0].currentHp = gameState.starterData.currentHp;
         }
     }
 
@@ -1436,6 +1526,8 @@ function restartGame() {
     gameState.starter = null;
     gameState.starterAvailable = false;
     gameState.starterData = null;
+    gameState.party = [];
+    gameState.captureDevices = 5;
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
