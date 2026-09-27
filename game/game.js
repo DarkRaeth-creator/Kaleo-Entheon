@@ -208,8 +208,12 @@ function chooseStarter(name) {
 
     starterStatus.textContent = "Starter: " + name;
 
-    const starterNpc = getNpcs().find(npc => npc.type === "starter" && npc.species === name);
+    const starterNpc = currentMap.npcs.find(npc => npc.type === "starter" && npc.species === name);
     if (starterNpc) starterNpc.chosen = true;
+
+    // The two starters that were not selected remain visible for the moment,
+    // but the chosen starter is removed from the research-center world state.
+    // This makes the selection physically persistent rather than only changing UI text.
 
     openNpcDialogue({
         id: "starter-choice",
@@ -277,6 +281,10 @@ const maps = {
         ],
         spawn: { x: 4, y: 25 },
         exit: null,
+        encounters: [
+            { species: "Orrin", minLevel: 2, maxLevel: 3, weight: 60 },
+            { species: "Brindlew", minLevel: 2, maxLevel: 3, weight: 40 }
+        ],
         npcs: [
             {
                 id: "trainer",
@@ -436,7 +444,7 @@ const camera = {
 // ============================================================
 
 function getNpcs() {
-    return currentMap.npcs;
+    return currentMap.npcs.filter(npc => !npc.chosen);
 }
 
 
@@ -743,6 +751,14 @@ const speciesBattleData = {
             { name: "Tackle", category: "Physical", power: 40, damage: 5, effect: "—" },
             { name: "Scratch", category: "Physical", power: 40, damage: 5, effect: "—" }
         ]
+    },
+    Brindlew: {
+        level: 3,
+        maxHp: 32,
+        moves: [
+            { name: "Tackle", category: "Physical", power: 40, damage: 5, effect: "—" },
+            { name: "Scratch", category: "Physical", power: 40, damage: 5, effect: "—" }
+        ]
     }
 };
 
@@ -771,10 +787,41 @@ battleUI.fightButton.addEventListener("click", () => {
 
 battleUI.runButton.addEventListener("click", battleRun);
 
-function startWildEncounter() {
-    const wildSpecies = "Orrin";
-    const wildData = speciesBattleData[wildSpecies];
+function getEncounterPool() {
+    // The pool belongs to the current map, so future routes can define their
+    // own species without changing the battle code. Starters are explicitly
+    // excluded as a safety rule even if one is accidentally added to a pool.
+    const starters = new Set(["Nimblet", "Pipiri", "Morrowe"]);
+    return (currentMap.encounters || []).filter(entry => {
+        return !starters.has(entry.species) && speciesBattleData[entry.species];
+    });
+}
 
+function chooseWeightedEncounter(pool) {
+    const totalWeight = pool.reduce((sum, entry) => sum + Math.max(0, entry.weight || 0), 0);
+    if (totalWeight <= 0) return pool[Math.floor(Math.random() * pool.length)];
+
+    let roll = Math.random() * totalWeight;
+    for (const entry of pool) {
+        roll -= Math.max(0, entry.weight || 0);
+        if (roll < 0) return entry;
+    }
+
+    return pool[pool.length - 1];
+}
+
+function randomInt(min, max) {
+    const low = Math.min(min, max);
+    const high = Math.max(min, max);
+    return Math.floor(Math.random() * (high - low + 1)) + low;
+}
+
+function calculateScaledHp(baseHp, baseLevel, level) {
+    const scale = Math.max(0, level - baseLevel);
+    return baseHp + scale * 3;
+}
+
+function startWildEncounter() {
     // There is no default starter anymore. A battle can only begin
     // after the player has actually received an Entheon.
     if (!gameState.starter || !gameState.starterData) {
@@ -783,7 +830,25 @@ function startWildEncounter() {
         return;
     }
 
+    const encounterPool = getEncounterPool();
+    if (encounterPool.length === 0) {
+        showWorldMessage("No wild Entheon are currently defined for this area.");
+        gameState.encounterCooldown = 1200;
+        return;
+    }
+
+    const encounter = chooseWeightedEncounter(encounterPool);
+    const wildSpecies = encounter.species;
+    const wildData = speciesBattleData[wildSpecies];
+
+    if (!wildData) {
+        console.error("Encounter species has no battle data:", wildSpecies);
+        gameState.encounterCooldown = 1200;
+        return;
+    }
+
     const playerData = gameState.starterData;
+    const wildLevel = randomInt(encounter.minLevel, encounter.maxLevel);
 
     gameState.mode = "battle";
 
@@ -797,9 +862,9 @@ function startWildEncounter() {
         },
         wild: {
             name: wildSpecies,
-            level: wildData.level,
-            hp: wildData.maxHp,
-            maxHp: wildData.maxHp,
+            level: wildLevel,
+            hp: calculateScaledHp(wildData.maxHp, wildData.level, wildLevel),
+            maxHp: calculateScaledHp(wildData.maxHp, wildData.level, wildLevel),
             moves: wildData.moves
         },
         playerTurn: true,
@@ -1368,6 +1433,13 @@ function restartGame() {
     gameState.transitionCooldown = 0;
     gameState.encounterCooldown = 0;
     gameState.battle = null;
+
+    // Reset world-state changes made during the previous playthrough.
+    Object.values(maps).forEach(map => {
+        map.npcs.forEach(npc => {
+            if (npc.type === "starter") npc.chosen = false;
+        });
+    });
 
     starterStatus.textContent = "Starter: —";
     areaStatus.textContent = "Kaleo";
