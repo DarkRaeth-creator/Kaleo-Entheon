@@ -1783,7 +1783,10 @@ function renderInventoryList() {
                 <strong>${item.name}</strong>
                 <span>${item.description}</span>
             </div>
-            <div class="inventory-quantity">×${item.quantity}</div>
+            <div class="inventory-card-actions">
+                <span class="inventory-quantity">×${item.quantity}</span>
+                <span class="inventory-use-label">Use</span>
+            </div>
         </button>
     `).join("") : '<div class="inventory-empty">You do not have any usable items.</div>';
 
