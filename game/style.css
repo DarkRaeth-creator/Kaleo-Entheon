@@ -276,3 +276,240 @@ body {
 .party-hp-fill{height:100%;background:#3f9d55;transition:width 180ms ease}
 @media (max-width: 1320px) { .party-panel { width: 230px; top: 10px; right: 10px; } }
 
+
+/* ============================================================
+   PARTY SCREEN
+   ============================================================ */
+
+.ui-small-button {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    background: #353542;
+    color: #fff;
+    border: 2px solid #555565;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ui-small-button:hover {
+    background: #454554;
+    border-color: #77778a;
+}
+
+.party-screen {
+    position: absolute;
+    inset: 8px;
+    z-index: 40;
+    background: #252530;
+    border: 3px solid #111118;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.55);
+    overflow: auto;
+}
+
+.party-screen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #41414f;
+}
+
+.party-screen-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.party-screen-header p {
+    margin: 5px 0 0;
+    color: #bdbdc8;
+    font-size: 13px;
+}
+
+.party-screen-body {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(280px, .9fr);
+    gap: 18px;
+}
+
+.party-screen-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-content: start;
+}
+
+.party-screen-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 82px;
+    padding: 11px;
+    background: #30303d;
+    color: #fff;
+    border: 2px solid #555565;
+    border-radius: 9px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.party-screen-card:hover {
+    background: #393947;
+    border-color: #77778a;
+}
+
+.party-screen-card.selected {
+    border-color: #a6c8ff;
+    box-shadow: 0 0 0 2px rgba(166,200,255,.18);
+}
+
+.party-screen-card.active {
+    background: #343d4b;
+}
+
+.party-screen-card.fainted {
+    opacity: .55;
+}
+
+.party-screen-card-number {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #181820;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.party-screen-card-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.party-screen-card-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.party-screen-card-title span,
+.party-screen-hp {
+    color: #bdbdc8;
+    font-size: 12px;
+}
+
+.party-active-badge {
+    position: absolute;
+    top: 6px;
+    right: 7px;
+    color: #a6c8ff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .7px;
+}
+
+.party-detail {
+    min-height: 280px;
+    padding: 18px;
+    background: #181820;
+    border: 2px solid #41414f;
+    border-radius: 10px;
+}
+
+.party-detail-empty {
+    min-height: 180px;
+    display: grid;
+    place-items: center;
+    color: #bdbdc8;
+    text-align: center;
+}
+
+.party-detail-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 22px;
+}
+
+.party-detail-name {
+    font-size: 27px;
+    font-weight: 800;
+}
+
+.party-detail-level {
+    margin-top: 4px;
+    color: #bdbdc8;
+}
+
+.party-detail-active {
+    padding: 5px 8px;
+    border: 1px solid #596b85;
+    border-radius: 6px;
+    color: #a6c8ff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .6px;
+}
+
+.party-detail-stat {
+    margin-bottom: 22px;
+}
+
+.party-detail-stat-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    font-size: 13px;
+}
+
+.party-detail-hp-track {
+    height: 12px;
+    background: #41414f;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.party-detail-section h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+.party-detail-moves {
+    display: grid;
+    gap: 8px;
+}
+
+.party-detail-move {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #30303d;
+    border: 1px solid #555565;
+    border-radius: 7px;
+}
+
+.party-detail-move span {
+    color: #bdbdc8;
+    font-size: 12px;
+}
+
+@media (max-width: 800px) {
+    .party-screen-body {
+        grid-template-columns: 1fr;
+    }
+
+    .party-screen-list {
+        grid-template-columns: 1fr;
+    }
+}

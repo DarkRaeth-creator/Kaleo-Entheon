@@ -38,6 +38,7 @@
                     <div id="controls-help">
                         <span><strong>Move:</strong> WASD / Arrow Keys</span>
                         <span><strong>Interact:</strong> E / Enter / Space</span>
+                        <button id="party-button" class="ui-small-button" type="button">Party</button>
                     </div>
 
                     <div id="world-message" class="world-message hidden"></div>
@@ -52,6 +53,26 @@
                         <div class="party-panel-title">ENTHEON PARTY</div>
                         <div id="party-list" class="party-list"></div>
                     </aside>
+
+                    <section id="party-screen" class="party-screen hidden" aria-label="Party">
+                        <div class="party-screen-header">
+                            <div>
+                                <h2>Your Entheon Party</h2>
+                                <p id="party-screen-subtitle">Your current team</p>
+                            </div>
+                            <button id="party-close-button" class="ui-small-button" type="button">Close</button>
+                        </div>
+
+                        <div class="party-screen-body">
+                            <div id="party-screen-list" class="party-screen-list"></div>
+
+                            <div id="party-detail" class="party-detail">
+                                <div class="party-detail-empty">
+                                    Select an Entheon to view its details.
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
 <div id="battle-screen" class="battle-screen hidden">
@@ -95,6 +116,6 @@
         </div>
     </div>
 
-    <script src="game.js?v=20260927-10"></script>
+    <script src="game.js?v=20260927-11"></script>
 </body>
 </html>
