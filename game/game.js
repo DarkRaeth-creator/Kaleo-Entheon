@@ -11,7 +11,9 @@ const gameState = {
     activeDialogue: null,
     dialogueIndex: 0,
     currentMap: "town",
-    transitionCooldown: 0
+    transitionCooldown: 0,
+    encounterCooldown: 0,
+    battle: null
 };
 
 
@@ -32,6 +34,16 @@ const worldMessage = document.getElementById("world-message");
 const npcDialogue = document.getElementById("npc-dialogue");
 const npcDialogueName = document.getElementById("npc-dialogue-name");
 const npcDialogueText = document.getElementById("npc-dialogue-text");
+
+const battleScreen = document.getElementById("battle-screen");
+const battleWildName = document.getElementById("battle-wild-name");
+const battleWildHp = document.getElementById("battle-wild-hp");
+const battleMessage = document.getElementById("battle-message");
+const battleFightButton = document.getElementById("battle-fight");
+const battleRunButton = document.getElementById("battle-run");
+
+battleFightButton.addEventListener("click", battleFight);
+battleRunButton.addEventListener("click", battleRun);
 
 
 // ============================================================
@@ -216,7 +228,8 @@ const TILE = {
     WATER: "W",
     PATH: "G",
     WALL: "#",
-    DOOR: "D"
+    DOOR: "D",
+    TALL_GRASS: "V"
 };
 
 const maps = {
@@ -234,15 +247,15 @@ const maps = {
             "#.............#...#...................#",
             "#.............#...#...................#",
             "#.............#####...................#",
-            "#......................................#",
-            "#......................................#",
+            "#....VVVVVV............................#",
+            "#....VVVVVV............................#",
             "#....WWWW..............................#",
             "#....WWWW..............................#",
             "#....WWWW..............TT.............#",
             "#......................TT.............#",
             "#......................................#",
-            "#................GGGG..................#",
-            "#................GGGG..................#",
+            "#................GGGG....VVVVVV........#",
+            "#................GGGG....VVVVVV........#",
             "#................GGGG..................#",
             "#......................................#",
             "#......................TT.............#",
@@ -423,6 +436,7 @@ function startOverworld() {
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
+    gameState.encounterCooldown = 0;
 
     loadMap("town", 4, 25);
 
@@ -508,6 +522,10 @@ function updatePlayer(delta) {
         gameState.transitionCooldown -= delta * 16.67;
     }
 
+    if (gameState.encounterCooldown > 0) {
+        gameState.encounterCooldown -= delta * 16.67;
+    }
+
     let dx = 0;
     let dy = 0;
 
@@ -548,6 +566,12 @@ function updatePlayer(delta) {
 
     if (gameState.transitionCooldown <= 0) {
         checkAutomaticTransitions();
+    }
+
+    if (gameState.encounterCooldown <= 0 && getTile(Math.floor(player.x), Math.floor(player.y)) === TILE.TALL_GRASS) {
+        if (Math.random() < 0.018) {
+            startWildEncounter();
+        }
     }
 }
 
@@ -626,6 +650,62 @@ function checkAutomaticTransitions() {
     }
 }
 
+
+// ============================================================
+// WILD ENCOUNTERS / TEMPORARY BATTLE
+// ============================================================
+
+function startWildEncounter() {
+    gameState.mode = "battle";
+    gameState.battle = {
+        wildName: "Wild Entheon",
+        wildHp: 30,
+        wildMaxHp: 30
+    };
+
+    battleScreen.classList.remove("hidden");
+    overworldScreen.classList.add("hidden");
+    updateBattleScreen();
+}
+
+function updateBattleScreen() {
+    if (!gameState.battle) return;
+
+    battleWildName.textContent = gameState.battle.wildName;
+    battleWildHp.textContent = `${gameState.battle.wildHp} / ${gameState.battle.wildMaxHp}`;
+    battleMessage.textContent = `A wild ${gameState.battle.wildName} appeared!`;
+}
+
+function battleFight() {
+    if (!gameState.battle) return;
+
+    gameState.battle.wildHp = Math.max(0, gameState.battle.wildHp - 10);
+
+    if (gameState.battle.wildHp === 0) {
+        battleMessage.textContent = `The wild ${gameState.battle.wildName} was defeated!`;
+        setTimeout(endWildEncounter, 1000);
+        return;
+    }
+
+    battleMessage.textContent = `Your ${gameState.starter || "Entheon"} attacked!`;
+    updateBattleScreen();
+    battleMessage.textContent = `Your ${gameState.starter || "Entheon"} attacked! The wild Entheon has ${gameState.battle.wildHp} HP left.`;
+}
+
+function battleRun() {
+    battleMessage.textContent = "You got away safely.";
+    setTimeout(endWildEncounter, 500);
+}
+
+function endWildEncounter() {
+    gameState.mode = "overworld";
+    gameState.battle = null;
+    gameState.encounterCooldown = 1500;
+    battleScreen.classList.add("hidden");
+    overworldScreen.classList.remove("hidden");
+    showWorldMessage("You returned to the route.");
+    drawGame();
+}
 
 // ============================================================
 // CAMERA
@@ -791,6 +871,21 @@ function drawTile(tile, x, y) {
         ctx.fillRect(x + 22, y + 19, 3, 3);
     }
 
+    else if (tile === TILE.TALL_GRASS) {
+        ctx.fillStyle = "#4f963f";
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+        ctx.strokeStyle = "#2f7030";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 5; i++) {
+            const bx = x + 5 + i * 5;
+            ctx.beginPath();
+            ctx.moveTo(bx, y + 25);
+            ctx.lineTo(bx + 2, y + 10);
+            ctx.stroke();
+        }
+    }
+
     else if (tile === TILE.PATH) {
         ctx.fillStyle = "#c8ad78";
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -932,6 +1027,8 @@ function restartGame() {
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
     gameState.transitionCooldown = 0;
+    gameState.encounterCooldown = 0;
+    gameState.battle = null;
 
     starterStatus.textContent = "Starter: —";
     areaStatus.textContent = "Kaleo";
