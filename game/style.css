@@ -819,3 +819,27 @@ body {
 @media (max-width: 700px) {
     .inventory-target-button { flex-direction: column; align-items: flex-start; }
 }
+
+
+/* ============================================================
+   TRAVELLING MERCHANT SHOP
+   ============================================================ */
+.shop-screen { position:absolute; inset:8px; z-index:1150; background:#252530; border:3px solid #111118; border-radius:10px; padding:18px; box-shadow:0 12px 35px rgba(0,0,0,.55); overflow:auto; }
+.shop-screen-header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid #41414f; }
+.shop-screen-header h2 { margin:0; font-size:24px; }
+.shop-screen-header p { margin:5px 0 0; color:#bdbdc8; font-size:13px; }
+.shop-header-actions { display:flex; align-items:center; gap:10px; }
+.shop-vale { min-width:130px; padding:9px 12px; border:2px solid #555565; border-radius:7px; background:#181820; color:#f0d477; font-weight:800; text-align:center; }
+.shop-list { display:grid; gap:10px; }
+.shop-item { width:100%; min-height:86px; display:flex; align-items:center; gap:14px; padding:13px; background:#30303d; color:#fff; border:2px solid #555565; border-radius:9px; cursor:pointer; text-align:left; }
+.shop-item:hover:not(:disabled) { background:#393947; border-color:#a6c8ff; }
+.shop-item:disabled { cursor:not-allowed; opacity:.48; }
+.shop-item-icon { width:46px; height:46px; flex:0 0 46px; display:grid; place-items:center; border-radius:50%; background:#181820; font-size:25px; }
+.shop-item-info { display:flex; flex-direction:column; gap:4px; flex:1; }
+.shop-item-info span { color:#bdbdc8; font-size:12px; }
+.shop-item-info small { color:#8f8fa0; font-size:11px; }
+.shop-item-price { color:#f0d477; font-weight:800; white-space:nowrap; }
+.shop-empty { padding:35px; text-align:center; color:#bdbdc8; }
+.inventory-currency-banner { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border:2px solid #555565; border-radius:8px; background:#181820; color:#f0d477; }
+.inventory-currency-banner span { font-weight:800; }
+@media (max-width:700px) { .shop-screen-header { align-items:flex-start; } .shop-header-actions { flex-direction:column; align-items:stretch; } .shop-item-price { font-size:12px; } }

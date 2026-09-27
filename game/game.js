@@ -20,12 +20,21 @@ const gameState = {
     activePartyIndex: 0,
     selectedPartyIndex: 0,
     captureDevices: 5,
+    vale: 1500,
     crystals: {
         capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 }
     },
     items: {
         recoveryTonic: { id: "recoveryTonic", name: "Recovery Tonic", description: "Restores 25 HP to one Entheon.", quantity: 3, kind: "heal", amount: 25 },
         revivalTonic: { id: "revivalTonic", name: "Revival Tonic", description: "Revives a fainted Entheon at 50% of its maximum HP.", quantity: 1, kind: "revive", amount: 0.5 }
+    },
+    shop: {
+        merchantId: "travelling-merchant",
+        stock: {
+            recoveryTonic: { id: "recoveryTonic", name: "Recovery Tonic", description: "Restores 25 HP to one Entheon.", price: 100 },
+            revivalTonic: { id: "revivalTonic", name: "Revival Tonic", description: "Revives a fainted Entheon at 50% of its maximum HP.", price: 300 },
+            capture: { id: "capture", name: "Capture Crystal", description: "Standard crystal used for Entheon resonance and capture.", price: 150 }
+        }
     },
     pendingItemId: null,
     partyScreenBattleMode: false,
@@ -74,6 +83,10 @@ const inventoryScreen = document.getElementById("inventory-screen");
 const inventoryList = document.getElementById("inventory-list");
 const inventoryCloseButton = document.getElementById("inventory-close-button");
 const inventoryTarget = document.getElementById("inventory-target");
+const shopScreen = document.getElementById("shop-screen");
+const shopList = document.getElementById("shop-list");
+const shopVale = document.getElementById("shop-vale");
+const shopCloseButton = document.getElementById("shop-close-button");
 function setCaptureStatus(text) {
     const battleArea =
         document.getElementById("battle-screen") ||
@@ -399,7 +412,7 @@ const maps = {
                 lines: [
                     "Oh! A customer! Funny, I was just about to leave.",
                     "I travel wherever trainers need supplies. Somehow, I always arrive at exactly the right place.",
-                    "My full shop inventory will be connected once the item economy is ready."
+                    "I sell the essentials every travelling Trainer needs."
                 ],
                 shop: {
                     inventory: ["recoveryTonic", "revivalTonic", "capture"]
@@ -1194,6 +1207,14 @@ if (inventoryCloseButton) {
     });
 }
 
+if (shopCloseButton) {
+    shopCloseButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeMerchantShop();
+    });
+}
+
 if (partyButton) {
     partyButton.addEventListener("click", (event) => {
         event.preventDefault();
@@ -1778,6 +1799,7 @@ function renderInventoryList() {
     `).join("") : '<div class="inventory-empty">No capture crystals.</div>';
 
     inventoryList.innerHTML = `
+        <div class="inventory-currency-banner"><strong>Vale</strong><span>${getVale().toLocaleString()}</span></div>
         <div class="inventory-section-title">Consumables</div>
         ${itemHtml}
         <div class="inventory-section-title">Capture Crystals</div>
@@ -2313,12 +2335,98 @@ function advanceDialogue() {
         } else if (interaction === "trainer") {
             showWorldMessage("This trainer is ready for a battle system that will be connected in the next development step.");
         } else if (interaction === "merchant") {
-            showWorldMessage("Merchant interaction registered. The full shop interface will be connected with the economy system.");
+            openMerchantShop(npc);
         }
         return;
     }
 
     updateNpcDialogueText();
+}
+
+function getVale() {
+    return Math.max(0, Number(gameState.vale || 0));
+}
+
+function renderValeDisplays() {
+    if (shopVale) shopVale.textContent = `${getVale().toLocaleString()} Vale`;
+}
+
+function getMerchantStock(npc) {
+    const ids = npc?.shop?.inventory || Object.keys(gameState.shop?.stock || {});
+    return ids.map(id => gameState.shop?.stock?.[id]).filter(Boolean);
+}
+
+function renderMerchantShop(npc) {
+    if (!shopList) return;
+    const stock = getMerchantStock(npc);
+    renderValeDisplays();
+    shopList.innerHTML = stock.length ? stock.map(item => {
+        const owned = item.id === "capture"
+            ? (getCrystalInventory()[item.id]?.quantity || 0)
+            : (getItemInventory()[item.id]?.quantity || 0);
+        const canBuy = getVale() >= item.price;
+        return `
+            <button type="button" class="shop-item" data-shop-item-id="${item.id}" ${canBuy ? "" : "disabled"}>
+                <div class="shop-item-icon">${item.id === "capture" ? "◇" : "✦"}</div>
+                <div class="shop-item-info">
+                    <strong>${item.name}</strong>
+                    <span>${item.description}</span>
+                    <small>Carried: ×${owned}</small>
+                </div>
+                <div class="shop-item-price">${item.price.toLocaleString()} Vale</div>
+            </button>
+        `;
+    }).join("") : '<div class="shop-empty">The merchant has nothing in stock right now.</div>';
+
+    shopList.querySelectorAll("[data-shop-item-id]").forEach(button => {
+        button.addEventListener("click", () => buyShopItem(button.dataset.shopItemId, npc));
+    });
+}
+
+function openMerchantShop(npc) {
+    if (!shopScreen) return;
+    gameState.activeShopNpc = npc;
+    renderMerchantShop(npc);
+    shopScreen.classList.remove("hidden");
+}
+
+function closeMerchantShop() {
+    if (shopScreen) shopScreen.classList.add("hidden");
+    gameState.activeShopNpc = null;
+}
+
+function buyShopItem(itemId, npc = gameState.activeShopNpc) {
+    const item = gameState.shop?.stock?.[itemId];
+    if (!item || getVale() < item.price) return;
+
+    gameState.vale -= item.price;
+
+    if (itemId === "capture") {
+        const crystals = getCrystalInventory();
+        if (!crystals.capture) {
+            crystals.capture = { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 0 };
+        }
+        crystals.capture.quantity++;
+        gameState.captureDevices = getTotalCrystalCount();
+    } else {
+        const inventory = getItemInventory();
+        if (!inventory[itemId]) {
+            inventory[itemId] = {
+                id: itemId,
+                name: item.name,
+                description: item.description,
+                quantity: 0,
+                kind: itemId === "recoveryTonic" ? "heal" : "revive",
+                amount: itemId === "recoveryTonic" ? 25 : 0.5
+            };
+        }
+        inventory[itemId].quantity++;
+    }
+
+    renderMerchantShop(npc);
+    renderInventoryList();
+    renderCrystalList();
+    showWorldMessage(`You bought 1 ${item.name} for ${item.price.toLocaleString()} Vale.`);
 }
 
 function showStarterConfirmation(species) {
