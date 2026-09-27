@@ -80,6 +80,10 @@ body {
 .battle-action-button:active:not(:disabled),
 .move-button:active:not(:disabled) { transform: translateY(1px); }
 
+#overworld-screen {
+    position: relative;
+}
+
 #game-container {
     width: 100%;
     display: flex;
@@ -256,4 +260,29 @@ body {
 .party-member-level,.party-hp-text{font-size:11px}
 .party-hp-track{height:6px;overflow:hidden;border-radius:4px;background:#ddd}
 .party-hp-fill{height:100%;background:#3f9d55;transition:width 180ms ease}
-@media(max-width:900px){.party-panel{width:230px;top:10px;right:10px}}
+@media (max-width: 1320px) { .party-panel { width: 230px; top: 10px; right: 10px; } }
+
+/* Large game viewport */
+#game-container {
+    width: min(1280px, calc(100vw - 48px));
+    max-width: 1280px;
+}
+
+#game-canvas {
+    width: 100%;
+    max-width: 100%;
+    image-rendering: pixelated;
+}
+
+@media (max-width: 900px) {
+    #game-container {
+        width: calc(100vw - 24px);
+    }
+}
+
+@media (min-width: 1400px) {
+    #game-container {
+        width: min(1400px, calc(100vw - 64px));
+        max-width: 1400px;
+    }
+}
