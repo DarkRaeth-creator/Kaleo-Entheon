@@ -136,43 +136,105 @@ body {
 .npc-dialogue-hint { margin-top: 12px; color: #bdbdc8; font-size: 12px; text-align: right; }
 
 .battle-screen {
+    width: 100%;
     background: #22222d;
-    border-radius: 8px;
-    padding: 20px;
+    border: 2px solid #41414f;
+    border-radius: 10px;
+    padding: 18px;
 }
 
 .battle-field {
-    min-height: 360px;
     position: relative;
-    border-radius: 8px;
-    background: #20202a;
+    width: 100%;
+    min-height: 420px;
+    border-radius: 10px;
+    background: linear-gradient(#9fca72 0%, #9fca72 62%, #78a854 62%, #78a854 100%);
     border: 2px solid #41414f;
     overflow: hidden;
     padding: 20px;
 }
 
-.battle-opponent { display: flex; justify-content: flex-end; }
-.battle-player-card { display: flex; justify-content: flex-start; margin-top: 150px; }
-
-.battle-creature-card {
-    width: min(420px, 70%);
-    background: #181820;
-    border: 2px solid #555565;
-    border-radius: 10px;
-    padding: 14px;
+.battle-field::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 62%;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,.035) 0,
+        rgba(255,255,255,.035) 2px,
+        transparent 2px,
+        transparent 12px
+    );
+    pointer-events: none;
 }
 
-.battle-creature-title { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 18px; }
-.battle-creature-title span { color: #bdbdc8; font-size: 14px; }
-.battle-hp-text { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
-.hp-bar { height: 10px; background: #41414f; border-radius: 999px; overflow: hidden; }
-.hp-fill { height: 100%; width: 100%; background: #69b85f; transition: width .25s ease; }
+.battle-opponent {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 2;
+    width: min(360px, 48%);
+}
+
+.battle-player-card {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    z-index: 2;
+    width: min(360px, 48%);
+}
+
+.battle-creature-card {
+    width: 100%;
+    background: rgba(24,24,32,.96);
+    border: 2px solid #555565;
+    border-radius: 10px;
+    padding: 13px 15px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.28);
+}
+
+.battle-creature-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 17px;
+}
+
+.battle-creature-title span {
+    color: #bdbdc8;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.battle-hp-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.hp-bar {
+    height: 11px;
+    background: #41414f;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    width: 100%;
+    background: #69b85f;
+    transition: width .25s ease;
+}
 
 .battle-creature-placeholder {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    z-index: 1;
     width: 150px;
     height: 90px;
     border-radius: 50%;
@@ -181,11 +243,27 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    box-shadow: 0 10px 20px rgba(0,0,0,.25);
+    box-shadow: 0 10px 20px rgba(0,0,0,.28);
 }
 
-.battle-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-.battle-action-button { text-align: left; }
+.battle-opponent + .battle-creature-placeholder {
+    right: 20%;
+    top: 29%;
+}
+
+.battle-player-card ~ .battle-creature-placeholder {
+    left: 20%;
+    top: 48%;
+}
+
+.battle-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.battle-action-button { text-align: center; }
 
 .battle-moves {
     display: grid;
@@ -194,7 +272,13 @@ body {
     margin-top: 12px;
 }
 
-.move-button { display: flex; flex-direction: column; gap: 5px; }
+.move-button {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 72px;
+}
+
 .move-name { font-weight: bold; font-size: 16px; }
 .move-meta { color: #bdbdc8; font-size: 12px; }
 .move-button:disabled,

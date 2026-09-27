@@ -688,7 +688,8 @@ const battleUI = {
 };
 
 battleUI.fightButton.addEventListener("click", () => {
-    battleUI.moves.scrollIntoView({ block: "nearest" });
+    battleUI.moves.classList.remove("hidden");
+    battleUI.fightButton.classList.add("hidden");
 });
 
 battleUI.runButton.addEventListener("click", battleRun);
@@ -722,6 +723,9 @@ function startWildEncounter() {
 
     battleScreen.classList.remove("hidden");
     overworldScreen.classList.add("hidden");
+    battleUI.moves.classList.add("hidden");
+    battleUI.fightButton.classList.remove("hidden");
+    battleUI.runButton.classList.remove("hidden");
 
     renderBattle();
 }
@@ -839,6 +843,9 @@ function endWildEncounter(message) {
 
     battleScreen.classList.add("hidden");
     overworldScreen.classList.remove("hidden");
+    battleUI.moves.classList.add("hidden");
+    battleUI.fightButton.classList.remove("hidden");
+    battleUI.runButton.classList.remove("hidden");
 
     showWorldMessage(message);
     drawGame();
