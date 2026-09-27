@@ -2281,7 +2281,14 @@ function advanceDialogue() {
         const interaction = npc.interaction || npc.type;
         closeNpcDialogue();
 
-        if (interaction === "trainer") {
+        // Completing the researcher/professor introduction unlocks the
+        // three starter Entheon. The flag is deliberately set here, after
+        // the final dialogue line, so merely approaching the NPC does not
+        // count as having received the introduction.
+        if (interaction === "professor") {
+            gameState.starterAvailable = true;
+            showWorldMessage("The researcher has introduced you. The three starter Entheon are ready for you to meet.");
+        } else if (interaction === "trainer") {
             showWorldMessage("This trainer is ready for a battle system that will be connected in the next development step.");
         } else if (interaction === "merchant") {
             showWorldMessage("Merchant interaction registered. The full shop interface will be connected with the economy system.");
