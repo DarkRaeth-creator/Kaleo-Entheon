@@ -221,6 +221,7 @@ function chooseStarter(name) {
     }];
 
     starterStatus.textContent = "Starter: " + name;
+    renderParty();
 
     const starterNpc = currentMap.npcs.find(npc => npc.type === "starter" && npc.species === name);
     if (starterNpc) starterNpc.chosen = true;
@@ -813,6 +814,39 @@ battleUI.fightButton.addEventListener("click", () => {
 battleUI.captureButton.addEventListener("click", battleCapture);
 battleUI.runButton.addEventListener("click", battleRun);
 
+
+function renderParty() {
+    if (!gameUI.partyPanel || !gameUI.partyList) return;
+
+    if (!gameState.party || gameState.party.length === 0) {
+        gameUI.partyPanel.classList.add("hidden");
+        gameUI.partyList.innerHTML = "";
+        return;
+    }
+
+    gameUI.partyPanel.classList.remove("hidden");
+    gameUI.partyList.innerHTML = gameState.party.map((member, index) => {
+        const hp = Math.max(0, member.currentHp);
+        const maxHp = Math.max(1, member.maxHp);
+        const hpPercent = Math.max(0, Math.min(100, hp / maxHp * 100));
+
+        return `
+            <div class="party-member${index === 0 ? " active" : ""}${hp <= 0 ? " fainted" : ""}">
+                <div class="party-member-number">${index + 1}</div>
+                <div class="party-member-info">
+                    <div class="party-member-top">
+                        <span class="party-member-name">${member.species}</span>
+                        <span class="party-member-level">Lv. ${member.level}</span>
+                    </div>
+                    <div class="party-hp-track">
+                        <div class="party-hp-fill" style="width:${hpPercent}%"></div>
+                    </div>
+                    <div class="party-hp-text">${hp} / ${maxHp} HP</div>
+                </div>
+            </div>`;
+    }).join("");
+}
+
 function getEncounterPool() {
     // The pool belongs to the current map, so future routes can define their
     // own species without changing the battle code. Starters are explicitly
@@ -1055,6 +1089,7 @@ function battleCapture() {
         };
 
         gameState.party.push(captured);
+        renderParty();
 
         renderBattle(
             `You captured ${battle.wild.name}! It has been added to your party.`
@@ -1102,6 +1137,7 @@ function endWildEncounter(message) {
         if (gameState.party[0]) {
             gameState.party[0].currentHp = gameState.starterData.currentHp;
         }
+        renderParty();
     }
 
     gameState.mode = "overworld";
