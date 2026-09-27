@@ -21,7 +21,7 @@ const gameState = {
     selectedPartyIndex: 0,
     captureDevices: 5,
     crystals: {
-        capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5, captureModifier: 1 }
+        capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 }
     },
     partyScreenBattleMode: false,
     partyScreenForced: false,
@@ -1397,109 +1397,55 @@ function selectCrystalForCapture(crystalId) {
     battleCapture(crystalId);
 }
 
+function battleCapture(crystalId) {
+    const battle = gameState.battle;
+    const crystal = getCrystalInventory()[crystalId];
 
-function calculateCaptureChance(target, crystal) {
-    if (!target) return 0;
-
-    const maxHp = Math.max(1, Number(target.maxHp) || 1);
-    const currentHp = Math.max(0, Number(target.currentHp) || 0);
-    const hpRatio = currentHp / maxHp;
-
-    // Prototype formula: weaker targets are easier to capture.
-    // Crystal modifiers are data-driven and can be expanded later.
-    const crystalModifier = Number(crystal?.captureModifier) || 1;
-    const baseChance = 0.20;
-    const hpBonus = (1 - hpRatio) * 0.60;
-
-    return Math.max(0.05, Math.min(0.95, (baseChance + hpBonus) * crystalModifier));
-}
-
-function getPartyCapacity() {
-    // Six is the intended long-term party size.
-    return 6;
-}
-
-function resolveCapturedEntheon(target) {
-    if (!target) return { success: false, reason: "invalid" };
-
-    if (gameState.party.length >= getPartyCapacity()) {
-        return { success: false, reason: "party_full" };
-    }
-
-    const captured = {
-        species: target.species,
-        level: target.level,
-        maxHp: target.maxHp,
-        currentHp: target.maxHp,
-        moves: Array.isArray(target.moves) ? target.moves.map(move => ({ ...move })) : []
-    };
-
-    gameState.party.push(captured);
-    gameState.selectedPartyIndex = gameState.party.length - 1;
-    renderParty();
-
-    return { success: true, member: captured };
-}
-
-function battleCapture(selectedCrystal = null) {
-    const target = gameState.currentWildEncounter || gameState.wildEncounter;
-    if (!target) {
-        clearCaptureStatus();
-        showWorldMessage("There is no Entheon to capture.");
+    if (!battle || battle.locked || !battle.playerTurn || battle.wild.hp <= 0 || !crystal || crystal.quantity <= 0) {
         return;
     }
 
-    const crystal = selectedCrystal || {
-        id: "capture",
-        name: "Capture Crystal",
-        grade: "Capture",
-        captureModifier: 1
-    };
+    battle.locked = true;
+    battle.showMoves = false;
+    crystal.quantity--;
+    gameState.captureDevices = getTotalCrystalCount();
 
-    setCaptureStatus(`You hold out the ${crystal.name}.`);
+    const chance = calculateCaptureChance(battle, crystal);
+    const success = Math.random() < chance;
+    const wildName = battle.wild.name;
+    const wildLevel = battle.wild.level;
+    const crystalName = crystal.name;
 
-    setTimeout(() => {
-        setCaptureStatus("The crystal begins to resonate with the Entheon...");
+    renderBattle(`You hold out the ${crystalName}. The crystal begins to resonate with ${wildName}...`);
+    playCaptureResonance(success, () => {
+        const currentBattle = gameState.battle;
+        if (!currentBattle || currentBattle.wild.name !== wildName) return;
 
-        setTimeout(() => {
-            setCaptureStatus("The Entheon's form begins dissolving into light...");
+        if (success) {
+            const captured = {
+                species: currentBattle.wild.name,
+                level: wildLevel,
+                maxHp: currentBattle.wild.maxHp,
+                currentHp: currentBattle.wild.hp,
+                moves: currentBattle.wild.moves.map(move => ({ ...move }))
+            };
+
+            gameState.party.push(captured);
+            gameState.selectedPartyIndex = gameState.party.length - 1;
+            renderParty();
+            renderBattle(`The resonance succeeded! ${wildName} was absorbed into the ${crystalName}.`);
 
             setTimeout(() => {
-                const chance = calculateCaptureChance(target, crystal);
-                const success = Math.random() < chance;
+                endWildEncounter(`${wildName} joined your party. ${crystalName}s remaining: ${crystal.quantity}.`);
+            }, 1000);
+            return;
+        }
 
-                if (success) {
-                    setCaptureStatus("The resonance stabilizes. The Entheon is absorbed!");
-
-                    setTimeout(() => {
-                        const result = resolveCapturedEntheon(target);
-
-                        if (result.success) {
-                            clearCaptureStatus();
-                            if (typeof endBattleAfterCapture === 'function') endBattleAfterCapture();
-                            showWorldMessage(`${target.species} was captured!`);
-                        } else {
-                            clearCaptureStatus();
-                            showWorldMessage("Your party is full. The capture could not be completed.");
-                        }
-                    }, 900);
-                } else {
-                    setCaptureStatus("The resonance collapses! The Entheon reforms.");
-
-                    setTimeout(() => {
-                        clearCaptureStatus();
-                        showWorldMessage(`${target.species} broke free!`);
-
-                        if (typeof enemyTurn === "function") {
-                            setTimeout(enemyTurn, 450);
-                        }
-                    }, 1000);
-                }
-            }, 850);
-        }, 850);
-    }, 500);
+        currentBattle.playerTurn = false;
+        renderBattle(`The resonance failed! ${wildName} resisted the ${crystalName} and reformed.`);
+        setTimeout(wildBattleAttack, 850);
+    });
 }
-
 
 function playCaptureResonance(success, onComplete) {
     if (!captureEffect || !battleCreatureVisual) {

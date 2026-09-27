@@ -38,7 +38,8 @@
                     <div id="controls-help">
                         <span><strong>Move:</strong> WASD / Arrow Keys</span>
                         <span><strong>Interact:</strong> E / Enter / Space</span>
-                    </div>
+                    
+                        <button id="party-button" class="ui-small-button" type="button">Party</button></div>
 
                     <div id="world-message" class="world-message hidden"></div>
 
@@ -47,9 +48,45 @@
                         <div id="npc-dialogue-text"></div>
                         <div class="npc-dialogue-hint">Press E, Enter or Space to continue</div>
                     </div>
+
+                    <aside id="party-panel" class="party-panel hidden" aria-label="Entheon Party">
+                        <div class="party-panel-title">ENTHEON PARTY</div>
+                        <div id="party-list" class="party-list"></div>
+                    </aside>
+
+
+
+                    
                 </div>
 
-                <div id="battle-screen" class="battle-screen hidden">
+<section id="crystal-screen" class="crystal-screen hidden" aria-label="Capture Crystals">
+                        <div class="crystal-screen-header">
+                            <div>
+                                <h2>Capture Crystals</h2>
+                                <p>Select a crystal to attempt a resonance.</p>
+                            </div>
+                            <button id="crystal-close-button" class="ui-small-button" type="button">Cancel</button>
+                        </div>
+                        <div id="crystal-list" class="crystal-list"></div>
+                    </section>
+
+<section id="party-screen" class="party-screen hidden" aria-label="Entheon Party Screen">
+                        <div class="party-screen-header">
+                            <div>
+                                <h2>Your Entheon Party</h2>
+                                <p>Your current team</p>
+                            </div>
+                            <button id="party-close-button" class="ui-small-button" type="button">Close</button>
+                        </div>
+                        <div class="party-screen-body">
+                            <div id="party-screen-list" class="party-screen-list"></div>
+                            <div id="party-detail" class="party-detail">
+                                <div class="party-detail-empty">Select an Entheon to view its details.</div>
+                            </div>
+                        </div>
+                    </section>
+
+<div id="battle-screen" class="battle-screen hidden">
                     <div class="battle-field">
                         <div class="battle-opponent">
                             <div class="battle-creature-card">
@@ -62,7 +99,14 @@
                             </div>
                         </div>
 
-                        <div class="battle-creature-placeholder">ENTHEON</div>
+                        <div id="battle-creature-visual" class="battle-creature-placeholder">ENTHEON</div>
+                        <div id="capture-effect" class="capture-effect hidden" aria-hidden="true">
+                            <div class="capture-crystal-visual">◇</div>
+                            <div class="resonance-beam"></div>
+                            <div class="resonance-particles">
+                                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                            </div>
+                        </div>
 
                         <div class="battle-player-card">
                             <div class="battle-creature-card">
@@ -80,6 +124,8 @@
 
                     <div class="battle-actions">
                         <button id="battle-fight" class="battle-action-button" type="button">Fight</button>
+                        <button id="battle-capture" class="battle-action-button" type="button">Capture (5)</button>
+                        <button id="battle-party" class="battle-action-button" type="button">Party</button>
                         <button id="battle-run" class="battle-action-button" type="button">Run</button>
                     </div>
 
@@ -90,6 +136,6 @@
     </div>
 
     <script src="world-data.js"></script>
-    <script src="game.js"></script>
+    <script src="game.js?v=20260927-15"></script>
 </body>
 </html>
