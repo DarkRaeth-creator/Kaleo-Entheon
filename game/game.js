@@ -648,20 +648,28 @@ function updateCamera() {
 // ============================================================
 
 function interact() {
-    const facing = getFacingDirection();
+    // NPCs can be spoken to from any direction. Find the closest NPC
+    // within interaction range instead of requiring the player to face them.
+    const interactionRange = 1.35;
 
-    const targetX = Math.floor(player.x + facing.x);
-    const targetY = Math.floor(player.y + facing.y);
+    const nearbyNpcs = getNpcs()
+        .map(npc => ({
+            npc,
+            distance: Math.hypot(player.x - npc.x, player.y - npc.y)
+        }))
+        .filter(result => result.distance <= interactionRange)
+        .sort((a, b) => a.distance - b.distance);
 
-    const npc = getNpcs().find(character => {
-        return Math.abs(character.x - targetX) <= 0.5 &&
-               Math.abs(character.y - targetY) <= 0.5;
-    });
-
-    if (npc) {
-        openNpcDialogue(npc);
+    if (nearbyNpcs.length > 0) {
+        openNpcDialogue(nearbyNpcs[0].npc);
         return;
     }
+
+    // Doors and environmental objects still use the direction the player
+    // is facing, so interaction with the world remains predictable.
+    const facing = getFacingDirection();
+    const targetX = Math.floor(player.x + facing.x);
+    const targetY = Math.floor(player.y + facing.y);
 
     const tile = getTile(targetX, targetY);
 
