@@ -244,26 +244,11 @@ function chooseStarter(name) {
         return;
     }
 
-    // Store the actual chosen Entheon outside the battle object so its HP
-    // and future progression can persist from one encounter to the next.
-    gameState.starterData = {
-        species: name,
-        level: speciesData.level,
-        maxHp: speciesData.maxHp,
-        currentHp: speciesData.maxHp,
-        moves: speciesData.moves.map(move => ({ ...move }))
-    };
-
-    // Begin the party structure with the chosen starter. The active battle
-    // system still uses starterData for now; the full party/switching system
-    // will be layered on top of this later.
-    gameState.party = [{
-        species: name,
-        level: speciesData.level,
-        maxHp: speciesData.maxHp,
-        currentHp: speciesData.maxHp,
-        moves: speciesData.moves.map(move => ({ ...move }))
-    }];
+    // Create the chosen starter as a persistent creature object. Its
+    // statistics, XP and moves now belong to the individual Entheon.
+    const starterCreature = createCreature(name, speciesData.level);
+    gameState.starterData = starterCreature;
+    gameState.party = [starterCreature];
 
     gameState.activePartyIndex = 0;
     gameState.selectedPartyIndex = 0;
@@ -374,6 +359,18 @@ const maps = {
                     "The paths around Kaleo connect to places far beyond this area.",
                     "You should talk to people whenever you visit a new settlement.",
                     "You never know what you might learn."
+                ]
+            },
+            {
+                id: "restoration-attendant",
+                type: "restoration",
+                name: "Restoration Attendant",
+                x: 31,
+                y: 24,
+                color: "#69a9a0",
+                lines: [
+                    "Welcome to the Restoration Hub.",
+                    "We can restore your Entheon to full health."
                 ]
             }
         ]
@@ -788,52 +785,168 @@ function checkAutomaticTransitions() {
 // ============================================================
 
 const speciesBattleData = {
-    // Starter moves currently unlocked at Level 5.
-    // These follow the established species move pools.
+    // Prototype numeric statistics. The canonical reference establishes
+    // Base Statistics as part of species data, but does not currently give
+    // numeric values. These are therefore explicit balancing values for the
+    // prototype and can be rebalanced later.
     Nimblet: {
         level: 5,
-        maxHp: 40,
+        baseStats: { hp: 28, attack: 52, defense: 40, specialAttack: 40, specialDefense: 38, speed: 60 },
         moves: [
-            { name: "Tackle", category: "Physical", power: 40, damage: 7, effect: "—" },
-            { name: "Scratch", category: "Physical", power: 40, damage: 8, effect: "—" },
-            { name: "Quick Attack", category: "Physical", power: 40, damage: 7, effect: "Priority attack" }
+            { level: 1, name: "Tackle", category: "Physical", power: 40, accuracy: 100, effect: "—" },
+            { level: 1, name: "Scratch", category: "Physical", power: 40, accuracy: 100, effect: "—" },
+            { level: 4, name: "Quick Attack", category: "Physical", power: 40, accuracy: 100, effect: "Priority attack" },
+            { level: 7, name: "Quick Strike", category: "Physical", power: 40, accuracy: 100, effect: "Priority attack" },
+            { level: 10, name: "Focus", category: "Status", power: 0, accuracy: 100, effect: "Raises Attack and accuracy" },
+            { level: 13, name: "Agility", category: "Status", power: 0, accuracy: 100, effect: "Raises Speed" }
         ]
     },
     Pipiri: {
         level: 5,
-        maxHp: 40,
+        baseStats: { hp: 28, attack: 38, defense: 46, specialAttack: 54, specialDefense: 50, speed: 34 },
         moves: [
-            { name: "Tackle", category: "Physical", power: 40, damage: 7, effect: "—" },
-            { name: "Water Pulse", category: "Special", power: 60, damage: 10, effect: "Chance to Confuse" },
-            { name: "Aqua Jet", category: "Physical", power: 40, damage: 7, effect: "Priority attack" }
+            { level: 1, name: "Tackle", category: "Physical", power: 40, accuracy: 100, effect: "—" },
+            { level: 1, name: "Water Pulse", category: "Special", power: 60, accuracy: 100, effect: "Chance to Confuse" },
+            { level: 4, name: "Aqua Jet", category: "Physical", power: 40, accuracy: 100, effect: "Priority attack" },
+            { level: 7, name: "Cleansing Flow", category: "Status", power: 0, accuracy: 100, effect: "Removes selected status conditions" },
+            { level: 10, name: "Brine Armor", category: "Status", power: 0, accuracy: 100, effect: "Raises Defense" },
+            { level: 13, name: "Restorative Pulse", category: "Status", power: 0, accuracy: 100, effect: "Restores moderate HP" }
         ]
     },
     Morrowe: {
         level: 5,
-        maxHp: 40,
+        baseStats: { hp: 28, attack: 50, defense: 40, specialAttack: 48, specialDefense: 44, speed: 48 },
         moves: [
-            { name: "Scratch", category: "Physical", power: 40, damage: 8, effect: "—" },
-            { name: "Bite", category: "Physical", power: 60, damage: 10, effect: "Chance to Flinch" },
-            { name: "Shadow Claw", category: "Physical", power: 55, damage: 11, effect: "Increased critical-hit chance" }
+            { level: 1, name: "Scratch", category: "Physical", power: 40, accuracy: 100, effect: "—" },
+            { level: 1, name: "Bite", category: "Physical", power: 60, accuracy: 100, effect: "Chance to Flinch" },
+            { level: 4, name: "Shadow Claw", category: "Physical", power: 55, accuracy: 100, effect: "Increased critical-hit chance" },
+            { level: 7, name: "Shadow Bolt", category: "Special", power: 60, accuracy: 100, effect: "—" },
+            { level: 10, name: "Umbral Step", category: "Status", power: 0, accuracy: 100, effect: "Raises Evasion and changes positioning" },
+            { level: 13, name: "Night Veil", category: "Status", power: 0, accuracy: 100, effect: "Creates concealment" }
         ]
     },
     Orrin: {
         level: 3,
-        maxHp: 30,
+        baseStats: { hp: 24, attack: 42, defense: 36, specialAttack: 30, specialDefense: 34, speed: 40 },
         moves: [
-            { name: "Tackle", category: "Physical", power: 40, damage: 5, effect: "—" },
-            { name: "Scratch", category: "Physical", power: 40, damage: 5, effect: "—" }
+            { level: 1, name: "Tackle", category: "Physical", power: 40, accuracy: 100, effect: "—" },
+            { level: 1, name: "Scratch", category: "Physical", power: 40, accuracy: 100, effect: "—" }
         ]
     },
     Brindlew: {
         level: 3,
-        maxHp: 32,
+        baseStats: { hp: 26, attack: 44, defense: 46, specialAttack: 34, specialDefense: 40, speed: 32 },
         moves: [
-            { name: "Tackle", category: "Physical", power: 40, damage: 5, effect: "—" },
-            { name: "Scratch", category: "Physical", power: 40, damage: 5, effect: "—" }
+            { level: 1, name: "Tackle", category: "Physical", power: 40, accuracy: 100, effect: "—" },
+            { level: 1, name: "Scratch", category: "Physical", power: 40, accuracy: 100, effect: "—" },
+            { level: 4, name: "Vine Lash", category: "Physical", power: 45, accuracy: 100, effect: "—" },
+            { level: 7, name: "Leaf Dart", category: "Special", power: 50, accuracy: 100, effect: "—" },
+            { level: 10, name: "Root Bind", category: "Status", power: 0, accuracy: 100, effect: "Restricts movement and deals residual damage" },
+            { level: 13, name: "Growth", category: "Status", power: 0, accuracy: 100, effect: "Raises Attack and Special Attack" }
         ]
     }
 };
+
+const MAX_LEVEL = 100;
+
+function xpRequiredForLevel(level) {
+    return level >= MAX_LEVEL ? 0 : 50 + level * 25;
+}
+
+function getMoveSetForLevel(species, level) {
+    const data = speciesBattleData[species];
+    if (!data) return [];
+    return data.moves.filter(move => move.level <= level).map(move => ({ ...move }));
+}
+
+function calculateCreatureStats(species, level) {
+    const data = speciesBattleData[species];
+    if (!data) return null;
+    const growth = Math.max(0, level - 1);
+    const base = data.baseStats;
+    return {
+        hp: base.hp + growth * 3,
+        attack: base.attack + growth,
+        defense: base.defense + growth,
+        specialAttack: base.specialAttack + growth,
+        specialDefense: base.specialDefense + growth,
+        speed: base.speed + growth
+    };
+}
+
+function createCreature(species, level, currentHp = null) {
+    const data = speciesBattleData[species];
+    if (!data) return null;
+    const stats = calculateCreatureStats(species, level);
+    const maxHp = stats.hp;
+    return {
+        species,
+        level,
+        xp: 0,
+        xpToNext: xpRequiredForLevel(level),
+        stats,
+        maxHp,
+        currentHp: currentHp === null ? maxHp : Math.min(currentHp, maxHp),
+        moves: getMoveSetForLevel(species, level)
+    };
+}
+
+function ensureCreatureProgressionData(member) {
+    if (!member || !speciesBattleData[member.species]) return member;
+    const level = member.level || speciesBattleData[member.species].level || 1;
+    const stats = calculateCreatureStats(member.species, level);
+    const oldMaxHp = member.maxHp;
+
+    if (member.xp === undefined) member.xp = 0;
+    member.xpToNext = xpRequiredForLevel(level);
+    member.maxHp = stats.hp;
+
+    if (member.currentHp === undefined || member.currentHp === null) {
+        member.currentHp = member.maxHp;
+    } else if (oldMaxHp && oldMaxHp !== member.maxHp && member.currentHp > 0) {
+        member.currentHp = Math.min(member.maxHp, Math.round(member.currentHp / oldMaxHp * member.maxHp));
+    } else {
+        member.currentHp = Math.min(member.currentHp, member.maxHp);
+    }
+
+    member.stats = stats;
+    member.moves = getMoveSetForLevel(member.species, level);
+    return member;
+}
+
+function awardExperience(member, amount) {
+    ensureCreatureProgressionData(member);
+    member.xp += amount;
+    const levels = [];
+
+    while (member.level < MAX_LEVEL) {
+        const required = xpRequiredForLevel(member.level);
+        if (member.xp < required) break;
+
+        member.xp -= required;
+        member.level += 1;
+        levels.push(member.level);
+
+        const stats = calculateCreatureStats(member.species, member.level);
+        member.stats = stats;
+        member.maxHp = stats.hp;
+        member.currentHp = member.maxHp;
+        member.moves = getMoveSetForLevel(member.species, member.level);
+    }
+
+    member.xpToNext = xpRequiredForLevel(member.level);
+    return { gained: amount, levels };
+}
+
+function getDamageForMove(attacker, defender, move) {
+    if (!move || move.power <= 0) return 0;
+    const physical = move.category === "Physical";
+    const attackStat = physical ? attacker.stats.attack : attacker.stats.specialAttack;
+    const defenseStat = physical ? defender.stats.defense : defender.stats.specialDefense;
+    const raw = (((2 * attacker.level / 5 + 2) * move.power * attackStat / Math.max(1, defenseStat)) / 35) + 2;
+    const variance = 0.90 + Math.random() * 0.11;
+    return Math.max(1, Math.floor(raw * variance));
+}
 
 const battleUI = {
     wildName: document.getElementById("battle-wild-name"),
@@ -916,6 +1029,7 @@ function renderParty() {
                         <div class="party-hp-fill" style="width:${hpPercent}%"></div>
                     </div>
                     <div class="party-hp-text">${hp} / ${maxHp} HP</div>
+                    <div class="party-hp-text">XP ${member.xp || 0} / ${member.xpToNext || 0}</div>
                 </div>
             </div>`;
     }).join("");
@@ -992,6 +1106,17 @@ function renderPartyScreen() {
             </div>
         </div>
         <div class="party-detail-section">
+            <h3>Progression</h3>
+            <div class="party-detail-move">
+                <strong>XP</strong>
+                <span>${member.xp || 0} / ${member.xpToNext || 0}</span>
+            </div>
+            <div class="party-detail-move">
+                <strong>Stats</strong>
+                <span>ATK ${member.stats?.attack ?? "—"} · DEF ${member.stats?.defense ?? "—"} · SpA ${member.stats?.specialAttack ?? "—"} · SpD ${member.stats?.specialDefense ?? "—"} · SPD ${member.stats?.speed ?? "—"}</span>
+            </div>
+        </div>
+        <div class="party-detail-section">
             <h3>Moves</h3>
             <div class="party-detail-moves">
                 ${moves.length
@@ -1025,7 +1150,8 @@ function switchActivePartyMember(index) {
         return;
     }
 
-    const oldIndex = gameState.activePartyIndex;
+    ensureCreatureProgressionData(member);
+
     gameState.activePartyIndex = index;
     gameState.selectedPartyIndex = index;
     gameState.starter = member.species;
@@ -1034,11 +1160,13 @@ function switchActivePartyMember(index) {
     if (gameState.battle && gameState.partyScreenBattleMode) {
         const battle = gameState.battle;
         battle.player = {
+            creature: member,
             name: member.species,
             level: member.level,
             hp: member.currentHp,
             maxHp: member.maxHp,
-            moves: member.moves
+            stats: { ...member.stats },
+            moves: member.moves.map(move => ({ ...move }))
         };
         battle.showMoves = false;
         battle.forceSwitch = false;
@@ -1156,40 +1284,62 @@ function startWildEncounter() {
         return;
     }
 
-    const activeMember = gameState.party[gameState.activePartyIndex] || gameState.party[0];
+    let activeMember = gameState.party[gameState.activePartyIndex] || gameState.party[0];
     if (!activeMember) {
         showWorldMessage("You need an Entheon partner before entering tall grass.");
         gameState.encounterCooldown = 1200;
         return;
     }
 
+    if (activeMember.currentHp <= 0) {
+        const replacementIndex = gameState.party.findIndex(member => member.currentHp > 0);
+        if (replacementIndex >= 0) {
+            gameState.activePartyIndex = replacementIndex;
+            gameState.selectedPartyIndex = replacementIndex;
+            activeMember = gameState.party[replacementIndex];
+            gameState.starter = activeMember.species;
+            gameState.starterData = activeMember;
+            renderParty();
+        } else {
+            showWorldMessage("All of your Entheon have fainted. Visit a Restoration Hub before entering tall grass.");
+            gameState.encounterCooldown = 1200;
+            return;
+        }
+    }
+
     gameState.starter = activeMember.species;
     gameState.starterData = activeMember;
 
-    const playerData = activeMember;
+    const playerData = ensureCreatureProgressionData(activeMember);
     const wildLevel = randomInt(encounter.minLevel, encounter.maxLevel);
+    const wildCreature = createCreature(wildSpecies, wildLevel);
 
     gameState.mode = "battle";
 
     gameState.battle = {
         player: {
-            name: activeMember.species,
+            creature: playerData,
+            name: playerData.species,
             level: playerData.level,
             hp: playerData.currentHp,
             maxHp: playerData.maxHp,
-            moves: playerData.moves
+            stats: { ...playerData.stats },
+            moves: playerData.moves.map(move => ({ ...move }))
         },
         wild: {
-            name: wildSpecies,
-            level: wildLevel,
-            hp: calculateScaledHp(wildData.maxHp, wildData.level, wildLevel),
-            maxHp: calculateScaledHp(wildData.maxHp, wildData.level, wildLevel),
-            moves: wildData.moves
+            creature: wildCreature,
+            name: wildCreature.species,
+            level: wildCreature.level,
+            hp: wildCreature.currentHp,
+            maxHp: wildCreature.maxHp,
+            stats: { ...wildCreature.stats },
+            moves: wildCreature.moves.map(move => ({ ...move }))
         },
         playerTurn: true,
         locked: false,
         showMoves: false,
-        forceSwitch: false
+        forceSwitch: false,
+        outcome: null
     };
 
     battleScreen.classList.remove("hidden");
@@ -1267,12 +1417,13 @@ function useMove(move) {
     battle.locked = true;
     battle.showMoves = false;
 
-    const damage = move.damage;
+    const damage = getDamageForMove(battle.player, battle.wild, move);
     battle.wild.hp = Math.max(0, battle.wild.hp - damage);
 
     if (battle.wild.hp <= 0) {
+        battle.outcome = "defeat";
         renderBattle(
-            `${battle.player.name} used ${move.name}! The wild ${battle.wild.name} was defeated!`
+            `${battle.player.name} used ${move.name}! It dealt ${damage} damage. The wild ${battle.wild.name} was defeated!`
         );
 
         setTimeout(() => endWildEncounter("The battle is over."), 1100);
@@ -1294,7 +1445,7 @@ function wildBattleAttack() {
         Math.floor(Math.random() * battle.wild.moves.length)
     ];
 
-    const damage = move.damage;
+    const damage = getDamageForMove(battle.wild, battle.player, move);
     battle.player.hp = Math.max(0, battle.player.hp - damage);
 
     if (battle.player.hp <= 0) {
@@ -1422,13 +1573,11 @@ function battleCapture(crystalId) {
         if (!currentBattle || currentBattle.wild.name !== wildName) return;
 
         if (success) {
-            const captured = {
-                species: currentBattle.wild.name,
-                level: wildLevel,
-                maxHp: currentBattle.wild.maxHp,
-                currentHp: currentBattle.wild.hp,
-                moves: currentBattle.wild.moves.map(move => ({ ...move }))
-            };
+            const captured = createCreature(
+                currentBattle.wild.name,
+                wildLevel,
+                currentBattle.wild.hp
+            );
 
             gameState.party.push(captured);
             gameState.selectedPartyIndex = gameState.party.length - 1;
@@ -1509,15 +1658,31 @@ function battleRun() {
 }
 
 function endWildEncounter(message) {
-    // Preserve the active Entheon's HP between encounters. If it fainted,
-    // restore it for now so the prototype cannot leave the player permanently stuck.
-    if (gameState.battle?.player) {
+    const finishedBattle = gameState.battle;
+
+    // Preserve the active Entheon's HP between encounters.
+    if (finishedBattle?.player) {
         const activeMember = gameState.party[gameState.activePartyIndex];
         if (activeMember) {
-            activeMember.currentHp = gameState.battle.player.hp;
-            if (activeMember.currentHp <= 0) {
-                activeMember.currentHp = activeMember.maxHp;
+            ensureCreatureProgressionData(activeMember);
+            activeMember.currentHp = Math.min(activeMember.maxHp, finishedBattle.player.hp);
+
+            // A fainted Entheon stays at 0 HP until the player uses a
+            // Restoration Hub (or another future healing method).
+
+            // Only a defeated wild Entheon awards battle XP. Running away and
+            // successful capture do not award XP in this progression step.
+            if (finishedBattle.outcome === "defeat" && finishedBattle.wild) {
+                const xpGain = 30 + finishedBattle.wild.level * 12;
+                const result = awardExperience(activeMember, xpGain);
+
+                if (result.levels.length > 0) {
+                    message = `${activeMember.species} gained ${xpGain} XP and reached Level ${result.levels.join(", ")}!`;
+                } else {
+                    message = `${activeMember.species} gained ${xpGain} XP.`;
+                }
             }
+
             gameState.starterData = activeMember;
             gameState.starter = activeMember.species;
         }
@@ -1560,6 +1725,46 @@ function updateCamera() {
 
 
 // ============================================================
+// RECOVERY / RESTORATION
+// ============================================================
+
+function restoreParty() {
+    if (!gameState.party || gameState.party.length === 0) {
+        showWorldMessage("You don't have any Entheon to restore yet.");
+        return false;
+    }
+
+    let changed = false;
+
+    gameState.party.forEach(member => {
+        ensureCreatureProgressionData(member);
+        if (member.currentHp !== member.maxHp) {
+            member.currentHp = member.maxHp;
+            changed = true;
+        }
+    });
+
+    // Keep the active battle-facing references synchronized if a recovery
+    // action is ever expanded to work from another UI in the future.
+    const activeMember = gameState.party[gameState.activePartyIndex];
+    if (activeMember) {
+        gameState.starterData = activeMember;
+        gameState.starter = activeMember.species;
+    }
+
+    renderParty();
+
+    showWorldMessage(
+        changed
+            ? "Your Entheon have been fully restored. Everyone is ready for battle!"
+            : "Your Entheon are already at full health."
+    );
+
+    return true;
+}
+
+
+// ============================================================
 // INTERACTION
 // ============================================================
 
@@ -1582,6 +1787,11 @@ function interact() {
         if (npc.type === "researcher") {
             openNpcDialogue(npc);
             gameState.starterAvailable = true;
+            return;
+        }
+
+        if (npc.type === "restoration") {
+            restoreParty();
             return;
         }
 
