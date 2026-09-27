@@ -828,8 +828,30 @@ battleUI.fightButton.addEventListener("click", () => {
 });
 
 battleUI.captureButton.addEventListener("click", battleCapture);
-battleUI.partyButton?.addEventListener("click", () => openPartyScreen(true, false));
-partyButton?.addEventListener("click", () => openPartyScreen(false, false));
+if (battleUI.partyButton) {
+    battleUI.partyButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!gameState.battle || gameState.battle.locked || !gameState.battle.playerTurn) return;
+        openPartyScreen(true, false);
+    });
+}
+
+if (partyButton) {
+    partyButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openPartyScreen(false, false);
+    });
+}
+
+if (partyCloseButton) {
+    partyCloseButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closePartyScreen();
+    });
+}
 battleUI.runButton.addEventListener("click", battleRun);
 
 
@@ -1034,6 +1056,7 @@ function closePartyScreen() {
     if (gameState.partyScreenForced) return;
     partyScreen.classList.add("hidden");
     gameState.partyScreenBattleMode = false;
+    gameState.partyScreenForced = false;
     if (partyCloseButton) {
         partyCloseButton.textContent = "Close";
         partyCloseButton.disabled = false;
