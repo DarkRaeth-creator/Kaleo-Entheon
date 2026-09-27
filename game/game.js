@@ -349,6 +349,8 @@ const maps = {
         npcs: [
             {
                 id: "trainer",
+                type: "trainer",
+                interaction: "trainer",
                 name: "Young Trainer",
                 x: 22,
                 y: 12,
@@ -361,6 +363,8 @@ const maps = {
             },
             {
                 id: "resident",
+                type: "npc",
+                interaction: "dialogue",
                 name: "Kaleo Resident",
                 x: 27,
                 y: 21,
@@ -374,6 +378,7 @@ const maps = {
             {
                 id: "restoration-attendant",
                 type: "restoration",
+                interaction: "restoration",
                 name: "Restoration Attendant",
                 x: 31,
                 y: 24,
@@ -382,6 +387,23 @@ const maps = {
                     "Welcome to the Restoration Hub.",
                     "We can restore your Entheon to full health."
                 ]
+            },
+            {
+                id: "travelling-merchant",
+                type: "merchant",
+                interaction: "merchant",
+                name: "Travelling Merchant",
+                x: 34,
+                y: 10,
+                color: "#b88a52",
+                lines: [
+                    "Oh! A customer! Funny, I was just about to leave.",
+                    "I travel wherever trainers need supplies. Somehow, I always arrive at exactly the right place.",
+                    "My full shop inventory will be connected once the item economy is ready."
+                ],
+                shop: {
+                    inventory: ["recoveryTonic", "revivalTonic", "capture"]
+                }
             }
         ]
     },
@@ -408,6 +430,7 @@ const maps = {
             {
                 id: "researcher",
                 type: "researcher",
+                interaction: "professor",
                 name: "Researcher",
                 x: 6,
                 y: 4,
@@ -461,6 +484,7 @@ const maps = {
             {
                 id: "assistant",
                 type: "npc",
+                interaction: "dialogue",
                 name: "Research Assistant",
                 x: 16,
                 y: 4,
@@ -2146,34 +2170,15 @@ function restoreParty() {
 // INTERACTION
 // ============================================================
 
-function interact() {
-    // NPCs can be spoken to from any direction. Find the closest NPC
-    // within interaction range instead of requiring the player to face them.
-    const interactionRange = 1.35;
+function handleNpcInteraction(npc) {
+    const interaction = npc.interaction || npc.type || "dialogue";
 
-    const nearbyNpcs = getNpcs()
-        .map(npc => ({
-            npc,
-            distance: Math.hypot(player.x - npc.x, player.y - npc.y)
-        }))
-        .filter(result => result.distance <= interactionRange)
-        .sort((a, b) => a.distance - b.distance);
-
-    if (nearbyNpcs.length > 0) {
-        const npc = nearbyNpcs[0].npc;
-
-        if (npc.type === "researcher") {
-            openNpcDialogue(npc);
-            gameState.starterAvailable = true;
-            return;
-        }
-
-        if (npc.type === "restoration") {
+    switch (interaction) {
+        case "restoration":
             restoreParty();
             return;
-        }
 
-        if (npc.type === "starter") {
+        case "starter":
             if (!gameState.starterAvailable) {
                 showWorldMessage("The Entheon is waiting for the researcher to introduce you.");
                 return;
@@ -2186,9 +2191,32 @@ function interact() {
 
             openStarterDialogue(npc);
             return;
-        }
 
-        openNpcDialogue(npc);
+        case "professor":
+        case "dialogue":
+        case "merchant":
+        case "trainer":
+        default:
+            openNpcDialogue(npc);
+            return;
+    }
+}
+
+function interact() {
+    // NPC interaction is data-driven: each NPC declares an interaction type,
+    // while this function only finds the nearest interactable character.
+    const interactionRange = 1.35;
+
+    const nearbyNpcs = getNpcs()
+        .map(npc => ({
+            npc,
+            distance: Math.hypot(player.x - npc.x, player.y - npc.y)
+        }))
+        .filter(result => result.distance <= interactionRange)
+        .sort((a, b) => a.distance - b.distance);
+
+    if (nearbyNpcs.length > 0) {
+        handleNpcInteraction(nearbyNpcs[0].npc);
         return;
     }
 
@@ -2197,54 +2225,16 @@ function interact() {
     const facing = getFacingDirection();
     const targetX = Math.floor(player.x + facing.x);
     const targetY = Math.floor(player.y + facing.y);
-
     const tile = getTile(targetX, targetY);
 
-    if (tile === TILE.TREE) {
-        showWorldMessage("A tree blocks your path.");
-        return;
-    }
-
-    if (tile === TILE.WATER) {
-        showWorldMessage("The water is too deep to cross.");
-        return;
-    }
-
     if (tile === TILE.DOOR) {
-        if (gameState.currentMap === "town") {
-            showWorldMessage("The entrance leads into the Entheon Research Center.");
-        } else {
-            showWorldMessage("The exit leads back into Kaleo.");
-        }
+        enterBuildingAt(targetX, targetY);
         return;
     }
 
     showWorldMessage("There is nothing to interact with here.");
 }
 
-function getFacingDirection() {
-    if (keys["arrowup"] || keys["w"]) return { x: 0, y: -1 };
-    if (keys["arrowdown"] || keys["s"]) return { x: 0, y: 1 };
-    if (keys["arrowleft"] || keys["a"]) return { x: -1, y: 0 };
-
-    return { x: 1, y: 0 };
-}
-
-
-function openStarterDialogue(starterNpc) {
-    gameState.activeDialogue = {
-        id: starterNpc.id,
-        type: "starter",
-        name: starterNpc.name,
-        lines: starterNpc.lines,
-        starterSpecies: starterNpc.species
-    };
-    gameState.dialogueIndex = 0;
-
-    npcDialogueName.textContent = starterNpc.name;
-    npcDialogue.classList.remove("hidden");
-    updateNpcDialogueText();
-}
 
 // ============================================================
 // NPC DIALOGUE
@@ -2265,7 +2255,10 @@ function updateNpcDialogueText() {
 
     if (!npc) return;
 
-    npcDialogueText.textContent = npc.lines[gameState.dialogueIndex];
+    const lines = Array.isArray(npc.lines) && npc.lines.length
+        ? npc.lines
+        : ["..."];
+    npcDialogueText.textContent = lines[Math.min(gameState.dialogueIndex, lines.length - 1)];
 }
 
 function advanceDialogue() {
@@ -2275,15 +2268,24 @@ function advanceDialogue() {
 
     gameState.dialogueIndex++;
 
-    if (gameState.dialogueIndex >= npc.lines.length) {
-        if (npc.type === "starter") {
+    const lineCount = Array.isArray(npc.lines) ? npc.lines.length : 0;
+
+    if (gameState.dialogueIndex >= lineCount) {
+        if (npc.type === "starter" || npc.interaction === "starter") {
             const species = npc.starterSpecies;
             closeNpcDialogue();
             showStarterConfirmation(species);
             return;
         }
 
+        const interaction = npc.interaction || npc.type;
         closeNpcDialogue();
+
+        if (interaction === "trainer") {
+            showWorldMessage("This trainer is ready for a battle system that will be connected in the next development step.");
+        } else if (interaction === "merchant") {
+            showWorldMessage("Merchant interaction registered. The full shop interface will be connected with the economy system.");
+        }
         return;
     }
 
@@ -2489,7 +2491,8 @@ function drawNpcs() {
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 12px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("!", px, py - 25);
+        const marker = npc.interaction === "merchant" ? "$" : npc.interaction === "trainer" ? "!" : "!";
+        ctx.fillText(marker, px, py - 25);
     });
 }
 
