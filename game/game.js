@@ -64,6 +64,31 @@ const partyDetail = document.getElementById("party-detail");
 const crystalScreen = document.getElementById("crystal-screen");
 const crystalList = document.getElementById("crystal-list");
 const crystalCloseButton = document.getElementById("crystal-close-button");
+function setCaptureStatus(text) {
+    const battleArea =
+        document.getElementById("battle-screen") ||
+        document.querySelector(".battle-screen") ||
+        document.getElementById("game-screen") ||
+        document.querySelector(".game-screen");
+
+    if (!battleArea) return;
+
+    let overlay = document.getElementById("capture-status-overlay");
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "capture-status-overlay";
+        overlay.className = "capture-status-overlay";
+        battleArea.appendChild(overlay);
+    }
+    overlay.textContent = text;
+    overlay.classList.remove("hidden");
+}
+
+function clearCaptureStatus() {
+    const overlay = document.getElementById("capture-status-overlay");
+    if (overlay) overlay.remove();
+}
+
 const captureEffect = document.getElementById("capture-effect");
 const battleCreatureVisual = document.getElementById("battle-creature-visual");
 

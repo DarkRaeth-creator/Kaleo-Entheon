@@ -619,3 +619,24 @@ body {
 @keyframes particle-7 { from { transform: translate(0,0); opacity: 0; } 25% { opacity: 1; } to { transform: translate(-75px,100px); opacity: 0; } }
 @keyframes particle-8 { from { transform: translate(0,0); opacity: 0; } 25% { opacity: 1; } to { transform: translate(15px,185px); opacity: 0; } }
 
+
+/* Capture resonance status */
+.capture-status-overlay {
+    position: absolute;
+    left: 50%;
+    bottom: 86px;
+    transform: translateX(-50%);
+    z-index: 90;
+    min-width: min(560px, 80%);
+    padding: 12px 18px;
+    border: 2px solid #666679;
+    border-radius: 9px;
+    background: rgba(20, 20, 28, 0.94);
+    color: #f4f4f7;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    box-shadow: 0 8px 24px rgba(0,0,0,.45);
+    pointer-events: none;
+}
