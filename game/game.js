@@ -3588,6 +3588,14 @@ function restoreParty() {
 // ============================================================
 
 function handleNpcInteraction(npc) {
+    // The Research Center researcher is a special, unambiguous interaction.
+    // Do not allow any stale/incorrect interaction metadata to route this NPC
+    // through ferry logic. The researcher must always open the starter intro.
+    if (currentMap === maps.research_center && npc.id === "researcher") {
+        openNpcDialogue(npc);
+        return;
+    }
+
     const interaction = npc.interaction || npc.type || "dialogue";
 
     switch (interaction) {
