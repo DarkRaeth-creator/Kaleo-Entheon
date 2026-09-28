@@ -40,7 +40,8 @@
                         <span><strong>Interact:</strong> E / Enter / Space</span>
                     
                         <button id="party-button" class="ui-small-button" type="button">Party</button>
-                        <button id="inventory-button" class="ui-small-button" type="button">Inventory</button></div>
+                        <button id="inventory-button" class="ui-small-button" type="button">Inventory</button>
+                        <button id="world-map-button" class="ui-small-button" type="button">Map</button></div>
 
                     <div id="world-message" class="world-message hidden"></div>
 
@@ -84,6 +85,41 @@
         </div>
     </div>
     <div id="shop-list" class="shop-list"></div>
+</section>
+
+<section id="world-map-screen" class="world-map-screen hidden" aria-label="World Map">
+    <div class="world-map-screen-header">
+        <div>
+            <h2>Map of Kaleo</h2>
+            <p id="world-map-location">Current location</p>
+        </div>
+        <button id="world-map-close-button" class="ui-small-button" type="button">Close</button>
+    </div>
+    <div class="world-map-body">
+        <div class="world-map-visual">
+            <div class="world-map-frame" id="world-map-frame">
+                <img src="images/world-map.png" alt="Map of Kaleo showing regions, settlements, cities and route connections">
+                <div id="world-map-markers"></div>
+            </div>
+        </div>
+        <aside class="world-map-info">
+            <div class="world-map-card">
+                <div class="world-map-card-label">YOU ARE HERE</div>
+                <div id="world-map-current-name" class="world-map-current-name">—</div>
+                <div id="world-map-current-region" class="world-map-current-region">—</div>
+            </div>
+            <div class="world-map-card">
+                <div class="world-map-card-label">CURRENT ROUTE</div>
+                <div id="world-map-route-name" class="world-map-route-name">Not currently on an overland route.</div>
+                <div id="world-map-route-direction" class="world-map-route-direction"></div>
+            </div>
+            <div class="world-map-card">
+                <div class="world-map-card-label">CONNECTIONS</div>
+                <div id="world-map-connections" class="world-map-connections"></div>
+            </div>
+            <div class="world-map-hint">Press <strong>M</strong> to open or close the map.</div>
+        </aside>
+    </div>
 </section>
 
 <section id="inventory-screen" class="inventory-screen hidden" aria-label="Inventory">
@@ -165,6 +201,6 @@
     </div>
 
     <script src="world-data.js"></script>
-    <script src="game.js?v=20260928-researcher-hardfix"></script>
+    <script src="game.js?v=20260928-world-map"></script>
 </body>
 </html>

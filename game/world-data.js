@@ -16,6 +16,48 @@
 const KALEO_WORLD = {
     name: "Kaleo",
 
+    // Approximate normalized positions on the supplied numbered world map.
+    // These are presentation coordinates only; route connectivity remains
+    // authoritative in the routes/ferryRoutes arrays below.
+    mapPoints: {
+        "settlement-1": { x: 32.7, y: 58.0 },
+        "everhope-city": { x: 37.1, y: 50.7 },
+        "settlement-2": { x: 35.9, y: 43.6 },
+        "settlement-3": { x: 29.9, y: 43.0 },
+        "settlement-4": { x: 24.1, y: 55.7 },
+        "harveston-city": { x: 24.2, y: 60.9 },
+        "settlement-5": { x: 32.4, y: 66.7 },
+        "settlement-6": { x: 29.3, y: 76.8 },
+        "settlement-7": { x: 41.3, y: 67.9 },
+        "settlement-9": { x: 31.2, y: 37.0 },
+        "settlement-10": { x: 23.7, y: 37.9 },
+        "stonehaven-city": { x: 24.0, y: 28.8 },
+        "settlement-11": { x: 17.8, y: 27.4 },
+        "settlement-12": { x: 15.6, y: 41.2 },
+        "gullhaven-city": { x: 12.0, y: 69.1 },
+        "settlement-13": { x: 15.4, y: 79.9 },
+        "settlement-14": { x: 25.6, y: 21.4 },
+        "settlement-15": { x: 31.4, y: 16.7 },
+        "thermalis-city": { x: 41.0, y: 29.9 },
+        "settlement-16": { x: 37.7, y: 24.9 },
+        "settlement-17": { x: 42.7, y: 19.2 },
+        "settlement-18": { x: 51.2, y: 29.2 },
+        "settlement-19": { x: 59.4, y: 28.2 },
+        "winterhold-city": { x: 58.4, y: 20.7 },
+        "northreach-city": { x: 68.7, y: 25.0 },
+        "settlement-20": { x: 73.7, y: 32.8 },
+        "lakecrest-city": { x: 81.7, y: 45.6 },
+        "settlement-21": { x: 65.5, y: 48.0 },
+        "settlement-22": { x: 59.2, y: 41.1 },
+        "settlement-23": { x: 68.1, y: 54.2 },
+        "settlement-24": { x: 68.3, y: 61.4 },
+        "fairhaven-city": { x: 94.0, y: 53.5 },
+        "settlement-25": { x: 81.1, y: 65.0 },
+        "settlement-26": { x: 83.0, y: 39.9 },
+        "lume-city": { x: 53.0, y: 51.0 },
+        "highreach-hot-springs": { x: 35.8, y: 16.8 }
+    },
+
     regions: [
         { id: "westmere", name: "Westmere", majorCity: "everhope-city", gymId: "everhope-gym", landmark: "great-tree" },
         { id: "greenvale", name: "Greenvale", majorCity: "harveston-city", gymId: "harveston-gym", landmark: "great-windmill" },

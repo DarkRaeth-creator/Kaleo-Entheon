@@ -91,6 +91,16 @@ const shopScreen = document.getElementById("shop-screen");
 const shopList = document.getElementById("shop-list");
 const shopVale = document.getElementById("shop-vale");
 const shopCloseButton = document.getElementById("shop-close-button");
+const worldMapScreen = document.getElementById("world-map-screen");
+const worldMapButton = document.getElementById("world-map-button");
+const worldMapCloseButton = document.getElementById("world-map-close-button");
+const worldMapLocation = document.getElementById("world-map-location");
+const worldMapCurrentName = document.getElementById("world-map-current-name");
+const worldMapCurrentRegion = document.getElementById("world-map-current-region");
+const worldMapRouteName = document.getElementById("world-map-route-name");
+const worldMapRouteDirection = document.getElementById("world-map-route-direction");
+const worldMapConnections = document.getElementById("world-map-connections");
+const worldMapMarkers = document.getElementById("world-map-markers");
 function setCaptureStatus(text) {
     const battleArea =
         document.getElementById("battle-screen") ||
@@ -1963,6 +1973,201 @@ function getNpcs() {
 
 
 // ============================================================
+// WORLD MAP
+// ============================================================
+
+const DIRECTION_LABELS = {
+    north: "North",
+    northeast: "Northeast",
+    east: "East",
+    southeast: "Southeast",
+    south: "South",
+    southwest: "Southwest",
+    west: "West",
+    northwest: "Northwest"
+};
+
+const OPPOSITE_DIRECTIONS = {
+    north: "south",
+    northeast: "southwest",
+    east: "west",
+    southeast: "northwest",
+    south: "north",
+    southwest: "northeast",
+    west: "east",
+    northwest: "southeast"
+};
+
+function getWorldLocationForMap(mapId) {
+    return window.KALEO_WORLD?.locations?.find(location => location.mapId === mapId) || null;
+}
+
+function getWorldRouteForMap(mapId) {
+    return window.KALEO_WORLD?.routes?.find(route => route.mapId === mapId) || null;
+}
+
+function getWorldLocationLabel(locationId) {
+    return window.KALEO_WORLD?.getLocation(locationId)?.name || locationId;
+}
+
+function getRegionLabel(locationId) {
+    const location = window.KALEO_WORLD?.getLocation(locationId);
+    if (!location) return "";
+    return window.KALEO_WORLD?.regions?.find(region => region.id === location.region)?.name || location.region || "";
+}
+
+function getCurrentWorldContext() {
+    const location = getWorldLocationForMap(gameState.currentMap);
+    const route = getWorldRouteForMap(gameState.currentMap);
+
+    if (location) {
+        return {
+            kind: "location",
+            location,
+            route: null,
+            region: getRegionLabel(location.id),
+            name: location.name
+        };
+    }
+
+    if (route) {
+        const from = window.KALEO_WORLD?.getLocation(route.from);
+        const to = window.KALEO_WORLD?.getLocation(route.to);
+        const region = from?.region === to?.region
+            ? getRegionLabel(route.from)
+            : `${getRegionLabel(route.from)} / ${getRegionLabel(route.to)}`;
+        return {
+            kind: "route",
+            location: null,
+            route,
+            region,
+            name: `${from?.name || route.from} → ${to?.name || route.to}`
+        };
+    }
+
+    return {
+        kind: "unknown",
+        location: null,
+        route: null,
+        region: "",
+        name: currentMap?.name || gameState.currentMap
+    };
+}
+
+function getConnectionsForLocation(locationId) {
+    const connections = [];
+    const routes = window.KALEO_WORLD?.routes?.filter(route => route.from === locationId || route.to === locationId) || [];
+
+    routes.forEach(route => {
+        const isFrom = route.from === locationId;
+        const destinationId = isFrom ? route.to : route.from;
+        connections.push({
+            kind: "route",
+            name: getWorldLocationLabel(destinationId),
+            direction: isFrom ? route.direction : route.reverseDirection,
+            trail: route.kind === "secondary-trail" ? "Side route" : "Main route"
+        });
+    });
+
+    const ferries = window.KALEO_WORLD?.ferryRoutes?.filter(route => route.from === locationId || route.to === locationId) || [];
+    ferries.forEach(route => {
+        const isFrom = route.from === locationId;
+        const destinationId = isFrom ? route.to : route.from;
+        connections.push({
+            kind: "ferry",
+            name: getWorldLocationLabel(destinationId),
+            direction: isFrom ? route.direction : OPPOSITE_DIRECTIONS[route.direction] || route.direction,
+            trail: "Ferry"
+        });
+    });
+
+    return connections;
+}
+
+function renderWorldMapMarkers(context) {
+    if (!worldMapMarkers) return;
+    worldMapMarkers.innerHTML = "";
+
+    const points = window.KALEO_WORLD?.mapPoints || {};
+    const addMarker = (locationId, className, label) => {
+        const point = points[locationId];
+        if (!point) return;
+        const marker = document.createElement("div");
+        marker.className = `world-map-marker ${className}`.trim();
+        marker.style.left = `${point.x}%`;
+        marker.style.top = `${point.y}%`;
+        if (label) {
+            const labelEl = document.createElement("div");
+            labelEl.className = "world-map-marker-label";
+            labelEl.textContent = label;
+            marker.appendChild(labelEl);
+        }
+        worldMapMarkers.appendChild(marker);
+    };
+
+    if (context.kind === "location" && context.location) {
+        addMarker(context.location.id, "current", context.location.name);
+    }
+
+    if (context.kind === "route" && context.route) {
+        addMarker(context.route.from, "current", getWorldLocationLabel(context.route.from));
+        addMarker(context.route.to, "route-endpoint", getWorldLocationLabel(context.route.to));
+    }
+}
+
+function openWorldMap() {
+    if (!worldMapScreen || gameState.mode !== "overworld") return;
+
+    const context = getCurrentWorldContext();
+    if (worldMapLocation) worldMapLocation.textContent = `${context.name}${context.region ? ` · ${context.region}` : ""}`;
+    if (worldMapCurrentName) worldMapCurrentName.textContent = context.name;
+    if (worldMapCurrentRegion) worldMapCurrentRegion.textContent = context.region || "World of Kaleo";
+
+    if (context.kind === "route" && context.route) {
+        const from = getWorldLocationLabel(context.route.from);
+        const to = getWorldLocationLabel(context.route.to);
+        worldMapRouteName.textContent = `${from} → ${to}`;
+        worldMapRouteDirection.textContent = `${DIRECTION_LABELS[context.route.direction] || context.route.direction} from ${from} · ${context.route.kind === "secondary-trail" ? "Side route" : "Main route"}`;
+    } else {
+        worldMapRouteName.textContent = "You are in a settlement or city.";
+        worldMapRouteDirection.textContent = "The connected paths below follow the established world-map directions.";
+    }
+
+    if (worldMapConnections) {
+        let locationId = context.location?.id || null;
+        if (!locationId && context.route) {
+            locationId = null;
+        }
+
+        if (locationId) {
+            const connections = getConnectionsForLocation(locationId);
+            worldMapConnections.innerHTML = connections.length
+                ? connections.map(connection => `
+                    <div class="world-map-connection ${connection.kind === "ferry" ? "ferry" : ""}">
+                        <strong>${connection.name}</strong>
+                        <span>${connection.trail} · ${DIRECTION_LABELS[connection.direction] || connection.direction}</span>
+                    </div>`).join("")
+                : '<div class="world-map-connection"><strong>No mapped connections yet</strong><span>This location has not been fully connected in the current prototype.</span></div>';
+        } else if (context.route) {
+            const from = getWorldLocationLabel(context.route.from);
+            const to = getWorldLocationLabel(context.route.to);
+            worldMapConnections.innerHTML = `
+                <div class="world-map-connection"><strong>${from}</strong><span>Return: ${DIRECTION_LABELS[context.route.reverseDirection] || context.route.reverseDirection}</span></div>
+                <div class="world-map-connection"><strong>${to}</strong><span>Continue: ${DIRECTION_LABELS[context.route.direction] || context.route.direction}</span></div>`;
+        } else {
+            worldMapConnections.innerHTML = '<div class="world-map-connection"><strong>Map position unavailable</strong><span>This temporary area is not yet registered in the world graph.</span></div>';
+        }
+    }
+
+    renderWorldMapMarkers(context);
+    worldMapScreen.classList.remove("hidden");
+}
+
+function closeWorldMap() {
+    if (worldMapScreen) worldMapScreen.classList.add("hidden");
+}
+
+// ============================================================
 // INPUT
 // ============================================================
 
@@ -1975,6 +2180,19 @@ document.addEventListener("keydown", event => {
         ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)
     ) {
         event.preventDefault();
+    }
+
+    if (key === "m" && gameState.mode === "overworld") {
+        event.preventDefault();
+        if (worldMapScreen?.classList.contains("hidden")) openWorldMap();
+        else closeWorldMap();
+        return;
+    }
+
+    if (key === "escape" && gameState.mode === "overworld" && worldMapScreen && !worldMapScreen.classList.contains("hidden")) {
+        event.preventDefault();
+        closeWorldMap();
+        return;
     }
 
     if (
@@ -2633,6 +2851,22 @@ if (inventoryButton) {
         event.preventDefault();
         event.stopPropagation();
         openInventory(false);
+    });
+}
+
+if (worldMapButton) {
+    worldMapButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openWorldMap();
+    });
+}
+
+if (worldMapCloseButton) {
+    worldMapCloseButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeWorldMap();
     });
 }
 

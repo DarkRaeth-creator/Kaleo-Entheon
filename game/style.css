@@ -871,3 +871,135 @@ body {
 .inventory-currency-banner { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border:2px solid #555565; border-radius:8px; background:#181820; color:#f0d477; }
 .inventory-currency-banner span { font-weight:800; }
 @media (max-width:700px) { .shop-screen-header { align-items:flex-start; } .shop-header-actions { flex-direction:column; align-items:stretch; } .shop-item-price { font-size:12px; } }
+
+
+/* ============================================================
+   WORLD MAP
+   ============================================================ */
+.world-map-screen {
+    position: absolute;
+    inset: 8px;
+    z-index: 1200;
+    background: #171720;
+    border: 3px solid #111118;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.65);
+    overflow: auto;
+}
+.world-map-screen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #41414f;
+}
+.world-map-screen-header h2 { margin: 0; font-size: 24px; }
+.world-map-screen-header p { margin: 5px 0 0; color: #bdbdc8; font-size: 13px; }
+.world-map-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 285px;
+    gap: 14px;
+    align-items: start;
+}
+.world-map-visual {
+    min-width: 0;
+    background: #0e0e15;
+    border: 2px solid #454554;
+    border-radius: 8px;
+    padding: 8px;
+}
+.world-map-frame {
+    position: relative;
+    width: 100%;
+    line-height: 0;
+    overflow: hidden;
+    border-radius: 5px;
+}
+.world-map-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+}
+.world-map-marker {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: #4b90ff;
+    box-shadow: 0 0 0 3px rgba(20,20,30,.8), 0 0 14px rgba(75,144,255,.9);
+    z-index: 5;
+}
+.world-map-marker.current {
+    width: 22px;
+    height: 22px;
+    background: #ffcf4b;
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgba(20,20,30,.8), 0 0 18px rgba(255,207,75,.95);
+    animation: worldMapPulse 1.35s ease-in-out infinite;
+}
+.world-map-marker.route-endpoint { background: #7db4ff; }
+.world-map-marker-label {
+    position: absolute;
+    left: 50%;
+    top: 22px;
+    transform: translateX(-50%);
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: rgba(17,17,24,.92);
+    color: #fff;
+    border: 1px solid #6a6a7c;
+    font: 700 10px/1.2 Arial, sans-serif;
+    white-space: nowrap;
+}
+@keyframes worldMapPulse {
+    0%,100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.18); }
+}
+.world-map-info { display: grid; gap: 10px; }
+.world-map-card {
+    padding: 12px;
+    background: #24242f;
+    border: 2px solid #454554;
+    border-radius: 8px;
+}
+.world-map-card-label {
+    color: #8f8fa0;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .8px;
+    margin-bottom: 6px;
+}
+.world-map-current-name { font-size: 18px; font-weight: 900; }
+.world-map-current-region { margin-top: 4px; color: #bdbdc8; font-size: 12px; }
+.world-map-route-name { font-weight: 800; line-height: 1.35; }
+.world-map-route-direction { margin-top: 5px; color: #a6c8ff; font-size: 12px; }
+.world-map-connections { display: grid; gap: 7px; }
+.world-map-connection {
+    padding: 8px 9px;
+    border-radius: 6px;
+    background: #30303d;
+    border: 1px solid #555565;
+}
+.world-map-connection strong { display: block; }
+.world-map-connection span { display: block; margin-top: 3px; color: #bdbdc8; font-size: 11px; }
+.world-map-connection.ferry { border-color: #d7bb57; }
+.world-map-hint {
+    padding: 9px 10px;
+    color: #8f8fa0;
+    font-size: 11px;
+    text-align: center;
+}
+@media (max-width: 900px) {
+    .world-map-body { grid-template-columns: 1fr; }
+    .world-map-info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .world-map-hint { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+    .world-map-info { grid-template-columns: 1fr; }
+}
