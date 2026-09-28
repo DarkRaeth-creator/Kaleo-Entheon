@@ -318,9 +318,9 @@ const TILE = {
 
 const maps = {
     town: {
-        name: "Kaleo",
+        name: "Westmere — Southern Settlement",
         data: [
-            "########################################",
+            "####################D####################",
             "#......................................#",
             "#......................................#",
             "#..TT..............GGGG...............#",
@@ -353,6 +353,11 @@ const maps = {
         ],
         spawn: { x: 4, y: 25 },
         exit: null,
+        // World skeleton connection: the southern Westmere settlement
+        // connects northward to the route leading to Everhope City.
+        exits: [
+            { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 15, targetY: 16, message: "You leave the southern Westmere settlement and follow the Main Trail toward Everhope City." }
+        ],
         // Temporary encounter probabilities for the current starting area.
         // Species eligibility comes from Westmere's canonical regional list;
         // the exact habitat tables will be expanded as individual routes are built.
@@ -429,6 +434,182 @@ const maps = {
                 }
             }
         ]
+    },
+
+    route_south_everhope: {
+        name: "Westmere — Main Trail to Everhope City",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 15, y: 16 },
+        exits: [
+            { x: 14, y: 16, targetMap: "town", targetX: 20, targetY: 1, message: "You return to the southern Westmere settlement." },
+            { x: 14, y: 0, targetMap: "everhope_city", targetX: 15, targetY: 16, message: "The Main Trail brings you to Everhope City." }
+        ],
+        encounters: []
+    },
+
+    everhope_city: {
+        name: "Everhope City",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 15, y: 16 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_south_everhope", targetX: 14, targetY: 1, message: "You head back toward the southern Westmere settlement." },
+            { x: 14, y: 0, targetMap: "route_everhope_settlement2", targetX: 15, targetY: 16, message: "You leave Everhope City along the Main Trail." }
+        ],
+        encounters: [],
+        npcs: []
+    },
+
+    route_everhope_settlement2: {
+        name: "Westmere — Main Trail to Settlement 2",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 15, y: 16 },
+        exits: [
+            { x: 14, y: 16, targetMap: "everhope_city", targetX: 14, targetY: 1, message: "You return to Everhope City." },
+            { x: 14, y: 0, targetMap: "westmere_settlement2", targetX: 15, targetY: 16, message: "You arrive at Settlement 2 in Westmere." }
+        ],
+        encounters: []
+    },
+
+    westmere_settlement2: {
+        name: "Westmere — Settlement 2",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 15, y: 16 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_everhope_settlement2", targetX: 14, targetY: 1, message: "You return toward Everhope City." },
+            { x: 14, y: 0, targetMap: "route_settlement2_settlement3", targetX: 15, targetY: 16, message: "You leave Settlement 2 along the Main Trail." }
+        ],
+        encounters: [],
+        npcs: []
+    },
+
+    route_settlement2_settlement3: {
+        name: "Westmere — Main Trail to Settlement 3",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 15, y: 16 },
+        exits: [
+            { x: 14, y: 16, targetMap: "westmere_settlement2", targetX: 14, targetY: 1, message: "You return to Settlement 2." },
+            { x: 14, y: 0, targetMap: "westmere_settlement3", targetX: 15, targetY: 16, message: "You arrive at Settlement 3 in Westmere." }
+        ],
+        encounters: []
+    },
+
+    westmere_settlement3: {
+        name: "Westmere — Settlement 3",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 15, y: 16 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14, targetY: 1, message: "You return to Settlement 2." }
+        ],
+        encounters: [],
+        npcs: []
     },
 
     research_center: {
@@ -564,7 +745,7 @@ const camera = {
 // ============================================================
 
 function getNpcs() {
-    return currentMap.npcs.filter(npc => !npc.chosen);
+    return (currentMap.npcs || []).filter(npc => !npc.chosen);
 }
 
 
@@ -809,6 +990,22 @@ function checkAutomaticTransitions() {
         return;
     }
 
+    // World-map connections are data-driven. Each prototype area declares
+    // its exits so the geographical skeleton can grow without hard-coding
+    // every settlement/route pair into the movement system.
+    const exits = currentMap.exits || [];
+    const worldExit = exits.find(exit => exit.x === tileX && exit.y === tileY);
+
+    if (worldExit) {
+        transitionTo(
+            worldExit.targetMap,
+            worldExit.targetX,
+            worldExit.targetY,
+            worldExit.message
+        );
+        return;
+    }
+
     if (gameState.currentMap === "town") {
         transitionTo(
             "research_center",
@@ -820,9 +1017,6 @@ function checkAutomaticTransitions() {
     }
 
     if (gameState.currentMap === "research_center") {
-        // The Research Center door is at town tile (19, 7).
-        // The tile immediately to its right, (20, 7), is outside the building.
-        // Use the map's exit data as the single source of truth.
         const exit = currentMap.exit;
 
         if (exit) {
@@ -830,7 +1024,7 @@ function checkAutomaticTransitions() {
                 exit.targetMap,
                 exit.targetX,
                 exit.targetY,
-                "You step back outside into Kaleo."
+                "You step back outside into the southern Westmere settlement."
             );
         }
     }
@@ -2859,7 +3053,7 @@ function restartGame() {
     });
 
     starterStatus.textContent = "Starter: —";
-    areaStatus.textContent = "Kaleo";
+    areaStatus.textContent = "Westmere — Southern Settlement";
 
     npcDialogue.classList.add("hidden");
     overworldScreen.classList.add("hidden");

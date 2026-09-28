@@ -94,6 +94,16 @@ const KALEO_WORLD = {
         }
     ],
 
+    // Playable map-node skeleton for the first Westmere progression slice.
+    // The two later settlement names are deliberately provisional until the
+    // source/map assigns Valehaven, Briarwood and Oakridge to exact markers.
+    mapNodes: [
+        { id: "westmere-southern-settlement", region: "westmere", type: "settlement", name: "Westmere — Southern Settlement", mapId: "town" },
+        { id: "everhope-city", region: "westmere", type: "major-city", name: "Everhope City", mapId: "everhope_city", gymId: "everhope-gym" },
+        { id: "westmere-settlement-2", region: "westmere", type: "settlement", name: "Settlement 2", mapId: "westmere_settlement2" },
+        { id: "westmere-settlement-3", region: "westmere", type: "settlement", name: "Settlement 3", mapId: "westmere_settlement3" }
+    ],
+
     gyms: [
         {
             id: "everhope-gym",
@@ -185,7 +195,15 @@ const KALEO_WORLD = {
     ],
 
     transportation: {
-        mainTrails: [],
+        // Initial playable-world skeleton. These are geographical connections,
+        // not final route art or settlement layouts. Settlement names remain
+        // provisional where the map/source material has not yet assigned a
+        // specific name to the physical marker.
+        mainTrails: [
+            { id: "westmere-south-to-everhope", from: "westmere-southern-settlement", to: "everhope-city", mapId: "route_south_everhope" },
+            { id: "everhope-to-westmere-settlement-2", from: "everhope-city", to: "westmere-settlement-2", mapId: "route_everhope_settlement2" },
+            { id: "westmere-settlement-2-to-3", from: "westmere-settlement-2", to: "westmere-settlement-3", mapId: "route_settlement2_settlement3" }
+        ],
         secondaryTrails: [],
         ferryRoutes: [
             { from: "lume-port", endpoint: null, status: "mapped-endpoint-to-be-linked" },
