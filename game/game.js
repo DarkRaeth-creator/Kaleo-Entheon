@@ -357,7 +357,7 @@ const maps = {
         // connects northward to the route leading to Everhope City.
         exits: [
             { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 14.5, targetY: 15.5, message: "You leave the southern Westmere settlement and follow the Main Trail toward Everhope City." },
-            { x: 14, y: 7, targetMap: "research_center", targetX: 10.5, targetY: 9.5, message: "You enter the Entheon Research Center." }
+            { x: 18, y: 7, targetMap: "research_center", targetX: 10.5, targetY: 9.5, message: "You enter the Entheon Research Center." }
         ],
         // Temporary encounter probabilities for the current starting area.
         // Species eligibility comes from Westmere's canonical regional list;
