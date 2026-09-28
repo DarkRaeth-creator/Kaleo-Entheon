@@ -1037,7 +1037,7 @@ function loadMap(mapId, spawnX = null, spawnY = null) {
     }
 
     // Give the player a short grace period after entering a new map.
-    gameState.transitionCooldown = 350;
+    gameState.transitionCooldown = 300;
 
     areaStatus.textContent = currentMap.name;
 
@@ -1098,6 +1098,14 @@ function updatePlayer(delta) {
     if (keys["arrowdown"] || keys["s"]) dy += 1;
     if (keys["arrowleft"] || keys["a"]) dx -= 1;
     if (keys["arrowright"] || keys["d"]) dx += 1;
+
+    // Check an already-positioned player as well. Boundary doors can place the
+    // player directly on the doorway tile, so transitions must not depend on
+    // another movement event occurring.
+    if (gameState.transitionCooldown <= 0) {
+        checkAutomaticTransitions();
+        if (gameState.transitionCooldown > 0) return;
+    }
 
     if (dx === 0 && dy === 0) return;
 
