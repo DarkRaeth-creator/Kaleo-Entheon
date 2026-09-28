@@ -61,12 +61,12 @@ const KALEO_WORLD = {
         // Highreach
         { id: "settlement-14", number: 14, region: "highreach", type: "settlement", name: "Settlement 14", mapId: "highreach_settlement1" },
         { id: "settlement-15", number: 15, region: "highreach", type: "settlement", name: "Settlement 15", mapId: "highreach_settlement2" },
-        { id: "settlement-16", number: 16, region: "highreach", type: "settlement", name: "Settlement 16", mapId: null },
+        { id: "settlement-16", number: 16, region: "highreach", type: "settlement", name: "Settlement 16", mapId: "highreach_settlement3" },
         { id: "thermalis-city", region: "highreach", type: "major-city", name: "Thermalis", mapId: "thermalis_city", gymId: "thermalis-gym" },
 
         // Northvale
-        { id: "settlement-17", number: 17, region: "northvale", type: "settlement", name: "Settlement 17", mapId: null },
-        { id: "settlement-18", number: 18, region: "northvale", type: "settlement", name: "Settlement 18", mapId: null, portTo: "lume-city" },
+        { id: "settlement-17", number: 17, region: "northvale", type: "settlement", name: "Settlement 17", mapId: "northvale_settlement17" },
+        { id: "settlement-18", number: 18, region: "northvale", type: "settlement", name: "Settlement 18", mapId: "northvale_settlement18", portTo: "lume-city" },
         { id: "settlement-19", number: 19, region: "northvale", type: "settlement", name: "Settlement 19", mapId: null },
         { id: "northreach-city", region: "northvale", type: "major-city", name: "Northreach", mapId: null, gymId: "northreach-gym" },
 
@@ -140,17 +140,17 @@ const KALEO_WORLD = {
         // Stonehaven -> Highreach
         { id: "route-stonehaven-14", from: "stonehaven-city", to: "settlement-14", kind: "main-trail", mapId: "route_stonehaven_highreach", mapSections: [] },
         { id: "route-14-15", from: "settlement-14", to: "settlement-15", kind: "main-trail", mapId: "route_highreach_settlement1_2", mapSections: [] },
-        { id: "route-15-16", from: "settlement-15", to: "settlement-16", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-15-16", from: "settlement-15", to: "settlement-16", kind: "main-trail", mapId: "route_highreach_15_16", mapSections: ["route_highreach_15_16"] },
 
         // Highreach branch to hot springs
-        { id: "route-15-hot-springs", from: "settlement-15", to: "highreach-hot-springs", kind: "secondary-trail", mapId: null, mapSections: [] },
+        { id: "route-15-hot-springs", from: "settlement-15", to: "highreach-hot-springs", kind: "secondary-trail", mapId: "route_15_hot_springs", mapSections: ["route_15_hot_springs"] },
 
         // Highreach -> Thermalis / Northvale
-        { id: "route-16-thermalis", from: "settlement-16", to: "thermalis-city", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-16-17", from: "settlement-16", to: "settlement-17", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-16-thermalis", from: "settlement-16", to: "thermalis-city", kind: "main-trail", mapId: "route_highreach_16_thermalis", mapSections: ["route_highreach_16_thermalis"] },
+        { id: "route-16-17", from: "settlement-16", to: "settlement-17", kind: "main-trail", mapId: "route_highreach_16_17", mapSections: ["route_highreach_16_17"] },
 
         // Northvale
-        { id: "route-17-18", from: "settlement-17", to: "settlement-18", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-17-18", from: "settlement-17", to: "settlement-18", kind: "main-trail", mapId: "route_17_18", mapSections: ["route_17_18"] },
         { id: "route-18-19", from: "settlement-18", to: "settlement-19", kind: "main-trail", mapId: null, mapSections: [] },
         { id: "route-19-northreach", from: "settlement-19", to: "northreach-city", kind: "main-trail", mapId: null, mapSections: [] },
         { id: "route-19-winterhold", from: "settlement-19", to: "winterhold-city", kind: "secondary-trail", mapId: null, mapSections: [] },

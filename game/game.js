@@ -877,18 +877,18 @@ const maps = {
     },
 
     highreach_settlement2: {
-        name: "Highreach — Settlement 2",
+        name: "Highreach — Settlement 15",
         data: [
             "##############D###############",
             "#............................#",
             "#............................#",
             "#...........GGGG.............#",
             "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
             "#............................#",
+            "#............................#",
+            "#........TT..................D",
             "#........TT..................#",
-            "#........TT..................#",
+            "#............................#",
             "#............................#",
             "#..............VVVV..........#",
             "#..............VVVV..........#",
@@ -899,14 +899,15 @@ const maps = {
         ],
         spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "route_highreach_settlement1_2", targetX: 14.5, targetY: 1.5, message: "You return to the previous Highreach settlement." },
-            { x: 14, y: 0, targetMap: "route_highreach_thermalis", targetX: 14.5, targetY: 15.5, message: "The trail descends toward Thermalis." }
+            { x: 14, y: 16, targetMap: "route_highreach_settlement1_2", targetX: 14.5, targetY: 1.5, message: "You return toward Settlement 14." },
+            { x: 14, y: 0, targetMap: "route_highreach_15_16", targetX: 14.5, targetY: 15.5, message: "The trail continues toward Settlement 16." },
+            { x: 29, y: 7, targetMap: "route_15_hot_springs", targetX: 1.5, targetY: 8.5, message: "A side trail winds toward the Highreach hot springs." }
         ],
         encounters: []
     },
 
-    route_highreach_thermalis: {
-        name: "Highreach — Trail to Thermalis",
+    route_highreach_15_16: {
+        name: "Highreach — Trail to Settlement 16",
         data: [
             "##############D###############",
             "#............................#",
@@ -928,8 +929,211 @@ const maps = {
         ],
         spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "highreach_settlement2", targetX: 14.5, targetY: 1.5, message: "You return to the Highreach settlement." },
-            { x: 14, y: 0, targetMap: "thermalis_city", targetX: 14.5, targetY: 15.5, message: "You arrive in Thermalis." }
+            { x: 14, y: 16, targetMap: "highreach_settlement2", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 15." },
+            { x: 14, y: 0, targetMap: "highreach_settlement3", targetX: 14.5, targetY: 15.5, message: "You arrive at Settlement 16." }
+        ],
+        encounters: []
+    },
+
+    highreach_settlement3: {
+        name: "Highreach — Settlement 16",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#..........GGGG..............#",
+            "#..........GGGG..............#",
+            "#............................#",
+            "#...........GG...............#",
+            "#...........GG...............D",
+            "#...........GG...............#",
+            "#...........GG...............#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_highreach_15_16", targetX: 14.5, targetY: 1.5, message: "You return toward Settlement 15." },
+            { x: 14, y: 0, targetMap: "route_highreach_16_17", targetX: 14.5, targetY: 15.5, message: "The northern trail leads toward Settlement 17." },
+            { x: 29, y: 7, targetMap: "route_highreach_16_thermalis", targetX: 1.5, targetY: 8.5, message: "The eastern trail leads toward Thermalis." }
+        ],
+        encounters: []
+    },
+
+    route_highreach_16_thermalis: {
+        name: "Highreach — Eastern Trail to Thermalis",
+        data: [
+            "##############################",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "D........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "############################D"
+        ],
+        spawn: { x: 1.5, y: 8.5 },
+        exits: [
+            { x: 0, y: 7, targetMap: "highreach_settlement3", targetX: 28.5, targetY: 7.5, message: "You return to Settlement 16." },
+            { x: 29, y: 16, targetMap: "thermalis_city", targetX: 14.5, targetY: 15.5, message: "You arrive in Thermalis." }
+        ],
+        encounters: []
+    },
+
+    route_highreach_16_17: {
+        name: "Highreach → Northvale — Trail to Settlement 17",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "highreach_settlement3", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 16." },
+            { x: 14, y: 0, targetMap: "northvale_settlement17", targetX: 14.5, targetY: 15.5, message: "You cross into Northvale and reach Settlement 17." }
+        ],
+        encounters: []
+    },
+
+    northvale_settlement17: {
+        name: "Northvale — Settlement 17",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#............................#",
+            "#............................#",
+            "#...............TT...........#",
+            "#...............TT...........#",
+            "#............................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_highreach_16_17", targetX: 14.5, targetY: 1.5, message: "You return toward Highreach." },
+            { x: 14, y: 0, targetMap: "route_17_18", targetX: 14.5, targetY: 15.5, message: "The trail continues toward Settlement 18." }
+        ],
+        encounters: []
+    },
+
+    route_17_18: {
+        name: "Northvale — Trail to Settlement 18",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "northvale_settlement17", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 17." },
+            { x: 14, y: 0, targetMap: "northvale_settlement18", targetX: 14.5, targetY: 15.5, message: "You arrive at Settlement 18." }
+        ],
+        encounters: []
+    },
+
+    northvale_settlement18: {
+        name: "Northvale — Settlement 18",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_17_18", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 17." },
+            { x: 14, y: 0, targetMap: "route_18_19", targetX: 14.5, targetY: 15.5, message: "The trail continues toward Settlement 19." }
+        ],
+        encounters: []
+    },
+
+    route_15_hot_springs: {
+        name: "Highreach — Hot Springs Trail",
+        data: [
+            "##############################",
+            "#............................#",
+            "#............................#",
+            "#........TT..................#",
+            "#........TT..................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#...........WWWW.............#",
+            "#...........WWWW.............#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "############################D"
+        ],
+        spawn: { x: 1.5, y: 8.5 },
+        exits: [
+            { x: 0, y: 7, targetMap: "highreach_settlement2", targetX: 28.5, targetY: 7.5, message: "You return to Settlement 15." }
         ],
         encounters: []
     },
