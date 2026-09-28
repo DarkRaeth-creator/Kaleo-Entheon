@@ -356,7 +356,7 @@ const maps = {
         // World skeleton connection: the southern Westmere settlement
         // connects northward to the route leading to Everhope City.
         exits: [
-            { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 15, targetY: 16, message: "You leave the southern Westmere settlement and follow the Main Trail toward Everhope City." }
+            { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 14, targetY: 15, message: "You leave the southern Westmere settlement and follow the Main Trail toward Everhope City." }
         ],
         // Temporary encounter probabilities for the current starting area.
         // Species eligibility comes from Westmere's canonical regional list;
@@ -457,10 +457,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 15, y: 16 },
+        spawn: { x: 14, y: 15 },
         exits: [
             { x: 14, y: 16, targetMap: "town", targetX: 20, targetY: 1, message: "You return to the southern Westmere settlement." },
-            { x: 14, y: 0, targetMap: "everhope_city", targetX: 15, targetY: 16, message: "The Main Trail brings you to Everhope City." }
+            { x: 14, y: 0, targetMap: "everhope_city", targetX: 14, targetY: 15, message: "The Main Trail brings you to Everhope City." }
         ],
         encounters: []
     },
@@ -486,10 +486,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 15, y: 16 },
+        spawn: { x: 14, y: 15 },
         exits: [
             { x: 14, y: 16, targetMap: "route_south_everhope", targetX: 14, targetY: 1, message: "You head back toward the southern Westmere settlement." },
-            { x: 14, y: 0, targetMap: "route_everhope_settlement2", targetX: 15, targetY: 16, message: "You leave Everhope City along the Main Trail." }
+            { x: 14, y: 0, targetMap: "route_everhope_settlement2", targetX: 14, targetY: 15, message: "You leave Everhope City along the Main Trail." }
         ],
         encounters: [],
         npcs: []
@@ -516,10 +516,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 15, y: 16 },
+        spawn: { x: 14, y: 15 },
         exits: [
             { x: 14, y: 16, targetMap: "everhope_city", targetX: 14, targetY: 1, message: "You return to Everhope City." },
-            { x: 14, y: 0, targetMap: "westmere_settlement2", targetX: 15, targetY: 16, message: "You arrive at Settlement 2 in Westmere." }
+            { x: 14, y: 0, targetMap: "westmere_settlement2", targetX: 14, targetY: 15, message: "You arrive at Settlement 2 in Westmere." }
         ],
         encounters: []
     },
@@ -545,10 +545,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 15, y: 16 },
+        spawn: { x: 14, y: 15 },
         exits: [
             { x: 14, y: 16, targetMap: "route_everhope_settlement2", targetX: 14, targetY: 1, message: "You return toward Everhope City." },
-            { x: 14, y: 0, targetMap: "route_settlement2_settlement3", targetX: 15, targetY: 16, message: "You leave Settlement 2 along the Main Trail." }
+            { x: 14, y: 0, targetMap: "route_settlement2_settlement3", targetX: 14, targetY: 15, message: "You leave Settlement 2 along the Main Trail." }
         ],
         encounters: [],
         npcs: []
@@ -575,10 +575,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 15, y: 16 },
+        spawn: { x: 14, y: 15 },
         exits: [
             { x: 14, y: 16, targetMap: "westmere_settlement2", targetX: 14, targetY: 1, message: "You return to Settlement 2." },
-            { x: 14, y: 0, targetMap: "westmere_settlement3", targetX: 15, targetY: 16, message: "You arrive at Settlement 3 in Westmere." }
+            { x: 14, y: 0, targetMap: "westmere_settlement3", targetX: 14, targetY: 15, message: "You arrive at Settlement 3 in Westmere." }
         ],
         encounters: []
     },
@@ -604,7 +604,7 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 15, y: 16 },
+        spawn: { x: 14, y: 15 },
         exits: [
             { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14, targetY: 1, message: "You return to Settlement 2." }
         ],
