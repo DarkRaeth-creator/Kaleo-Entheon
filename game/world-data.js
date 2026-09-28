@@ -115,59 +115,59 @@ const KALEO_WORLD = {
     // built. A route can later contain one or many map sections.
     routes: [
         // Westmere main progression
-        { id: "route-1-everhope", from: "settlement-1", to: "everhope-city", kind: "main-trail", mapId: "route_south_everhope", mapSections: [] },
-        { id: "route-everhope-2", from: "everhope-city", to: "settlement-2", kind: "main-trail", mapId: "route_everhope_settlement2", mapSections: [] },
-        { id: "route-2-3", from: "settlement-2", to: "settlement-3", kind: "main-trail", mapId: "route_settlement2_settlement3", mapSections: [] },
+        { id: "route-1-everhope", from: "settlement-1", to: "everhope-city", direction: "north", reverseDirection: "south", kind: "main-trail", mapId: "route_south_everhope", mapSections: [] },
+        { id: "route-everhope-2", from: "everhope-city", to: "settlement-2", direction: "northwest", reverseDirection: "southeast", kind: "main-trail", mapId: "route_everhope_settlement2", mapSections: [] },
+        { id: "route-2-3", from: "settlement-2", to: "settlement-3", direction: "west", reverseDirection: "east", kind: "main-trail", mapId: "route_settlement2_settlement3", mapSections: [] },
 
         // Westmere branch into Greenvale
-        { id: "route-3-4", from: "settlement-3", to: "settlement-4", kind: "secondary-trail", mapId: "route_settlement3_greenvale", mapSections: ["route_settlement3_greenvale"] },
-        { id: "route-4-harveston", from: "settlement-4", to: "harveston-city", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-harveston-5", from: "harveston-city", to: "settlement-5", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-5-6", from: "settlement-5", to: "settlement-6", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-6-7", from: "settlement-6", to: "settlement-7", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-3-4", from: "settlement-3", to: "settlement-4", direction: "southwest", reverseDirection: "northeast", kind: "secondary-trail", mapId: "route_settlement3_greenvale", mapSections: ["route_settlement3_greenvale"] },
+        { id: "route-4-harveston", from: "settlement-4", to: "harveston-city", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-harveston-5", from: "harveston-city", to: "settlement-5", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-5-6", from: "settlement-5", to: "settlement-6", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-6-7", from: "settlement-6", to: "settlement-7", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: null, mapSections: [] },
 
         // Westmere -> Dunridge
-        { id: "route-3-9", from: "settlement-3", to: "settlement-9", kind: "main-trail", mapId: "route_westmere_dunridge", mapSections: [] },
-        { id: "route-9-10", from: "settlement-9", to: "settlement-10", kind: "main-trail", mapId: "route_dunridge_settlement2_stonehaven", mapSections: [] },
-        { id: "route-10-stonehaven", from: "settlement-10", to: "stonehaven-city", kind: "main-trail", mapId: "route_dunridge_settlement1_stonehaven", mapSections: [] },
+        { id: "route-3-9", from: "settlement-3", to: "settlement-9", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: "route_westmere_dunridge", mapSections: [] },
+        { id: "route-9-10", from: "settlement-9", to: "settlement-10", direction: "west", reverseDirection: "east", kind: "main-trail", mapId: "route_dunridge_settlement2_stonehaven", mapSections: [] },
+        { id: "route-10-stonehaven", from: "settlement-10", to: "stonehaven-city", direction: "north", reverseDirection: "south", kind: "main-trail", mapId: "route_dunridge_settlement1_stonehaven", mapSections: [] },
 
         // Stonehaven -> Seawick
-        { id: "route-stonehaven-11", from: "stonehaven-city", to: "settlement-11", kind: "main-trail", mapId: "route_stonehaven_seawick", mapSections: ["route_stonehaven_seawick"] },
-        { id: "route-11-12", from: "settlement-11", to: "settlement-12", kind: "main-trail", mapId: "route_11_12", mapSections: ["route_11_12"] },
-        { id: "route-12-gullhaven", from: "settlement-12", to: "gullhaven-city", kind: "main-trail", mapId: "route_12_gullhaven", mapSections: ["route_12_gullhaven"] },
-        { id: "route-gullhaven-13", from: "gullhaven-city", to: "settlement-13", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-stonehaven-11", from: "stonehaven-city", to: "settlement-11", direction: "northwest", reverseDirection: "southeast", kind: "main-trail", mapId: "route_stonehaven_seawick", mapSections: ["route_stonehaven_seawick"] },
+        { id: "route-11-12", from: "settlement-11", to: "settlement-12", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_11_12", mapSections: ["route_11_12"] },
+        { id: "route-12-gullhaven", from: "settlement-12", to: "gullhaven-city", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_12_gullhaven", mapSections: ["route_12_gullhaven"] },
+        { id: "route-gullhaven-13", from: "gullhaven-city", to: "settlement-13", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
 
         // Stonehaven -> Highreach
-        { id: "route-stonehaven-14", from: "stonehaven-city", to: "settlement-14", kind: "main-trail", mapId: "route_stonehaven_highreach", mapSections: [] },
-        { id: "route-14-15", from: "settlement-14", to: "settlement-15", kind: "main-trail", mapId: "route_highreach_settlement1_2", mapSections: [] },
-        { id: "route-15-16", from: "settlement-15", to: "settlement-16", kind: "main-trail", mapId: "route_highreach_15_16", mapSections: ["route_highreach_15_16"] },
+        { id: "route-stonehaven-14", from: "stonehaven-city", to: "settlement-14", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: "route_stonehaven_highreach", mapSections: [] },
+        { id: "route-14-15", from: "settlement-14", to: "settlement-15", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: "route_highreach_settlement1_2", mapSections: [] },
+        { id: "route-15-16", from: "settlement-15", to: "settlement-16", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_highreach_15_16", mapSections: ["route_highreach_15_16"] },
 
         // Highreach branch to hot springs
-        { id: "route-15-hot-springs", from: "settlement-15", to: "highreach-hot-springs", kind: "secondary-trail", mapId: "route_15_hot_springs", mapSections: ["route_15_hot_springs"] },
+        { id: "route-15-hot-springs", from: "settlement-15", to: "highreach-hot-springs", direction: "north", reverseDirection: "south", kind: "secondary-trail", mapId: "route_15_hot_springs", mapSections: ["route_15_hot_springs"] },
 
         // Highreach -> Thermalis / Northvale
-        { id: "route-16-thermalis", from: "settlement-16", to: "thermalis-city", kind: "main-trail", mapId: "route_highreach_16_thermalis", mapSections: ["route_highreach_16_thermalis"] },
-        { id: "route-16-17", from: "settlement-16", to: "settlement-17", kind: "main-trail", mapId: "route_highreach_16_17", mapSections: ["route_highreach_16_17"] },
+        { id: "route-16-thermalis", from: "settlement-16", to: "thermalis-city", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_highreach_16_thermalis", mapSections: ["route_highreach_16_thermalis"] },
+        { id: "route-16-17", from: "settlement-16", to: "settlement-17", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: "route_highreach_16_17", mapSections: ["route_highreach_16_17"] },
 
         // Northvale
-        { id: "route-17-18", from: "settlement-17", to: "settlement-18", kind: "main-trail", mapId: "route_17_18", mapSections: ["route_17_18"] },
-        { id: "route-18-19", from: "settlement-18", to: "settlement-19", kind: "main-trail", mapId: "route_18_19", mapSections: ["route_18_19"] },
-        { id: "route-19-northreach", from: "settlement-19", to: "northreach-city", kind: "main-trail", mapId: "route_19_northreach", mapSections: ["route_19_northreach"] },
-        { id: "route-19-winterhold", from: "settlement-19", to: "winterhold-city", kind: "secondary-trail", mapId: "route_19_winterhold", mapSections: ["route_19_winterhold"] },
-        { id: "route-northreach-20", from: "northreach-city", to: "settlement-20", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-17-18", from: "settlement-17", to: "settlement-18", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_17_18", mapSections: ["route_17_18"] },
+        { id: "route-18-19", from: "settlement-18", to: "settlement-19", direction: "east", reverseDirection: "west", kind: "main-trail", mapId: "route_18_19", mapSections: ["route_18_19"] },
+        { id: "route-19-northreach", from: "settlement-19", to: "northreach-city", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_19_northreach", mapSections: ["route_19_northreach"] },
+        { id: "route-19-winterhold", from: "settlement-19", to: "winterhold-city", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: "route_19_winterhold", mapSections: ["route_19_winterhold"] },
+        { id: "route-northreach-20", from: "northreach-city", to: "settlement-20", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: null, mapSections: [] },
 
         // Hawthorne
-        { id: "route-20-lakecrest", from: "settlement-20", to: "lakecrest-city", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-lakecrest-21", from: "lakecrest-city", to: "settlement-21", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-21-22", from: "settlement-21", to: "settlement-22", kind: "secondary-trail", mapId: null, mapSections: [] },
-        { id: "route-21-23", from: "settlement-21", to: "settlement-23", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-20-lakecrest", from: "settlement-20", to: "lakecrest-city", direction: "southwest", reverseDirection: "northeast", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-lakecrest-21", from: "lakecrest-city", to: "settlement-21", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-21-22", from: "settlement-21", to: "settlement-22", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: null, mapSections: [] },
+        { id: "route-21-23", from: "settlement-21", to: "settlement-23", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
 
         // Lakecrest -> Eastmere branch
-        { id: "route-lakecrest-26", from: "lakecrest-city", to: "settlement-26", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-26-fairhaven", from: "settlement-26", to: "fairhaven-city", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-fairhaven-25", from: "fairhaven-city", to: "settlement-25", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-fairhaven-24", from: "fairhaven-city", to: "settlement-24", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-24-23", from: "settlement-24", to: "settlement-23", kind: "secondary-trail", mapId: null, mapSections: [] }
+        { id: "route-lakecrest-26", from: "lakecrest-city", to: "settlement-26", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-26-fairhaven", from: "settlement-26", to: "fairhaven-city", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-fairhaven-25", from: "fairhaven-city", to: "settlement-25", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-fairhaven-24", from: "fairhaven-city", to: "settlement-24", direction: "southwest", reverseDirection: "northeast", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-24-23", from: "settlement-24", to: "settlement-23", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: null, mapSections: [] }
     ],
 
     // ========================================================
@@ -176,11 +176,11 @@ const KALEO_WORLD = {
     // These are separate from overland routes. Each numbered port
     // connects to Lume.
     ferryRoutes: [
-        { id: "ferry-2-lume", from: "settlement-2", to: "lume-city" },
-        { id: "ferry-7-lume", from: "settlement-7", to: "lume-city" },
-        { id: "ferry-18-lume", from: "settlement-18", to: "lume-city" },
-        { id: "ferry-22-lume", from: "settlement-22", to: "lume-city" },
-        { id: "ferry-24-lume", from: "settlement-24", to: "lume-city" }
+        { id: "ferry-2-lume", from: "settlement-2", direction: "southeast", to: "lume-city" },
+        { id: "ferry-7-lume", from: "settlement-7", direction: "northeast", to: "lume-city" },
+        { id: "ferry-18-lume", from: "settlement-18", direction: "south", to: "lume-city" },
+        { id: "ferry-22-lume", from: "settlement-22", direction: "southwest", to: "lume-city" },
+        { id: "ferry-24-lume", from: "settlement-24", direction: "northwest", to: "lume-city" }
     ],
 
     // ========================================================
@@ -202,6 +202,8 @@ const KALEO_WORLD = {
         settlementNumbering: "1–7, 9–26; Settlement 8 does not exist.",
         routeModel: "location-route-location",
         routeCanContainMultipleMapSections: true,
+        directionalRoutes: true,
+        directionModel: "Routes use compass directions from the source location to the destination; reverseDirection is the destination-side approach.",
         gymsAreIndependent: true
     }
 };

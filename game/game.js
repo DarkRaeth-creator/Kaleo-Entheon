@@ -1741,6 +1741,181 @@ const maps = {
     }
 };
 
+
+// ============================================================
+// DIRECTIONAL WORLD ROUTE LAYOUT
+// ============================================================
+// The world map is authoritative for the direction in which a route leaves
+// a location.  Placeholder maps use the same directional metadata now, so
+// later visual/world-building work does not have to move route entrances.
+//
+// Directions are expressed from the current map toward the destination:
+//   north, northeast, east, southeast, south, southwest, west, northwest
+//
+// For diagonal routes, the exit is placed near the corresponding corner.
+// The target spawn is placed at the opposite side of the destination map.
+
+const DIRECTIONAL_ROUTE_LAYOUT = {
+    north:      { x: 0.5, y: 0 },
+    northeast:  { x: 1,   y: 0 },
+    east:       { x: 1,   y: 0.5 },
+    southeast:  { x: 1,   y: 1 },
+    south:      { x: 0.5, y: 1 },
+    southwest:  { x: 0,   y: 1 },
+    west:       { x: 0,   y: 0.5 },
+    northwest:  { x: 0,   y: 0 }
+};
+
+function oppositeDirection(direction) {
+    return {
+        north: "south",
+        northeast: "southwest",
+        east: "west",
+        southeast: "northwest",
+        south: "north",
+        southwest: "northeast",
+        west: "east",
+        northwest: "southeast"
+    }[direction] || null;
+}
+
+function directionalPoint(direction, width, height) {
+    const spec = DIRECTIONAL_ROUTE_LAYOUT[direction];
+    if (!spec) return null;
+
+    // Keep corner exits one tile away from the extreme corner so the player
+    // can approach them naturally instead of being trapped against two walls.
+    const inset = 1;
+    let x;
+    let y;
+
+    if (spec.x === 0) x = 0;
+    else if (spec.x === 1) x = width - 1;
+    else x = Math.floor(width / 2);
+
+    if (spec.y === 0) y = 0;
+    else if (spec.y === 1) y = height - 1;
+    else y = Math.floor(height / 2);
+
+    // For cardinal exits, centre them. For diagonals, use the actual corner.
+    return { x, y };
+}
+
+function mapIdForLocation(locationId) {
+    return window.KALEO_WORLD?.getLocation(locationId)?.mapId || null;
+}
+
+function routeForMapId(mapId) {
+    return window.KALEO_WORLD?.routes?.find(route => route.mapId === mapId) || null;
+}
+
+function directionalExitInfo(mapId, exit) {
+    const route = routeForMapId(mapId);
+    if (!route) return null;
+
+    const fromMap = mapIdForLocation(route.from);
+    const toMap = mapIdForLocation(route.to);
+
+    // Location -> route map.
+    if (mapId === fromMap && exit.targetMap === route.mapId) {
+        return { direction: route.direction };
+    }
+    if (mapId === toMap && exit.targetMap === route.mapId) {
+        return { direction: route.reverseDirection };
+    }
+
+    // Route map -> location.
+    if (mapId === route.mapId && exit.targetMap === fromMap) {
+        return { direction: route.reverseDirection };
+    }
+    if (mapId === route.mapId && exit.targetMap === toMap) {
+        return { direction: route.direction };
+    }
+
+    return null;
+}
+
+function applyDirectionalRouteLayout() {
+    Object.entries(maps).forEach(([mapId, map]) => {
+        const exits = map.exits || [];
+        const width = map.data[0].length;
+        const height = map.data.length;
+
+        exits.forEach(exit => {
+            const info = directionalExitInfo(mapId, exit);
+            if (!info?.direction) return;
+
+            exit.direction = info.direction;
+            const point = directionalPoint(info.direction, width, height);
+            if (!point) return;
+
+            exit.x = point.x;
+            exit.y = point.y;
+
+            // Put the player's arrival point on the matching opposite edge
+            // when this exit targets another route/location map. This keeps
+            // placeholder routes directional before the final maps exist.
+            if (exit.targetMap && maps[exit.targetMap]) {
+                const targetWidth = maps[exit.targetMap].data[0].length;
+                const targetHeight = maps[exit.targetMap].data.length;
+                const entryDirection = oppositeDirection(info.direction);
+                const targetPoint = directionalPoint(entryDirection, targetWidth, targetHeight);
+
+                if (targetPoint) {
+                    exit.targetX = targetPoint.x + 0.5;
+                    exit.targetY = targetPoint.y + 0.5;
+
+                    // Move the spawn one tile inward where possible so the
+                    // player is not left standing inside a wall/door tile.
+                    if (entryDirection === "north") exit.targetY = 1.5;
+                    if (entryDirection === "south") exit.targetY = targetHeight - 1.5;
+                    if (entryDirection === "west") exit.targetX = 1.5;
+                    if (entryDirection === "east") exit.targetX = targetWidth - 1.5;
+                    if (entryDirection === "northeast") {
+                        exit.targetX = targetWidth - 1.5;
+                        exit.targetY = 1.5;
+                    }
+                    if (entryDirection === "northwest") {
+                        exit.targetX = 1.5;
+                        exit.targetY = 1.5;
+                    }
+                    if (entryDirection === "southeast") {
+                        exit.targetX = targetWidth - 1.5;
+                        exit.targetY = targetHeight - 1.5;
+                    }
+                    if (entryDirection === "southwest") {
+                        exit.targetX = 1.5;
+                        exit.targetY = targetHeight - 1.5;
+                    }
+                }
+            }
+        });
+
+        // Rebuild the visible doorway tiles from the authoritative exit
+        // positions. This is deliberately done after map declarations so
+        // placeholder geometry cannot drift away from the route graph.
+        const rows = map.data.map(row => row.split(""));
+
+        // Clear only boundary doorway tiles. Interior building doors are not
+        // route exits and must remain untouched.
+        for (let y = 0; y < rows.length; y++) {
+            for (let x = 0; x < rows[y].length; x++) {
+                if (x === 0 || x === rows[y].length - 1 || y === 0 || y === rows.length - 1) {
+                    if (rows[y][x] === TILE.DOOR) rows[y][x] = TILE.WALL;
+                }
+            }
+        }
+
+        exits.forEach(exit => {
+            if (exit.x < 0 || exit.y < 0 || exit.y >= rows.length || exit.x >= rows[exit.y].length) return;
+            rows[exit.y][exit.x] = TILE.DOOR;
+        });
+        map.data = rows.map(row => row.join(""));
+    });
+}
+
+applyDirectionalRouteLayout();
+
 let currentMap = maps.town;
 
 function getMapWidth() {
