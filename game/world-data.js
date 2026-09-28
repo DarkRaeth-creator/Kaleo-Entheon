@@ -41,7 +41,7 @@ const KALEO_WORLD = {
         { id: "settlement-3", number: 3, region: "westmere", type: "settlement", name: "Settlement 3", mapId: "westmere_settlement3" },
 
         // Greenvale
-        { id: "settlement-4", number: 4, region: "greenvale", type: "settlement", name: "Settlement 4", mapId: null },
+        { id: "settlement-4", number: 4, region: "greenvale", type: "settlement", name: "Settlement 4", mapId: "greenvale_settlement4" },
         { id: "harveston-city", region: "greenvale", type: "major-city", name: "Harveston", mapId: null, gymId: "harveston-gym" },
         { id: "settlement-5", number: 5, region: "greenvale", type: "settlement", name: "Settlement 5", mapId: null },
         { id: "settlement-6", number: 6, region: "greenvale", type: "settlement", name: "Settlement 6", mapId: null },
@@ -53,7 +53,7 @@ const KALEO_WORLD = {
         { id: "stonehaven-city", region: "dunridge", type: "major-city", name: "Stonehaven", mapId: "stonehaven" },
 
         // Seawick
-        { id: "settlement-11", number: 11, region: "seawick", type: "settlement", name: "Settlement 11", mapId: null },
+        { id: "settlement-11", number: 11, region: "seawick", type: "settlement", name: "Settlement 11", mapId: "seawick_settlement11" },
         { id: "settlement-12", number: 12, region: "seawick", type: "settlement", name: "Settlement 12", mapId: null },
         { id: "gullhaven-city", region: "seawick", type: "major-city", name: "Gullhaven", mapId: null, gymId: "gullhaven-gym" },
         { id: "settlement-13", number: 13, region: "seawick", type: "settlement", name: "Settlement 13", mapId: null },
@@ -120,7 +120,7 @@ const KALEO_WORLD = {
         { id: "route-2-3", from: "settlement-2", to: "settlement-3", kind: "main-trail", mapId: "route_settlement2_settlement3", mapSections: [] },
 
         // Westmere branch into Greenvale
-        { id: "route-3-4", from: "settlement-3", to: "settlement-4", kind: "secondary-trail", mapId: null, mapSections: [] },
+        { id: "route-3-4", from: "settlement-3", to: "settlement-4", kind: "secondary-trail", mapId: "route_settlement3_greenvale", mapSections: ["route_settlement3_greenvale"] },
         { id: "route-4-harveston", from: "settlement-4", to: "harveston-city", kind: "main-trail", mapId: null, mapSections: [] },
         { id: "route-harveston-5", from: "harveston-city", to: "settlement-5", kind: "main-trail", mapId: null, mapSections: [] },
         { id: "route-5-6", from: "settlement-5", to: "settlement-6", kind: "main-trail", mapId: null, mapSections: [] },
@@ -132,7 +132,7 @@ const KALEO_WORLD = {
         { id: "route-10-stonehaven", from: "settlement-10", to: "stonehaven-city", kind: "main-trail", mapId: "route_dunridge_settlement1_stonehaven", mapSections: [] },
 
         // Stonehaven -> Seawick
-        { id: "route-stonehaven-11", from: "stonehaven-city", to: "settlement-11", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-stonehaven-11", from: "stonehaven-city", to: "settlement-11", kind: "main-trail", mapId: "route_stonehaven_seawick", mapSections: ["route_stonehaven_seawick"] },
         { id: "route-11-12", from: "settlement-11", to: "settlement-12", kind: "main-trail", mapId: null, mapSections: [] },
         { id: "route-12-gullhaven", from: "settlement-12", to: "gullhaven-city", kind: "main-trail", mapId: null, mapSections: [] },
         { id: "route-gullhaven-13", from: "gullhaven-city", to: "settlement-13", kind: "main-trail", mapId: null, mapSections: [] },

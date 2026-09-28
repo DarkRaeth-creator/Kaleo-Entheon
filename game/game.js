@@ -608,10 +608,68 @@ const maps = {
         spawn: { x: 14.5, y: 15.5 },
         exits: [
             { x: 14, y: 0, targetMap: "route_westmere_dunridge", targetX: 14.5, targetY: 15.5, message: "You leave Westmere behind and follow the Main Trail toward Dunridge." },
-            { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 2." }
+            { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 2." },
+            { x: 0, y: 8, targetMap: "route_settlement3_greenvale", targetX: 28.5, targetY: 8.5, message: "A side trail leads southwest toward Greenvale." }
         ],
         encounters: [],
         npcs: []
+    },
+
+    route_settlement3_greenvale: {
+        name: "Westmere → Greenvale — Southern Trail",
+        data: [
+            "##############################",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "D.............GGGG...........#",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 28.5, y: 8.5 },
+        exits: [
+            { x: 0, y: 8, targetMap: "westmere_settlement3", targetX: 1.5, targetY: 8.5, message: "You return to Settlement 3." },
+            { x: 29, y: 8, targetMap: "greenvale_settlement4", targetX: 1.5, targetY: 8.5, message: "You arrive at Settlement 4 in Greenvale." }
+        ],
+        encounters: []
+    },
+
+    greenvale_settlement4: {
+        name: "Greenvale — Settlement 4",
+        data: [
+            "##############################",
+            "#............................#",
+            "#............................#",
+            "#....GGGG....................#",
+            "#....GGGG....................#",
+            "#............................#",
+            "#............................#",
+            "#...........TT...............#",
+            "#...........TT...............D",
+            "#............................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 1.5, y: 8.5 },
+        exits: [
+            { x: 29, y: 8, targetMap: "route_settlement3_greenvale", targetX: 1.5, targetY: 8.5, message: "You return toward Settlement 3." }
+        ],
+        encounters: []
     },
 
     route_westmere_dunridge: {
@@ -783,10 +841,68 @@ const maps = {
         spawn: { x: 14.5, y: 15.5 },
         exits: [
             { x: 14, y: 0, targetMap: "route_stonehaven_highreach", targetX: 14.5, targetY: 15.5, message: "You leave Stonehaven and follow the trail toward Highreach." },
-            { x: 14, y: 16, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to the Dunridge settlement." }
+            { x: 14, y: 16, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to the Dunridge settlement." },
+            { x: 0, y: 7, targetMap: "route_stonehaven_seawick", targetX: 28.5, targetY: 7.5, message: "A western coastal trail leads toward Seawick." }
         ],
         encounters: [],
         npcs: []
+    },
+
+    route_stonehaven_seawick: {
+        name: "Stonehaven → Seawick — Coastal Trail",
+        data: [
+            "##############################",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "D...........................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#....................TT......#",
+            "#....................TT......#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 28.5, y: 7.5 },
+        exits: [
+            { x: 0, y: 7, targetMap: "stonehaven", targetX: 1.5, targetY: 7.5, message: "You return to Stonehaven." },
+            { x: 29, y: 7, targetMap: "seawick_settlement11", targetX: 1.5, targetY: 7.5, message: "You arrive at Settlement 11 in Seawick." }
+        ],
+        encounters: []
+    },
+
+    seawick_settlement11: {
+        name: "Seawick — Settlement 11",
+        data: [
+            "##############################",
+            "#............................#",
+            "#........VVVV................#",
+            "#........VVVV................#",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "#............................D",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#....................TT......#",
+            "#....................TT......#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 1.5, y: 7.5 },
+        exits: [
+            { x: 29, y: 7, targetMap: "route_stonehaven_seawick", targetX: 1.5, targetY: 7.5, message: "You return toward Stonehaven." }
+        ],
+        encounters: []
     },
 
     route_stonehaven_highreach: {
@@ -1508,10 +1624,21 @@ function updatePlayer(delta) {
         player.y = newY;
     }
 
-    const minX = 0.55;
-    const maxX = getMapWidth() - 1.55;
-    const minY = 0.55;
-    const maxY = getMapHeight() - 0.55;
+    // Boundary exits need to be reachable at the edge of the map.
+    // Ordinary walls stay inset, but an exit on a boundary extends the
+    // playable clamp all the way to the centre of that doorway tile.
+    const exits = currentMap.exits || [];
+    const mapWidth = getMapWidth();
+    const mapHeight = getMapHeight();
+    const hasWestExit = exits.some(exit => exit.x === 0);
+    const hasEastExit = exits.some(exit => exit.x === mapWidth - 1);
+    const hasNorthExit = exits.some(exit => exit.y === 0);
+    const hasSouthExit = exits.some(exit => exit.y === mapHeight - 1);
+
+    const minX = hasWestExit ? 0.5 : 0.55;
+    const maxX = hasEastExit ? mapWidth - 0.5 : mapWidth - 1.55;
+    const minY = hasNorthExit ? 0.5 : 0.55;
+    const maxY = hasSouthExit ? mapHeight - 0.5 : mapHeight - 0.55;
 
     player.x = Math.max(minX, Math.min(maxX, player.x));
     player.y = Math.max(minY, Math.min(maxY, player.y));
