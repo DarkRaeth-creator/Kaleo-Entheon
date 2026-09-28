@@ -782,7 +782,182 @@ const maps = {
         ],
         spawn: { x: 14.5, y: 15.5 },
         exits: [
+            { x: 14, y: 0, targetMap: "route_stonehaven_highreach", targetX: 14.5, targetY: 15.5, message: "You leave Stonehaven and follow the trail toward Highreach." },
             { x: 14, y: 16, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to the Dunridge settlement." }
+        ],
+        encounters: [],
+        npcs: []
+    },
+
+    route_stonehaven_highreach: {
+        name: "Dunridge → Highreach — Mountain Trail",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to Stonehaven." },
+            { x: 14, y: 0, targetMap: "highreach_settlement1", targetX: 14.5, targetY: 15.5, message: "You cross into Highreach." }
+        ],
+        encounters: []
+    },
+
+    highreach_settlement1: {
+        name: "Highreach — Settlement 1",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#............................#",
+            "#......TT....................#",
+            "#......TT....................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_stonehaven_highreach", targetX: 14.5, targetY: 1.5, message: "You return toward Stonehaven." },
+            { x: 14, y: 0, targetMap: "route_highreach_settlement1_2", targetX: 14.5, targetY: 15.5, message: "The trail continues deeper into Highreach." }
+        ],
+        encounters: []
+    },
+
+    route_highreach_settlement1_2: {
+        name: "Highreach — Mountain Trail",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "highreach_settlement1", targetX: 14.5, targetY: 1.5, message: "You return to the previous Highreach settlement." },
+            { x: 14, y: 0, targetMap: "highreach_settlement2", targetX: 14.5, targetY: 15.5, message: "You arrive at another Highreach settlement." }
+        ],
+        encounters: []
+    },
+
+    highreach_settlement2: {
+        name: "Highreach — Settlement 2",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#............................#",
+            "#........TT..................#",
+            "#........TT..................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_highreach_settlement1_2", targetX: 14.5, targetY: 1.5, message: "You return to the previous Highreach settlement." },
+            { x: 14, y: 0, targetMap: "route_highreach_thermalis", targetX: 14.5, targetY: 15.5, message: "The trail descends toward Thermalis." }
+        ],
+        encounters: []
+    },
+
+    route_highreach_thermalis: {
+        name: "Highreach — Trail to Thermalis",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "highreach_settlement2", targetX: 14.5, targetY: 1.5, message: "You return to the Highreach settlement." },
+            { x: 14, y: 0, targetMap: "thermalis_city", targetX: 14.5, targetY: 15.5, message: "You arrive in Thermalis." }
+        ],
+        encounters: []
+    },
+
+    thermalis_city: {
+        name: "Thermalis",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_highreach_thermalis", targetX: 14.5, targetY: 1.5, message: "You return into Highreach." }
         ],
         encounters: [],
         npcs: []

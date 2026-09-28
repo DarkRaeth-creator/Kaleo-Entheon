@@ -104,7 +104,10 @@ const KALEO_WORLD = {
         { id: "westmere-settlement-3", region: "westmere", type: "settlement", name: "Settlement 3", mapId: "westmere_settlement3" },
         { id: "dunridge-settlement-east", region: "dunridge", type: "settlement", name: "Dunridge — Eastern Settlement", mapId: "dunridge_settlement2" },
         { id: "dunridge-settlement-southwest", region: "dunridge", type: "settlement", name: "Dunridge — Southwestern Settlement", mapId: "dunridge_settlement1" },
-        { id: "stonehaven", region: "dunridge", type: "major-city", name: "Stonehaven", mapId: "stonehaven" }
+        { id: "stonehaven", region: "dunridge", type: "major-city", name: "Stonehaven", mapId: "stonehaven" },
+        { id: "highreach-settlement-1", region: "highreach", type: "settlement", name: "Highreach — Settlement 1", mapId: "highreach_settlement1" },
+        { id: "highreach-settlement-2", region: "highreach", type: "settlement", name: "Highreach — Settlement 2", mapId: "highreach_settlement2" },
+        { id: "thermalis-city", region: "highreach", type: "major-city", name: "Thermalis", mapId: "thermalis_city", gymId: "thermalis-gym" }
     ],
 
     gyms: [
@@ -208,7 +211,10 @@ const KALEO_WORLD = {
             { id: "westmere-settlement-2-to-3", from: "westmere-settlement-2", to: "westmere-settlement-3", mapId: "route_settlement2_settlement3" },
             { id: "westmere-to-dunridge-east", from: "westmere-settlement-3", to: "dunridge-settlement-east", mapId: "route_westmere_dunridge" },
             { id: "dunridge-east-to-southwest", from: "dunridge-settlement-east", to: "dunridge-settlement-southwest", mapId: "route_dunridge_settlement2_stonehaven" },
-            { id: "dunridge-southwest-to-stonehaven", from: "dunridge-settlement-southwest", to: "stonehaven", mapId: "route_dunridge_settlement1_stonehaven" }
+            { id: "dunridge-southwest-to-stonehaven", from: "dunridge-settlement-southwest", to: "stonehaven", mapId: "route_dunridge_settlement1_stonehaven" },
+            { id: "stonehaven-to-highreach", from: "stonehaven", to: "highreach-settlement-1", mapId: "route_stonehaven_highreach" },
+            { id: "highreach-settlement-1-to-2", from: "highreach-settlement-1", to: "highreach-settlement-2", mapId: "route_highreach_settlement1_2" },
+            { id: "highreach-settlement-2-to-thermalis", from: "highreach-settlement-2", to: "thermalis-city", mapId: "route_highreach_thermalis" }
         ],
         secondaryTrails: [],
         ferryRoutes: [
