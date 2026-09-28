@@ -101,7 +101,10 @@ const KALEO_WORLD = {
         { id: "westmere-southern-settlement", region: "westmere", type: "settlement", name: "Westmere — Southern Settlement", mapId: "town" },
         { id: "everhope-city", region: "westmere", type: "major-city", name: "Everhope City", mapId: "everhope_city", gymId: "everhope-gym" },
         { id: "westmere-settlement-2", region: "westmere", type: "settlement", name: "Settlement 2", mapId: "westmere_settlement2" },
-        { id: "westmere-settlement-3", region: "westmere", type: "settlement", name: "Settlement 3", mapId: "westmere_settlement3" }
+        { id: "westmere-settlement-3", region: "westmere", type: "settlement", name: "Settlement 3", mapId: "westmere_settlement3" },
+        { id: "dunridge-settlement-east", region: "dunridge", type: "settlement", name: "Dunridge — Eastern Settlement", mapId: "dunridge_settlement2" },
+        { id: "dunridge-settlement-southwest", region: "dunridge", type: "settlement", name: "Dunridge — Southwestern Settlement", mapId: "dunridge_settlement1" },
+        { id: "stonehaven", region: "dunridge", type: "major-city", name: "Stonehaven", mapId: "stonehaven" }
     ],
 
     gyms: [
@@ -202,7 +205,10 @@ const KALEO_WORLD = {
         mainTrails: [
             { id: "westmere-south-to-everhope", from: "westmere-southern-settlement", to: "everhope-city", mapId: "route_south_everhope" },
             { id: "everhope-to-westmere-settlement-2", from: "everhope-city", to: "westmere-settlement-2", mapId: "route_everhope_settlement2" },
-            { id: "westmere-settlement-2-to-3", from: "westmere-settlement-2", to: "westmere-settlement-3", mapId: "route_settlement2_settlement3" }
+            { id: "westmere-settlement-2-to-3", from: "westmere-settlement-2", to: "westmere-settlement-3", mapId: "route_settlement2_settlement3" },
+            { id: "westmere-to-dunridge-east", from: "westmere-settlement-3", to: "dunridge-settlement-east", mapId: "route_westmere_dunridge" },
+            { id: "dunridge-east-to-southwest", from: "dunridge-settlement-east", to: "dunridge-settlement-southwest", mapId: "route_dunridge_settlement2_stonehaven" },
+            { id: "dunridge-southwest-to-stonehaven", from: "dunridge-settlement-southwest", to: "stonehaven", mapId: "route_dunridge_settlement1_stonehaven" }
         ],
         secondaryTrails: [],
         ferryRoutes: [

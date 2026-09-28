@@ -356,7 +356,8 @@ const maps = {
         // World skeleton connection: the southern Westmere settlement
         // connects northward to the route leading to Everhope City.
         exits: [
-            { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 14, targetY: 15, message: "You leave the southern Westmere settlement and follow the Main Trail toward Everhope City." }
+            { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 14.5, targetY: 15.5, message: "You leave the southern Westmere settlement and follow the Main Trail toward Everhope City." },
+            { x: 14, y: 7, targetMap: "research_center", targetX: 10.5, targetY: 9.5, message: "You enter the Entheon Research Center." }
         ],
         // Temporary encounter probabilities for the current starting area.
         // Species eligibility comes from Westmere's canonical regional list;
@@ -457,10 +458,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 14, y: 15 },
+        spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "town", targetX: 20, targetY: 1, message: "You return to the southern Westmere settlement." },
-            { x: 14, y: 0, targetMap: "everhope_city", targetX: 14, targetY: 15, message: "The Main Trail brings you to Everhope City." }
+            { x: 14, y: 16, targetMap: "town", targetX: 20.5, targetY: 1.5, message: "You return to the southern Westmere settlement." },
+            { x: 14, y: 0, targetMap: "everhope_city", targetX: 14.5, targetY: 15.5, message: "The Main Trail brings you to Everhope City." }
         ],
         encounters: []
     },
@@ -486,10 +487,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 14, y: 15 },
+        spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "route_south_everhope", targetX: 14, targetY: 1, message: "You head back toward the southern Westmere settlement." },
-            { x: 14, y: 0, targetMap: "route_everhope_settlement2", targetX: 14, targetY: 15, message: "You leave Everhope City along the Main Trail." }
+            { x: 14, y: 16, targetMap: "route_south_everhope", targetX: 14.5, targetY: 1.5, message: "You head back toward the southern Westmere settlement." },
+            { x: 14, y: 0, targetMap: "route_everhope_settlement2", targetX: 14.5, targetY: 15.5, message: "You leave Everhope City along the Main Trail." }
         ],
         encounters: [],
         npcs: []
@@ -516,10 +517,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 14, y: 15 },
+        spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "everhope_city", targetX: 14, targetY: 1, message: "You return to Everhope City." },
-            { x: 14, y: 0, targetMap: "westmere_settlement2", targetX: 14, targetY: 15, message: "You arrive at Settlement 2 in Westmere." }
+            { x: 14, y: 16, targetMap: "everhope_city", targetX: 14.5, targetY: 1.5, message: "You return to Everhope City." },
+            { x: 14, y: 0, targetMap: "westmere_settlement2", targetX: 14.5, targetY: 15.5, message: "You arrive at Settlement 2 in Westmere." }
         ],
         encounters: []
     },
@@ -545,10 +546,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 14, y: 15 },
+        spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "route_everhope_settlement2", targetX: 14, targetY: 1, message: "You return toward Everhope City." },
-            { x: 14, y: 0, targetMap: "route_settlement2_settlement3", targetX: 14, targetY: 15, message: "You leave Settlement 2 along the Main Trail." }
+            { x: 14, y: 16, targetMap: "route_everhope_settlement2", targetX: 14.5, targetY: 1.5, message: "You return toward Everhope City." },
+            { x: 14, y: 0, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 15.5, message: "You leave Settlement 2 along the Main Trail." }
         ],
         encounters: [],
         npcs: []
@@ -575,10 +576,10 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 14, y: 15 },
+        spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "westmere_settlement2", targetX: 14, targetY: 1, message: "You return to Settlement 2." },
-            { x: 14, y: 0, targetMap: "westmere_settlement3", targetX: 14, targetY: 15, message: "You arrive at Settlement 3 in Westmere." }
+            { x: 14, y: 16, targetMap: "westmere_settlement2", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 2." },
+            { x: 14, y: 0, targetMap: "westmere_settlement3", targetX: 14.5, targetY: 15.5, message: "You arrive at Settlement 3 in Westmere." }
         ],
         encounters: []
     },
@@ -604,9 +605,183 @@ const maps = {
             "#...........GGGG.............#",
             "##############D###############"
         ],
-        spawn: { x: 14, y: 15 },
+        spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14, targetY: 1, message: "You return to Settlement 2." }
+            { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 2." }
+        ],
+        encounters: [],
+        npcs: []
+    },
+
+    route_westmere_dunridge: {
+        name: "Dunridge — Main Trail",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 0, targetMap: "dunridge_settlement2", targetX: 14.5, targetY: 15.5, message: "You arrive at a Dunridge settlement." },
+            { x: 14, y: 16, targetMap: "westmere_settlement3", targetX: 14.5, targetY: 1.5, message: "You return toward Westmere." }
+        ],
+        encounters: []
+    },
+
+    dunridge_settlement2: {
+        name: "Dunridge — Settlement 2",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#....GGGG....................#",
+            "#....GGGG....................#",
+            "#....GGGG....................#",
+            "#....GGGG....................#",
+            "#............................#",
+            "#........TT..................#",
+            "#........TT..................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 0, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 15.5, message: "The Main Trail continues toward Stonehaven." },
+            { x: 14, y: 16, targetMap: "route_westmere_dunridge", targetX: 14.5, targetY: 1.5, message: "You return toward Westmere." }
+        ],
+        encounters: []
+    },
+
+    route_dunridge_settlement2_stonehaven: {
+        name: "Dunridge — Main Trail",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 0, targetMap: "dunridge_settlement1", targetX: 14.5, targetY: 15.5, message: "You arrive at another Dunridge settlement." },
+            { x: 14, y: 16, targetMap: "dunridge_settlement2", targetX: 14.5, targetY: 1.5, message: "You return to the eastern Dunridge settlement." }
+        ],
+        encounters: []
+    },
+
+    dunridge_settlement1: {
+        name: "Dunridge — Southwestern Settlement",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#....GGGG....................#",
+            "#....GGGG....................#",
+            "#....GGGG....................#",
+            "#....GGGG....................#",
+            "#............................#",
+            "#........TT..................#",
+            "#........TT..................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 0, targetMap: "route_dunridge_settlement1_stonehaven", targetX: 14.5, targetY: 15.5, message: "The trail continues north toward Stonehaven." },
+            { x: 14, y: 16, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to the eastern Dunridge settlement." }
+        ],
+        encounters: []
+    },
+
+    route_dunridge_settlement1_stonehaven: {
+        name: "Dunridge — Trail to Stonehaven",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 0, targetMap: "stonehaven", targetX: 14.5, targetY: 15.5, message: "You arrive at Stonehaven." },
+            { x: 14, y: 16, targetMap: "dunridge_settlement1", targetX: 14.5, targetY: 1.5, message: "You return to the southwestern Dunridge settlement." }
+        ],
+        encounters: []
+    },
+
+    stonehaven: {
+        name: "Stonehaven",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to the Dunridge settlement." }
         ],
         encounters: [],
         npcs: []
@@ -629,7 +804,9 @@ const maps = {
             "####################"
         ],
         spawn: { x: 12, y: 9 },
-        exit: { x: 10, y: 10, targetMap: "town", targetX: 20, targetY: 7 },
+        exits: [
+            { x: 10, y: 10, targetMap: "town", targetX: 14.5, targetY: 7.5, message: "You step back outside into the southern Westmere settlement." }
+        ],
         npcs: [
             {
                 id: "researcher",
@@ -798,7 +975,7 @@ function startOverworld() {
     gameState.encounterCooldown = 0;
     gameState.battle = null;
 
-    loadMap("town", 4, 25);
+    loadMap("town", 4.5, 25.5);
 
     introScreen.classList.add("hidden");
     overworldScreen.classList.remove("hidden");
@@ -812,6 +989,30 @@ function startOverworld() {
     cancelAnimationFrame(animationFrame);
     lastTime = performance.now();
     animationFrame = requestAnimationFrame(gameLoop);
+}
+
+function findSafeSpawn(x, y) {
+    const candidates = [
+        [x, y],
+        [x, y + 0.55],
+        [x, y - 0.55],
+        [x + 0.55, y],
+        [x - 0.55, y],
+        [x, y + 1],
+        [x, y - 1],
+        [x + 1, y],
+        [x - 1, y]
+    ];
+
+    for (const [cx, cy] of candidates) {
+        if (canMoveTo(cx, cy)) {
+            return { x: cx, y: cy };
+        }
+    }
+
+    // Last resort: use the requested location. This should only be reached
+    // if a future map designer creates a completely enclosed spawn area.
+    return { x, y };
 }
 
 function loadMap(mapId, spawnX = null, spawnY = null) {
@@ -828,8 +1029,11 @@ function loadMap(mapId, spawnX = null, spawnY = null) {
         keys[key] = false;
     });
 
-    if (spawnX !== null) player.x = spawnX;
-    if (spawnY !== null) player.y = spawnY;
+    if (spawnX !== null && spawnY !== null) {
+        const safe = findSafeSpawn(spawnX, spawnY);
+        player.x = safe.x;
+        player.y = safe.y;
+    }
 
     // Give the player a short grace period after entering a new map.
     gameState.transitionCooldown = 350;
@@ -982,52 +1186,26 @@ function getTile(x, y) {
 // ============================================================
 
 function checkAutomaticTransitions() {
-    const tileX = Math.floor(player.x);
-    const tileY = Math.floor(player.y);
-    const tile = getTile(tileX, tileY);
-
-    if (tile !== TILE.DOOR) {
-        return;
-    }
-
-    // World-map connections are data-driven. Each prototype area declares
-    // its exits so the geographical skeleton can grow without hard-coding
-    // every settlement/route pair into the movement system.
+    // Check the centre of each door tile rather than relying only on
+    // Math.floor(player.x/y). This makes boundary doors reliable even when
+    // collision radius or movement speed changes slightly.
     const exits = currentMap.exits || [];
-    const worldExit = exits.find(exit => exit.x === tileX && exit.y === tileY);
-
-    if (worldExit) {
-        transitionTo(
-            worldExit.targetMap,
-            worldExit.targetX,
-            worldExit.targetY,
-            worldExit.message
+    const worldExit = exits.find(exit => {
+        const distance = Math.hypot(
+            player.x - (exit.x + 0.5),
+            player.y - (exit.y + 0.5)
         );
-        return;
-    }
+        return distance <= (exit.triggerRadius || 0.62);
+    });
 
-    if (gameState.currentMap === "town") {
-        transitionTo(
-            "research_center",
-            12,
-            9,
-            "You enter the Entheon Research Center."
-        );
-        return;
-    }
+    if (!worldExit) return;
 
-    if (gameState.currentMap === "research_center") {
-        const exit = currentMap.exit;
-
-        if (exit) {
-            transitionTo(
-                exit.targetMap,
-                exit.targetX,
-                exit.targetY,
-                "You step back outside into the southern Westmere settlement."
-            );
-        }
-    }
+    transitionTo(
+        worldExit.targetMap,
+        worldExit.targetX,
+        worldExit.targetY,
+        worldExit.message
+    );
 }
 
 
@@ -3047,7 +3225,7 @@ function restartGame() {
 
     // Reset world-state changes made during the previous playthrough.
     Object.values(maps).forEach(map => {
-        map.npcs.forEach(npc => {
+        (map.npcs || []).forEach(npc => {
             if (npc.type === "starter") npc.chosen = false;
         });
     });
