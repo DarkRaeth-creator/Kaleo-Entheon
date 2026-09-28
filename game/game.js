@@ -607,6 +607,7 @@ const maps = {
         ],
         spawn: { x: 14.5, y: 15.5 },
         exits: [
+            { x: 14, y: 0, targetMap: "route_westmere_dunridge", targetX: 14.5, targetY: 15.5, message: "You leave Westmere behind and follow the Main Trail toward Dunridge." },
             { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 2." }
         ],
         encounters: [],
