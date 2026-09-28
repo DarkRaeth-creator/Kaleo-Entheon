@@ -42,6 +42,9 @@ const gameState = {
     activeDialogue: null,
     dialogueIndex: 0,
     currentMap: "town",
+    ferryReturnMap: null,
+    ferryReturnX: null,
+    ferryReturnY: null,
     transitionCooldown: 0,
     encounterCooldown: 0,
     battle: null,
@@ -552,7 +555,23 @@ const maps = {
             { x: 14, y: 0, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 15.5, message: "You leave Settlement 2 along the Main Trail." }
         ],
         encounters: [],
-        npcs: []
+        npcs: [
+            {
+                id: "lume-ferry-settlement2",
+                type: "ferry",
+                interaction: "ferry",
+                name: "Lume Ferrymaster",
+                x: 22,
+                y: 8,
+                color: "#4f8fb5",
+                destinationMap: "lume_city",
+                destinationX: 14.5,
+                destinationY: 15.5,
+                returnX: 14.5,
+                returnY: 8.5,
+                lines: ["The ferry to Lume is ready to depart."]
+            }
+        ]
     },
 
     route_settlement2_settlement3: {
@@ -591,11 +610,11 @@ const maps = {
             "#............................#",
             "#............................#",
             "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
             "D...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
             "#...........GGGG.............#",
             "#...........GGGG.............#",
             "#...........GGGG.............#",
@@ -626,7 +645,7 @@ const maps = {
             "#............................#",
             "#............................#",
             "#..............GGGG..........#",
-            "D.............GGGG...........#",
+            "D.............GGGG...........D",
             "#............................#",
             "#............................#",
             "#........GGGG................#",
@@ -858,7 +877,7 @@ const maps = {
             "#............................#",
             "#....TT......................#",
             "#....TT......................#",
-            "D...........................#",
+            "D............................D",
             "#..............GGGG..........#",
             "#..............GGGG..........#",
             "#............................#",
@@ -887,7 +906,7 @@ const maps = {
             "#............................#",
             "#....TT......................#",
             "#....TT......................#",
-            "#............................D",
+            "D............................D",
             "#..............GGGG..........#",
             "#..............GGGG..........#",
             "#............................#",
@@ -900,7 +919,8 @@ const maps = {
         ],
         spawn: { x: 1.5, y: 7.5 },
         exits: [
-            { x: 29, y: 7, targetMap: "route_stonehaven_seawick", targetX: 1.5, targetY: 7.5, message: "You return toward Stonehaven." }
+            { x: 0, y: 7, targetMap: "route_stonehaven_seawick", targetX: 1.5, targetY: 7.5, message: "You return toward Stonehaven." },
+            { x: 29, y: 7, targetMap: "route_11_12", targetX: 1.5, targetY: 1.5, message: "The coastal road continues toward Settlement 12." }
         ],
         encounters: []
     },
@@ -1100,7 +1120,7 @@ const maps = {
             "#............................#",
             "#............................#",
             "#............................#",
-            "############################D"
+            "#############################D"
         ],
         spawn: { x: 1.5, y: 8.5 },
         exits: [
@@ -1223,7 +1243,352 @@ const maps = {
             { x: 14, y: 16, targetMap: "route_17_18", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 17." },
             { x: 14, y: 0, targetMap: "route_18_19", targetX: 14.5, targetY: 15.5, message: "The trail continues toward Settlement 19." }
         ],
+        encounters: [],
+        npcs: [
+            {
+                id: "lume-ferry-settlement18",
+                type: "ferry",
+                interaction: "ferry",
+                name: "Lume Ferrymaster",
+                x: 22,
+                y: 8,
+                color: "#4f8fb5",
+                destinationMap: "lume_city",
+                destinationX: 14.5,
+                destinationY: 15.5,
+                returnX: 14.5,
+                returnY: 8.5,
+                lines: ["The ferry to Lume is ready to depart."]
+            }
+        ]
+    },
+
+    route_11_12: {
+        name: "Seawick — Coastal Trail to Settlement 12",
+        data: [
+            "##############################",
+            "D............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "#..............GGGG..........D",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#....................TT......#",
+            "#....................TT......#",
+            "#............................#",
+            "#...........GGGG.............#",
+            "#...........GGGG.............#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 1.5, y: 1.5 },
+        exits: [
+            { x: 0, y: 1, targetMap: "seawick_settlement11", targetX: 28.5, targetY: 7.5, message: "You return to Settlement 11." },
+            { x: 29, y: 7, targetMap: "seawick_settlement12", targetX: 1.5, targetY: 7.5, message: "You arrive at Settlement 12." }
+        ],
         encounters: []
+    },
+
+    seawick_settlement12: {
+        name: "Seawick — Settlement 12",
+        data: [
+            "##############################",
+            "#............................#",
+            "#........VVVV................#",
+            "#........VVVV................#",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "D..............GGGG..........D",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#....................TT......#",
+            "#....................TT......#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 1.5, y: 7.5 },
+        exits: [
+            { x: 0, y: 7, targetMap: "route_11_12", targetX: 28.5, targetY: 7.5, message: "You return toward Settlement 11." },
+            { x: 29, y: 7, targetMap: "route_12_gullhaven", targetX: 1.5, targetY: 7.5, message: "The road continues toward Gullhaven." }
+        ],
+        encounters: []
+    },
+
+    route_12_gullhaven: {
+        name: "Seawick — Trail to Gullhaven",
+        data: [
+            "##############################",
+            "D............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................D",
+            "#....TT......................#",
+            "#....TT......................#",
+            "#............................#",
+            "#....................VVVV....#",
+            "#....................VVVV....#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 1.5, y: 1.5 },
+        exits: [
+            { x: 0, y: 1, targetMap: "seawick_settlement12", targetX: 28.5, targetY: 7.5, message: "You return to Settlement 12." },
+            { x: 29, y: 7, targetMap: "gullhaven_city", targetX: 14.5, targetY: 15.5, message: "You arrive at Gullhaven." }
+        ],
+        encounters: []
+    },
+
+    gullhaven_city: {
+        name: "Gullhaven",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_12_gullhaven", targetX: 14.5, targetY: 1.5, message: "You return toward Settlement 12." }
+        ],
+        encounters: [],
+        npcs: []
+    },
+
+    route_18_19: {
+        name: "Northvale — Trail to Settlement 19",
+        data: [
+            "##############################",
+            "D............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#................GGGG........#",
+            "#................GGGG........D",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "#............................#",
+            "#..............VVVV..........#",
+            "#..............VVVV..........#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 1.5, y: 1.5 },
+        exits: [
+            { x: 0, y: 1, targetMap: "northvale_settlement18", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 18." },
+            { x: 29, y: 7, targetMap: "northvale_settlement19", targetX: 1.5, targetY: 7.5, message: "You arrive at Settlement 19." }
+        ],
+        encounters: []
+    },
+
+    northvale_settlement19: {
+        name: "Northvale — Settlement 19",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "D.............GGGG...........D",
+            "#.............GGGG...........#",
+            "#............................#",
+            "#............................#",
+            "#....TT......................#",
+            "#....TT......................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 1.5, y: 6.5 },
+        exits: [
+            { x: 14, y: 0, targetMap: "route_19_winterhold", targetX: 14.5, targetY: 15.5, message: "The northern trail climbs toward Winterhold in Isen." },
+            { x: 29, y: 6, targetMap: "route_19_northreach", targetX: 1.5, targetY: 7.5, message: "The road leads toward Northreach." }
+        ],
+        encounters: []
+    },
+
+    route_19_northreach: {
+        name: "Northvale — Trail to Northreach",
+        data: [
+            "##############################",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "D..............GGGG..........D",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#....................TT......#",
+            "#....................TT......#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############################"
+        ],
+        spawn: { x: 28.5, y: 7.5 },
+        exits: [
+            { x: 0, y: 7, targetMap: "northvale_settlement19", targetX: 28.5, targetY: 6.5, message: "You return to Settlement 19." },
+            { x: 29, y: 7, targetMap: "northreach_city", targetX: 14.5, targetY: 15.5, message: "You arrive at Northreach." }
+        ],
+        encounters: []
+    },
+
+    route_19_winterhold: {
+        name: "Isen — Trail to Winterhold",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#........TTTT................#",
+            "#........TTTT................#",
+            "#............................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#....VVVV....................#",
+            "#....VVVV....................#",
+            "#............................#",
+            "#....................TTTT....#",
+            "#....................TTTT....#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "northvale_settlement19", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 19." },
+            { x: 14, y: 0, targetMap: "winterhold_city", targetX: 14.5, targetY: 15.5, message: "You arrive in Winterhold." }
+        ],
+        encounters: []
+    },
+
+    northreach_city: {
+        name: "Northreach",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_19_northreach", targetX: 1.5, targetY: 7.5, message: "You return toward Settlement 19." }
+        ],
+        encounters: [],
+        npcs: []
+    },
+
+    winterhold_city: {
+        name: "Winterhold",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#........TTTT................#",
+            "#........TTTT................#",
+            "#............................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#....VVVV....................#",
+            "#....VVVV....................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [
+            { x: 14, y: 16, targetMap: "route_19_winterhold", targetX: 14.5, targetY: 1.5, message: "You return toward Settlement 19." }
+        ],
+        encounters: [],
+        npcs: []
+    },
+
+    lume_city: {
+        name: "Lume",
+        data: [
+            "##############D###############",
+            "#............................#",
+            "#............................#",
+            "#........GGGG................#",
+            "#........GGGG................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#..............GGGG..........#",
+            "#..............GGGG..........#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "#............................#",
+            "##############D###############"
+        ],
+        spawn: { x: 14.5, y: 15.5 },
+        exits: [],
+        encounters: [],
+        npcs: [
+            {
+                id: "lume-ferry-return",
+                type: "ferry_return",
+                interaction: "ferry_return",
+                name: "Lume Ferrymaster",
+                x: 18,
+                y: 8,
+                color: "#4f8fb5",
+                lines: ["I can arrange your return ferry to your previous port."]
+            }
+        ]
     },
 
     route_15_hot_springs: {
@@ -1277,7 +1642,7 @@ const maps = {
         ],
         spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "route_highreach_thermalis", targetX: 14.5, targetY: 1.5, message: "You return into Highreach." }
+            { x: 14, y: 16, targetMap: "route_highreach_16_thermalis", targetX: 14.5, targetY: 1.5, message: "You return into Highreach." }
         ],
         encounters: [],
         npcs: []
@@ -3246,12 +3611,59 @@ function handleNpcInteraction(npc) {
 
         case "professor":
         case "dialogue":
+        case "ferry":
+            useLumeFerry(npc);
+            return;
+
+        case "ferry_return":
+            returnFromLumeFerry();
+            return;
+
         case "merchant":
         case "trainer":
         default:
             openNpcDialogue(npc);
             return;
     }
+}
+
+function useLumeFerry(npc) {
+    const targetMap = npc.destinationMap || "lume_city";
+
+    if (!maps[targetMap]) {
+        showWorldMessage("The ferry service to Lume is planned, but Lume is not yet available in this build.");
+        return;
+    }
+
+    const confirmed = window.confirm("Take the ferry to Lume?");
+    if (!confirmed) return;
+
+    gameState.ferryReturnMap = gameState.currentMap;
+    gameState.ferryReturnX = npc.returnX ?? player.x;
+    gameState.ferryReturnY = npc.returnY ?? player.y;
+
+    transitionTo(
+        targetMap,
+        npc.destinationX ?? 14.5,
+        npc.destinationY ?? 15.5,
+        "You board the ferry and sail to Lume."
+    );
+}
+
+function returnFromLumeFerry() {
+    if (!gameState.ferryReturnMap || !maps[gameState.ferryReturnMap]) {
+        showWorldMessage("The return ferry route is not available yet.");
+        return;
+    }
+
+    const confirmed = window.confirm("Return by ferry to your previous port?");
+    if (!confirmed) return;
+
+    const targetMap = gameState.ferryReturnMap;
+    const targetX = gameState.ferryReturnX ?? 14.5;
+    const targetY = gameState.ferryReturnY ?? 15.5;
+
+    transitionTo(targetMap, targetX, targetY, "The ferry carries you back to your previous port.");
 }
 
 function interact() {

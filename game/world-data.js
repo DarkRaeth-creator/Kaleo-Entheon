@@ -54,8 +54,8 @@ const KALEO_WORLD = {
 
         // Seawick
         { id: "settlement-11", number: 11, region: "seawick", type: "settlement", name: "Settlement 11", mapId: "seawick_settlement11" },
-        { id: "settlement-12", number: 12, region: "seawick", type: "settlement", name: "Settlement 12", mapId: null },
-        { id: "gullhaven-city", region: "seawick", type: "major-city", name: "Gullhaven", mapId: null, gymId: "gullhaven-gym" },
+        { id: "settlement-12", number: 12, region: "seawick", type: "settlement", name: "Settlement 12", mapId: "seawick_settlement12" },
+        { id: "gullhaven-city", region: "seawick", type: "major-city", name: "Gullhaven", mapId: "gullhaven_city", gymId: "gullhaven-gym" },
         { id: "settlement-13", number: 13, region: "seawick", type: "settlement", name: "Settlement 13", mapId: null },
 
         // Highreach
@@ -67,11 +67,11 @@ const KALEO_WORLD = {
         // Northvale
         { id: "settlement-17", number: 17, region: "northvale", type: "settlement", name: "Settlement 17", mapId: "northvale_settlement17" },
         { id: "settlement-18", number: 18, region: "northvale", type: "settlement", name: "Settlement 18", mapId: "northvale_settlement18", portTo: "lume-city" },
-        { id: "settlement-19", number: 19, region: "northvale", type: "settlement", name: "Settlement 19", mapId: null },
-        { id: "northreach-city", region: "northvale", type: "major-city", name: "Northreach", mapId: null, gymId: "northreach-gym" },
+        { id: "settlement-19", number: 19, region: "northvale", type: "settlement", name: "Settlement 19", mapId: "northvale_settlement19" },
+        { id: "northreach-city", region: "northvale", type: "major-city", name: "Northreach", mapId: "northreach_city", gymId: "northreach-gym" },
 
         // Isen
-        { id: "winterhold-city", region: "isen", type: "major-city", name: "Winterhold", mapId: null },
+        { id: "winterhold-city", region: "isen", type: "major-city", name: "Winterhold", mapId: "winterhold_city" },
 
         // Hawthorne
         { id: "settlement-20", number: 20, region: "hawthorne", type: "settlement", name: "Settlement 20", mapId: null },
@@ -87,7 +87,7 @@ const KALEO_WORLD = {
         { id: "settlement-24", number: 24, region: "eastmere", type: "settlement", name: "Settlement 24", mapId: null, portTo: "lume-city" },
 
         // Lume
-        { id: "lume-city", region: "lume", type: "major-city", name: "Lume", mapId: null }
+        { id: "lume-city", region: "lume", type: "major-city", name: "Lume", mapId: "lume_city" }
     ],
 
     // ========================================================
@@ -133,8 +133,8 @@ const KALEO_WORLD = {
 
         // Stonehaven -> Seawick
         { id: "route-stonehaven-11", from: "stonehaven-city", to: "settlement-11", kind: "main-trail", mapId: "route_stonehaven_seawick", mapSections: ["route_stonehaven_seawick"] },
-        { id: "route-11-12", from: "settlement-11", to: "settlement-12", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-12-gullhaven", from: "settlement-12", to: "gullhaven-city", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-11-12", from: "settlement-11", to: "settlement-12", kind: "main-trail", mapId: "route_11_12", mapSections: ["route_11_12"] },
+        { id: "route-12-gullhaven", from: "settlement-12", to: "gullhaven-city", kind: "main-trail", mapId: "route_12_gullhaven", mapSections: ["route_12_gullhaven"] },
         { id: "route-gullhaven-13", from: "gullhaven-city", to: "settlement-13", kind: "main-trail", mapId: null, mapSections: [] },
 
         // Stonehaven -> Highreach
@@ -151,9 +151,9 @@ const KALEO_WORLD = {
 
         // Northvale
         { id: "route-17-18", from: "settlement-17", to: "settlement-18", kind: "main-trail", mapId: "route_17_18", mapSections: ["route_17_18"] },
-        { id: "route-18-19", from: "settlement-18", to: "settlement-19", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-19-northreach", from: "settlement-19", to: "northreach-city", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-19-winterhold", from: "settlement-19", to: "winterhold-city", kind: "secondary-trail", mapId: null, mapSections: [] },
+        { id: "route-18-19", from: "settlement-18", to: "settlement-19", kind: "main-trail", mapId: "route_18_19", mapSections: ["route_18_19"] },
+        { id: "route-19-northreach", from: "settlement-19", to: "northreach-city", kind: "main-trail", mapId: "route_19_northreach", mapSections: ["route_19_northreach"] },
+        { id: "route-19-winterhold", from: "settlement-19", to: "winterhold-city", kind: "secondary-trail", mapId: "route_19_winterhold", mapSections: ["route_19_winterhold"] },
         { id: "route-northreach-20", from: "northreach-city", to: "settlement-20", kind: "main-trail", mapId: null, mapSections: [] },
 
         // Hawthorne
