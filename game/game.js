@@ -3611,6 +3611,9 @@ function handleNpcInteraction(npc) {
 
         case "professor":
         case "dialogue":
+            openNpcDialogue(npc);
+            return;
+
         case "ferry":
             useLumeFerry(npc);
             return;
