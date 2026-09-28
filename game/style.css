@@ -42,7 +42,33 @@ body {
 
 .game-header h1 { margin: 0; font-size: 28px; }
 .game-header p { margin: 6px 0 0; color: #bdbdc8; }
-#status-bar { color: #bdbdc8; font-size: 14px; white-space: nowrap; }
+#status-bar {
+    color: #d8d8e2;
+    font-size: 13px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#area-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border: 1px solid #555565;
+    border-radius: 999px;
+    background: #252530;
+    color: #f2f2f2;
+    font-weight: 700;
+}
+
+#area-status::before {
+    content: "⌖";
+    margin-right: 5px;
+    color: #9fc7ff;
+}
+
+.status-divider { color: #77778a; }
 
 .game-screen {
     padding: 14px;

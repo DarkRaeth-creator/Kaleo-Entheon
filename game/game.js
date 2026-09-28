@@ -919,7 +919,7 @@ function updatePlayer(delta) {
     const minX = 0.55;
     const maxX = getMapWidth() - 1.55;
     const minY = 0.55;
-    const maxY = getMapHeight() - 1.55;
+    const maxY = getMapHeight() - 0.55;
 
     player.x = Math.max(minX, Math.min(maxX, player.x));
     player.y = Math.max(minY, Math.min(maxY, player.y));
