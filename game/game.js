@@ -1755,94 +1755,42 @@ const maps = {
         data: [
             "########################",
             "#FFFFFFFFFFFFFFFFFFFFFF#",
-            "#FSSSSFFLLLLFFSSSSSSFF#",
-            "#FSSSSFFLLLLFFSSSSSSFF#",
+            "#FSSSSFFFFCCCCFFFFSSSSF#",
+            "#FSSSSFFFFCCCCFFFFSSSSF#",
+            "#FFFFF....LLLL....FFFFF#",
+            "#FFFFF....LLLL....FFFFF#",
+            "#FFFFF..CC....CC..FFFFF#",
             "#FFFFF.................#",
-            "#FFFFF..CC....CC.......#",
-            "#FFFFF..CC....CC.......#",
-            "#FFFFF.................#",
-            "#FSSS....LLLLLLLL....SSF#",
-            "#FSSS....LFFFFFFL....SSF#",
-            "#F......PLFFFFFFLP......#",
-            "#F......................#",
-            "#F..SSSS....CCCC....SSS#",
-            "#F..SSSS............SSS#",
-            "#F..........D...........#",
+            "#FFFF....LLLLLLLL....FF#",
+            "#FFFF....LFFFFFFL....FF#",
+            "#FSSS....LFFFFFFL....SF#",
+            "#FSSS................SF#",
+            "#F....P...CC....CC...PF#",
+            "#F.....................#",
+            "#F....SSSS....SSSS.....#",
+            "#F.....................#",
+            "#F.........D...........#",
             "########################"
         ],
-        spawn: { x: 12.5, y: 13.5 },
+        spawn: { x: 11.5, y: 15.5 },
         exits: [
-            { x: 12, y: 14, targetMap: "town", targetX: 14.5, targetY: 7.5, message: "You step back outside into the southern Westmere settlement." }
+            { x: 10, y: 16, targetMap: "town", targetX: 14.5, targetY: 7.5, message: "You step back outside into the southern Westmere settlement." }
         ],
         npcs: [
-            {
-                id: "researcher",
-                type: "researcher",
-                interaction: "professor",
-                name: "Researcher",
-                x: 5,
-                y: 7,
-                color: "#8b6bbd",
-                lines: [
-                    "Welcome to the Entheon Research Center.",
-                    "Today is an important day. You are ready to begin your journey through Kaleo.",
-                    "I have three young Entheon here who are ready to meet a new trainer.",
-                    "When you are ready, take a look at them and choose the companion you connect with."
-                ]
-            },
-            {
-                id: "starter-nimblet",
-                type: "starter",
-                species: "Nimblet",
-                name: "Nimblet",
-                x: 10,
-                y: 4,
-                color: "#d3a65f",
-                lines: [
-                    "Nimblet watches you curiously.",
-                    "It seems comfortable around you."
-                ]
-            },
-            {
-                id: "starter-pipiri",
-                type: "starter",
-                species: "Pipiri",
-                name: "Pipiri",
-                x: 12,
-                y: 4,
-                color: "#78a9d8",
-                lines: [
-                    "Pipiri looks up at you.",
-                    "It gives a small, energetic chirp."
-                ]
-            },
-            {
-                id: "starter-morrowe",
-                type: "starter",
-                species: "Morrowe",
-                name: "Morrowe",
-                x: 14,
-                y: 4,
-                color: "#6e5b82",
-                lines: [
-                    "Morrowe studies you quietly.",
-                    "There is something calm and watchful about it."
-                ]
-            },
-            {
-                id: "assistant",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Research Assistant",
-                x: 18,
-                y: 7,
-                color: "#5d9f9b",
-                lines: [
-                    "Most of our work involves observing Entheon in their natural habitats.",
-                    "The more trainers explore, the more we learn.",
-                    "Perhaps your journey will teach us something new."
-                ]
-            }
+            { id: "researcher", type: "researcher", interaction: "professor", name: "Researcher", x: 5, y: 7, color: "#8b6bbd", lines: [
+                "Welcome to the Entheon Research Center.",
+                "Today is an important day. You are ready to begin your journey through Kaleo.",
+                "I have three young Entheon here who are ready to meet a new trainer.",
+                "When you are ready, take a look at them and choose the companion you connect with."
+            ]},
+            { id: "starter-nimblet", type: "starter", species: "Nimblet", name: "Nimblet", x: 10, y: 4, color: "#d3a65f", lines: ["Nimblet watches you curiously.", "It seems comfortable around you."] },
+            { id: "starter-pipiri", type: "starter", species: "Pipiri", name: "Pipiri", x: 12, y: 4, color: "#78a9d8", lines: ["Pipiri looks up at you.", "It gives a small, energetic chirp."] },
+            { id: "starter-morrowe", type: "starter", species: "Morrowe", name: "Morrowe", x: 14, y: 4, color: "#6e5b82", lines: ["Morrowe studies you quietly.", "There is something calm and watchful about it."] },
+            { id: "assistant", type: "npc", interaction: "dialogue", name: "Research Assistant", x: 18, y: 7, color: "#5d9f9b", lines: [
+                "Most of our work involves observing Entheon in their natural habitats.",
+                "The more trainers explore, the more we learn.",
+                "Perhaps your journey will teach us something new."
+            ]}
         ]
     }
 };
