@@ -326,7 +326,12 @@ const TILE = {
     PATH: "G",
     WALL: "#",
     DOOR: "D",
-    TALL_GRASS: "V"
+    TALL_GRASS: "V",
+    FLOOR: "F",
+    SHELF: "S",
+    LAB: "L",
+    DISPLAY: "C",
+    PLANT: "P"
 };
 
 const maps = {
@@ -362,7 +367,7 @@ const maps = {
         spawn: { x: 20.5, y: 21.5 },
         exits: [
             { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 14.5, targetY: 15.5, message: "You leave Settlement 1 and follow the Main Trail toward Everhope City." },
-            { x: 20, y: 8, targetMap: "research_center", targetX: 10.5, targetY: 9.5, message: "You enter the Entheon Research Center." }
+            { x: 20, y: 8, targetMap: "research_center", targetX: 12.5, targetY: 13.5, message: "You enter the Entheon Research Center." }
         ],
         encounters: [],
         npcs: [
@@ -1746,23 +1751,28 @@ const maps = {
 
     research_center: {
         name: "Entheon Research Center",
+        handBuilt: true,
         data: [
-            "####################",
-            "#..................#",
-            "#..TT..............#",
-            "#..TT..............#",
-            "#..................#",
-            "#.....####.........#",
-            "#.....#..#.........#",
-            "#.....#..#.........#",
-            "#.....####.........#",
-            "#..................#",
-            "#.........D........#",
-            "####################"
+            "########################",
+            "#FFFFFFFFFFFFFFFFFFFFFF#",
+            "#FSSSSFFLLLLFFSSSSSSFF#",
+            "#FSSSSFFLLLLFFSSSSSSFF#",
+            "#FFFFF.................#",
+            "#FFFFF..CC....CC.......#",
+            "#FFFFF..CC....CC.......#",
+            "#FFFFF.................#",
+            "#FSSS....LLLLLLLL....SSF#",
+            "#FSSS....LFFFFFFL....SSF#",
+            "#F......PLFFFFFFLP......#",
+            "#F......................#",
+            "#F..SSSS....CCCC....SSS#",
+            "#F..SSSS............SSS#",
+            "#F..........D...........#",
+            "########################"
         ],
-        spawn: { x: 12, y: 9 },
+        spawn: { x: 12.5, y: 13.5 },
         exits: [
-            { x: 10, y: 10, targetMap: "town", targetX: 14.5, targetY: 7.5, message: "You step back outside into the southern Westmere settlement." }
+            { x: 12, y: 14, targetMap: "town", targetX: 14.5, targetY: 7.5, message: "You step back outside into the southern Westmere settlement." }
         ],
         npcs: [
             {
@@ -1770,8 +1780,8 @@ const maps = {
                 type: "researcher",
                 interaction: "professor",
                 name: "Researcher",
-                x: 6,
-                y: 4,
+                x: 5,
+                y: 7,
                 color: "#8b6bbd",
                 lines: [
                     "Welcome to the Entheon Research Center.",
@@ -1785,7 +1795,7 @@ const maps = {
                 type: "starter",
                 species: "Nimblet",
                 name: "Nimblet",
-                x: 9,
+                x: 10,
                 y: 4,
                 color: "#d3a65f",
                 lines: [
@@ -1798,7 +1808,7 @@ const maps = {
                 type: "starter",
                 species: "Pipiri",
                 name: "Pipiri",
-                x: 11,
+                x: 12,
                 y: 4,
                 color: "#78a9d8",
                 lines: [
@@ -1811,7 +1821,7 @@ const maps = {
                 type: "starter",
                 species: "Morrowe",
                 name: "Morrowe",
-                x: 13,
+                x: 14,
                 y: 4,
                 color: "#6e5b82",
                 lines: [
@@ -1824,8 +1834,8 @@ const maps = {
                 type: "npc",
                 interaction: "dialogue",
                 name: "Research Assistant",
-                x: 16,
-                y: 4,
+                x: 18,
+                y: 7,
                 color: "#5d9f9b",
                 lines: [
                     "Most of our work involves observing Entheon in their natural habitats.",
@@ -2006,7 +2016,7 @@ function ensureExitApproach(map, exit) {
     const isWalkable = (tx, ty) => {
         if (tx < 0 || tx >= width || ty < 0 || ty >= height) return false;
         const tile = rows[ty][tx];
-        return tile !== TILE.WALL && tile !== TILE.VOID && tile !== TILE.TREE && tile !== TILE.WATER;
+        return tile !== TILE.WALL && tile !== TILE.VOID && tile !== TILE.TREE && tile !== TILE.WATER && tile !== TILE.SHELF && tile !== TILE.LAB && tile !== TILE.DISPLAY;
     };
 
     // Carve only until we hit existing walkable terrain. This preserves the
@@ -2884,7 +2894,10 @@ function canMoveTo(x, y) {
         return tile !== TILE.WALL &&
                tile !== TILE.VOID &&
                tile !== TILE.TREE &&
-               tile !== TILE.WATER;
+               tile !== TILE.WATER &&
+               tile !== TILE.SHELF &&
+               tile !== TILE.LAB &&
+               tile !== TILE.DISPLAY;
     });
 
     if (!terrainClear) {
@@ -4888,6 +4901,57 @@ function drawTile(tile, x, y) {
         ctx.fillStyle = "#d7bf8d";
         ctx.fillRect(x + 5, y + 6, 3, 3);
         ctx.fillRect(x + 20, y + 20, 3, 3);
+    }
+
+    else if (tile === TILE.FLOOR) {
+        ctx.fillStyle = "#d9d5c8";
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        ctx.fillStyle = "#c9c4b5";
+        ctx.fillRect(x, y + 30, TILE_SIZE, 2);
+        ctx.fillRect(x + 30, y, 2, TILE_SIZE);
+    }
+
+    else if (tile === TILE.SHELF) {
+        ctx.fillStyle = "#5b4635";
+        ctx.fillRect(x + 3, y + 3, 26, 26);
+        ctx.fillStyle = "#9b7952";
+        ctx.fillRect(x + 6, y + 7, 20, 4);
+        ctx.fillRect(x + 6, y + 15, 20, 4);
+        ctx.fillRect(x + 6, y + 23, 20, 3);
+        ctx.fillStyle = "#d8c28d";
+        ctx.fillRect(x + 8, y + 5, 4, 3);
+        ctx.fillRect(x + 17, y + 13, 4, 3);
+    }
+
+    else if (tile === TILE.LAB) {
+        ctx.fillStyle = "#394958";
+        ctx.fillRect(x + 2, y + 4, 28, 24);
+        ctx.fillStyle = "#78a5b6";
+        ctx.fillRect(x + 5, y + 7, 22, 5);
+        ctx.fillStyle = "#26313b";
+        ctx.fillRect(x + 5, y + 16, 22, 9);
+        ctx.fillStyle = "#77d4bd";
+        ctx.fillRect(x + 9, y + 18, 4, 4);
+        ctx.fillRect(x + 18, y + 18, 4, 4);
+    }
+
+    else if (tile === TILE.DISPLAY) {
+        ctx.fillStyle = "#4b6170";
+        ctx.fillRect(x + 3, y + 5, 26, 22);
+        ctx.fillStyle = "#a9d9df";
+        ctx.fillRect(x + 6, y + 8, 20, 12);
+        ctx.fillStyle = "#6a91a1";
+        ctx.fillRect(x + 10, y + 22, 12, 3);
+    }
+
+    else if (tile === TILE.PLANT) {
+        ctx.fillStyle = "#7c5639";
+        ctx.fillRect(x + 12, y + 19, 8, 9);
+        ctx.fillStyle = "#4c9a5a";
+        ctx.beginPath();
+        ctx.arc(x + 11, y + 14, 7, 0, Math.PI * 2);
+        ctx.arc(x + 20, y + 12, 7, 0, Math.PI * 2);
+        ctx.fill();
     }
 
     else if (tile === TILE.TREE) {
