@@ -672,277 +672,656 @@ const maps = {
     },
 
     westmere_settlement2: {
-        name: "Westmere — Settlement 2",
-        handBuilt: true,
-        data: [' D############################ ', ' #...........................# ', ' #GT.#####..........#######T.# ', '  #G.#####..######..#######..# ', '  #.G#####..######.T#######..# ', '  #..##D##G.######..###D###..# ', '  #T.GG.....##D###...........# ', '  #.VG.G....................T# ', '  #..G..G.GGGGGGGGG..........# ', '  #..G...GGGGGGGGGG..........# ', 'DG#G......GGGGGGGGGGGGGGGGGGG# ', '  #G......GGGGGGGGG.####.....# ', '  #G.#####GGGGGGGGG.D###....T# ', '  #G.#####........G.####.....# ', '  #G.####D........GG####WWWWW# ', '  #G.#####...V..........WWWWW# ', '  #G.#####............GGGGGWW# ', '  #GT......T.....T....GGGGGWW# ', '    #...V...............WWWWW# ', '    #......................#   ', '    ########################   '],
-        spawn: { x: 14.5, y: 10.5 },
-        exits: [
-            { x: 1, y: 0, targetMap: "route_everhope_settlement2", targetX: 28.5, targetY: 16.5, message: "You head back along the northwestern trail toward Everhope City." },
-            { x: 0, y: 10, targetMap: "route_settlement2_settlement3", targetX: 28.5, targetY: 8.5, message: "You leave Settlement 2 by the western road toward Settlement 3." }
+        "name": "Westmere — Settlement 2",
+        "handBuilt": true,
+        "data": [
+                "...............G...............",
+                "...............G...............",
+                "..#######.#####G....########...",
+                ".T#######T#####G..T.########...",
+                "..#######.#####G....########.T.",
+                "..#######.#####G....########...",
+                "..#######.#####G....########...",
+                ".V...G......G..G..V....G.......",
+                ".........V.....G............V..",
+                ".......GGGGGGGGGGGGGGGGG.......",
+                "DGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+                "......GGGGGGGGGGGGGGGGGGGG.....",
+                ".....G.........G......G....T...",
+                "..#######......G....######.....",
+                "..#######......G....######.WWWW",
+                ".T#######.T....G....######.WWWW",
+                "..#######......G..T.######.WWWW",
+                "..#######......G....######.WWWW",
+                "..#######..V...G.V....GGGGGGGGW",
+                "...............G........GGGGGGW",
+                "...............G.............D."
         ],
-        encounters: [],
-        npcs: [
-            {
-                id: "settlement2-restoration",
-                type: "restoration",
-                interaction: "restoration",
-                name: "Restoration Attendant",
-                x: 22,
-                y: 13,
-                color: "#69a9a0",
-                lines: [
-                    "Welcome to Settlement 2's Restoration Hub.",
-                    "The ferry makes this a popular stopping point for travellers."
-                ]
-            },
-            {
-                id: "settlement2-merchant",
-                type: "merchant",
-                interaction: "merchant",
-                name: "Market Merchant",
-                x: 23,
-                y: 6,
-                color: "#b88a52",
-                lines: [
-                    "Fresh supplies, ferry snacks and travel gear — all in one place.",
-                    "Lume traders bring half their stock through this town."
-                ],
-                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
-            },
-            {
-                id: "settlement2-ferrymaster",
-                type: "ferry",
-                interaction: "ferry",
-                name: "Lume Ferrymaster",
-                x: 25,
-                y: 16,
-                color: "#4f8fb5",
-                destinationMap: "lume_city",
-                destinationX: 15.5,
-                destinationY: 15.5,
-                returnX: 25.5,
-                returnY: 16.5,
-                lines: [
-                    "The Lume ferry departs from the southeastern pier.",
-                    "Ready to cross the Central Sea?"
-                ]
-            },
-            {
-                id: "settlement2-innkeeper",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Innkeeper",
-                x: 7,
-                y: 5,
-                color: "#9a718c",
-                lines: [
-                    "Travellers usually stay here before catching the ferry.",
-                    "Everhope feels far away once you can smell the sea air."
-                ]
-            },
-            {
-                id: "settlement2-mayor",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Town Steward",
-                x: 14,
-                y: 6,
-                color: "#7a7fa8",
-                lines: [
-                    "Settlement 2 grew around an old road and an even older ferry crossing.",
-                    "The western road leads onward to Settlement 3, while the ferry links us to Lume."
-                ]
-            },
-            {
-                id: "settlement2-traveller",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Travelling Trainer",
-                x: 12,
-                y: 10,
-                color: "#6b9ed2",
-                lines: [
-                    "This is a good place to stock up before choosing your next direction.",
-                    "West to Settlement 3, or southeast across the sea to Lume."
-                ]
-            }
+        "spawn": {
+                "x": 26.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 29,
+                        "y": 20,
+                        "targetMap": "route_everhope_settlement2",
+                        "targetX": 28.5,
+                        "targetY": 16.5,
+                        "message": "You head back along the northwestern trail toward Everhope City."
+                },
+                {
+                        "x": 0,
+                        "y": 10,
+                        "targetMap": "route_settlement2_settlement3",
+                        "targetX": 28.5,
+                        "targetY": 8.5,
+                        "message": "You leave Settlement 2 by the western road toward Settlement 3."
+                }
+        ],
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "settlement2-restoration",
+                        "type": "restoration",
+                        "interaction": "restoration",
+                        "name": "Restoration Attendant",
+                        "x": 6,
+                        "y": 15,
+                        "color": "#69a9a0",
+                        "lines": [
+                                "Welcome to Settlement 2's Restoration Hub.",
+                                "The ferry makes this a popular stopping point for travellers."
+                        ]
+                },
+                {
+                        "id": "settlement2-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Market Merchant",
+                        "x": 12,
+                        "y": 5,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Fresh supplies, ferry snacks and travel gear — all in one place.",
+                                "Lume traders bring half their stock through this town."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "revivalTonic",
+                                        "capture"
+                                ]
+                        }
+                },
+                {
+                        "id": "settlement2-ferrymaster",
+                        "type": "ferry",
+                        "interaction": "ferry",
+                        "name": "Lume Ferrymaster",
+                        "x": 25,
+                        "y": 18,
+                        "color": "#4f8fb5",
+                        "destinationMap": "lume_city",
+                        "destinationX": 17.5,
+                        "destinationY": 17.5,
+                        "returnX": 25.5,
+                        "returnY": 18.5,
+                        "lines": [
+                                "The Lume ferry departs from the southeastern pier.",
+                                "Ready to cross the Central Sea?"
+                        ]
+                },
+                {
+                        "id": "settlement2-innkeeper",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Innkeeper",
+                        "x": 5,
+                        "y": 8,
+                        "color": "#9a718c",
+                        "lines": [
+                                "Travellers usually stay here before catching the ferry.",
+                                "The road west is quieter than the road to Everhope."
+                        ]
+                },
+                {
+                        "id": "settlement2-steward",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Town Steward",
+                        "x": 17,
+                        "y": 8,
+                        "color": "#7a7fa8",
+                        "lines": [
+                                "Settlement 2 grew around the old coastal road and ferry crossing.",
+                                "The square is the heart of town."
+                        ]
+                },
+                {
+                        "id": "settlement2-traveller",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Travelling Trainer",
+                        "x": 20,
+                        "y": 10,
+                        "color": "#6b9ed2",
+                        "lines": [
+                                "Stock up here before choosing your next direction.",
+                                "West leads toward Settlement 3; southeast takes you to Lume by ferry."
+                        ]
+                }
         ]
-    },
+},
 
     route_settlement2_settlement3: {
-        name: "Westmere — Main Trail to Settlement 3",
-        data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "##############D###############"
+        "name": "Westmere — Trail to Settlement 3",
+        "handBuilt": true,
+        "data": [
+                "...............................",
+                "...............................",
+                "............................GGG",
+                "............T..............GGGG",
+                "....T.....................GVGGG",
+                "....................V....G.....",
+                "..........V...........GGG......",
+                ".......T..........GGGGGGG......",
+                "...............GGG....GGG......",
+                "D..........GGGGGGG..........T.D",
+                "..........G....GGG.............",
+                ".......GGG............T........",
+                "....GGGGGG....V.........V......",
+                "...G.V.GGG.....................",
+                "GGG...............T............",
+                "GGG.......................T....",
+                "GGG............................",
+                "...............................",
+                "..............................."
         ],
-        spawn: { x: 14.5, y: 15.5 },
-        exits: [
-            { x: 14, y: 16, targetMap: "westmere_settlement2", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 2." },
-            { x: 14, y: 0, targetMap: "westmere_settlement3", targetX: 14.5, targetY: 15.5, message: "You arrive at Settlement 3 in Westmere." }
+        "spawn": {
+                "x": 28.5,
+                "y": 9.5
+        },
+        "exits": [
+                {
+                        "x": 0,
+                        "y": 9,
+                        "targetMap": "westmere_settlement2",
+                        "targetX": 1.5,
+                        "targetY": 10.5,
+                        "message": "You return to Settlement 2."
+                },
+                {
+                        "x": 30,
+                        "y": 9,
+                        "targetMap": "westmere_settlement3",
+                        "targetX": 1.5,
+                        "targetY": 10.5,
+                        "message": "You arrive at Settlement 3."
+                }
         ],
-        encounters: []
-    },
+        "encounters": [
+                {
+                        "species": "Brindlew",
+                        "minLevel": 5,
+                        "maxLevel": 6,
+                        "weight": 70
+                }
+        ],
+        "npcs": [
+                {
+                        "id": "route23-trainer",
+                        "type": "trainer",
+                        "interaction": "trainer",
+                        "name": "Trail Trainer",
+                        "x": 16,
+                        "y": 9,
+                        "color": "#8f6a55",
+                        "lines": [
+                                "The western roads are where trainers prove themselves.",
+                                "Let us battle!"
+                        ],
+                        "team": [
+                                {
+                                        "species": "Brindlew",
+                                        "level": 6
+                                }
+                        ],
+                        "rewardVale": 180
+                }
+        ]
+},
 
     westmere_settlement3: {
-        name: "Westmere — Settlement 3",
-        data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "D...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "##############D###############"
+        "name": "Westmere — Settlement 3",
+        "handBuilt": true,
+        "data": [
+                "...............D...............",
+                "...............G...............",
+                ".T.......T#####G...............",
+                "..#######.#####G...T.########T.",
+                "..#######.#####G.....########..",
+                "..#######.#####G..V..########..",
+                "..#######...G..G.....########..",
+                "..#######..GGGGGGGGG.########..",
+                ".....G....VGGGGGGGGGV...G......",
+                "...........GGGGGGGGG...........",
+                "DGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+                "...........GGGGGGGGG...........",
+                ".....G...V.GGGGGGGGG.V..G......",
+                "..#######..GGGGGGGGG.########..",
+                "..#######......G.....########..",
+                "..#######......G.....########..",
+                "..#######......V.....########..",
+                "..#######......G.....########..",
+                "..#######......G.....########..",
+                ".T........T....G....T........T.",
+                "...............D..............."
         ],
-        spawn: { x: 14.5, y: 15.5 },
-        exits: [
-            { x: 14, y: 0, targetMap: "route_westmere_dunridge", targetX: 14.5, targetY: 15.5, message: "You leave Westmere behind and follow the Main Trail toward Dunridge." },
-            { x: 14, y: 16, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 1.5, message: "You return to Settlement 2." },
-            { x: 0, y: 8, targetMap: "route_settlement3_greenvale", targetX: 28.5, targetY: 8.5, message: "A side trail leads southwest toward Greenvale." }
+        "spawn": {
+                "x": 15.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "route_westmere_dunridge",
+                        "targetX": 28.5,
+                        "targetY": 19.5,
+                        "message": "You leave Westmere and follow the northeastern road toward Dunridge."
+                },
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_settlement2_settlement3",
+                        "targetX": 1.5,
+                        "targetY": 9.5,
+                        "message": "You return to Settlement 2."
+                },
+                {
+                        "x": 0,
+                        "y": 10,
+                        "targetMap": "route_settlement3_greenvale",
+                        "targetX": 28.5,
+                        "targetY": 19.5,
+                        "message": "A southwestern side road leads toward Greenvale."
+                }
         ],
-        encounters: [],
-        npcs: []
-    },
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "settlement3-elder",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Village Elder",
+                        "x": 15,
+                        "y": 10,
+                        "color": "#806d58",
+                        "lines": [
+                                "Settlement 3 sits where three roads meet.",
+                                "The northeast road follows the hills toward Dunridge."
+                        ]
+                },
+                {
+                        "id": "settlement3-ranger",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Greenvale Ranger",
+                        "x": 8,
+                        "y": 10,
+                        "color": "#5f9360",
+                        "lines": [
+                                "The southwestern trail eventually crosses into Greenvale.",
+                                "Watch the tall grass along the lower road."
+                        ]
+                },
+                {
+                        "id": "settlement3-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Roadside Merchant",
+                        "x": 24,
+                        "y": 10,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Three roads, one shop. Convenient, isn't it?"
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "capture"
+                                ]
+                        }
+                },
+                {
+                        "id": "settlement3-trainer",
+                        "type": "trainer",
+                        "interaction": "trainer",
+                        "name": "Crossroads Trainer",
+                        "x": 15,
+                        "y": 15,
+                        "color": "#6b7ea8",
+                        "lines": [
+                                "Every direction from here has a different challenge."
+                        ],
+                        "team": [
+                                {
+                                        "species": "Brindlew",
+                                        "level": 7
+                                }
+                        ],
+                        "rewardVale": 220
+                }
+        ]
+},
 
     route_settlement3_greenvale: {
-        name: "Westmere → Greenvale — Southern Trail",
-        data: [
-            "##############################",
-            "#............................#",
-            "#............................#",
-            "#........GGGG................#",
-            "#........GGGG................#",
-            "#............................#",
-            "#............................#",
-            "#..............GGGG..........#",
-            "D.............GGGG...........D",
-            "#............................#",
-            "#............................#",
-            "#........GGGG................#",
-            "#........GGGG................#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "##############################"
+        "name": "Westmere → Greenvale — Southern Trail",
+        "handBuilt": true,
+        "data": [
+                ".............................D.",
+                "...............................",
+                "..........................GGG..",
+                ".........................G.....",
+                "...T....................GT.....",
+                "...........T...........G.......",
+                "......................G...V....",
+                ".............V.......G.........",
+                ".......T..........GGG..........",
+                ".................G.............",
+                "................G..........T...",
+                ".........V.....G......V........",
+                "...........GGGG................",
+                "..........G........T...........",
+                ".........G.....................",
+                "......GGG.........V....T.......",
+                "....VG.........................",
+                "....G..........T...............",
+                "...G...........................",
+                "..G............................",
+                ".D............................."
         ],
-        spawn: { x: 28.5, y: 8.5 },
-        exits: [
-            { x: 0, y: 8, targetMap: "westmere_settlement3", targetX: 1.5, targetY: 8.5, message: "You return to Settlement 3." },
-            { x: 29, y: 8, targetMap: "greenvale_settlement4", targetX: 1.5, targetY: 8.5, message: "You arrive at Settlement 4 in Greenvale." }
+        "spawn": {
+                "x": 28.5,
+                "y": 2.5
+        },
+        "exits": [
+                {
+                        "x": 29,
+                        "y": 0,
+                        "targetMap": "westmere_settlement3",
+                        "targetX": 1.5,
+                        "targetY": 10.5,
+                        "message": "You return to Settlement 3."
+                },
+                {
+                        "x": 1,
+                        "y": 20,
+                        "targetMap": "greenvale_settlement4",
+                        "targetX": 28.5,
+                        "targetY": 0.5,
+                        "message": "You arrive at Settlement 4 in Greenvale."
+                }
         ],
-        encounters: []
-    },
+        "encounters": [
+                {
+                        "species": "Brindlew",
+                        "minLevel": 5,
+                        "maxLevel": 7,
+                        "weight": 70
+                }
+        ],
+        "npcs": [
+                {
+                        "id": "greenvale-ranger",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Border Ranger",
+                        "x": 15,
+                        "y": 12,
+                        "color": "#5f9360",
+                        "lines": [
+                                "The land becomes greener as you descend toward Greenvale.",
+                                "The next settlement is not far now."
+                        ]
+                }
+        ]
+},
 
     greenvale_settlement4: {
-        name: "Greenvale — Settlement 4",
-        data: [
-            "##############################",
-            "#............................#",
-            "#............................#",
-            "#....GGGG....................#",
-            "#....GGGG....................#",
-            "#............................#",
-            "#............................#",
-            "#...........TT...............#",
-            "#...........TT...............D",
-            "#............................#",
-            "#............................#",
-            "#..............VVVV..........#",
-            "#..............VVVV..........#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "##############################"
+        "name": "Greenvale — Settlement 4",
+        "handBuilt": true,
+        "data": [
+                ".............................D.",
+                "...............................",
+                ".T.............................",
+                "..#######.T.......T..#######...",
+                "..#######............#######.T.",
+                "..#######............#######...",
+                "..#######............#######...",
+                "..#######.V..........#######...",
+                ".....G.........G...V....G......",
+                "...............G...............",
+                "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+                "...............G...........V...",
+                ".....G.........G..V.....G......",
+                "..#######......G....########...",
+                "..#######...V..G....########...",
+                "..#######......G....########...",
+                "..#######......G....########.T.",
+                "..#######......G....########...",
+                "..#######.T....G..T.########...",
+                "...............G...............",
+                "...............G..............."
         ],
-        spawn: { x: 1.5, y: 8.5 },
-        exits: [
-            { x: 29, y: 8, targetMap: "route_settlement3_greenvale", targetX: 1.5, targetY: 8.5, message: "You return toward Settlement 3." }
+        "spawn": {
+                "x": 28.5,
+                "y": 1.5
+        },
+        "exits": [
+                {
+                        "x": 29,
+                        "y": 0,
+                        "targetMap": "route_settlement3_greenvale",
+                        "targetX": 1.5,
+                        "targetY": 19.5,
+                        "message": "You return toward Settlement 3."
+                }
         ],
-        encounters: []
-    },
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "settlement4-farmer",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Farmer",
+                        "x": 7,
+                        "y": 10,
+                        "color": "#8f704b",
+                        "lines": [
+                                "Greenvale country is rich with fields and open pasture."
+                        ]
+                },
+                {
+                        "id": "settlement4-trainer",
+                        "type": "trainer",
+                        "interaction": "trainer",
+                        "name": "Greenvale Trainer",
+                        "x": 20,
+                        "y": 10,
+                        "color": "#6b9ed2",
+                        "lines": [
+                                "A friendly battle before you continue?"
+                        ],
+                        "team": [
+                                {
+                                        "species": "Brindlew",
+                                        "level": 7
+                                }
+                        ],
+                        "rewardVale": 220
+                }
+        ]
+},
 
     route_westmere_dunridge: {
-        name: "Dunridge — Main Trail",
-        data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "##############D###############"
+        "name": "Westmere → Dunridge — Northeastern Trail",
+        "handBuilt": true,
+        "data": [
+                ".............................D.",
+                "...............................",
+                "..........................GGG..",
+                ".........................G.....",
+                "..........T.............G.V....",
+                "..T...............V..T.G.......",
+                "......................G........",
+                "........V............G......T..",
+                "..................GGG..........",
+                ".................G.............",
+                "......T.....V...G..............",
+                "...............G...............",
+                "............GGG.........T......",
+                "...........G...................",
+                "....V.....G......T.............",
+                ".........G.....................",
+                ".....GGGG.............V........",
+                "....G........T.................",
+                "...G...........................",
+                "..G............................",
+                ".D............................."
         ],
-        spawn: { x: 14.5, y: 15.5 },
-        exits: [
-            { x: 14, y: 0, targetMap: "dunridge_settlement2", targetX: 14.5, targetY: 15.5, message: "You arrive at a Dunridge settlement." },
-            { x: 14, y: 16, targetMap: "westmere_settlement3", targetX: 14.5, targetY: 1.5, message: "You return toward Westmere." }
+        "spawn": {
+                "x": 28.5,
+                "y": 2.5
+        },
+        "exits": [
+                {
+                        "x": 29,
+                        "y": 0,
+                        "targetMap": "dunridge_settlement2",
+                        "targetX": 1.5,
+                        "targetY": 19.5,
+                        "message": "You arrive at a Dunridge settlement."
+                },
+                {
+                        "x": 1,
+                        "y": 20,
+                        "targetMap": "westmere_settlement3",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward Westmere."
+                }
         ],
-        encounters: []
-    },
+        "encounters": [
+                {
+                        "species": "Brindlew",
+                        "minLevel": 6,
+                        "maxLevel": 8,
+                        "weight": 60
+                }
+        ],
+        "npcs": [
+                {
+                        "id": "dunridge-traveller",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Dunridge Traveller",
+                        "x": 16,
+                        "y": 10,
+                        "color": "#7a6b5c",
+                        "lines": [
+                                "The hills ahead mark the edge of Dunridge.",
+                                "The road becomes rougher from here."
+                        ]
+                }
+        ]
+},
 
     dunridge_settlement2: {
-        name: "Dunridge — Settlement 2",
-        data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#....GGGG....................#",
-            "#....GGGG....................#",
-            "#....GGGG....................#",
-            "#....GGGG....................#",
-            "#............................#",
-            "#........TT..................#",
-            "#........TT..................#",
-            "#............................#",
-            "#..............VVVV..........#",
-            "#..............VVVV..........#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "##############D###############"
+        "name": "Dunridge — Settlement 9",
+        "handBuilt": true,
+        "data": [
+                "...............G...............",
+                "...............G...............",
+                "..........T....G.............T.",
+                "...#######.#####.....########..",
+                ".T.#######.#####..T..########..",
+                "...#######.#####.....########..",
+                "...#######.#####.....########..",
+                "...#######...G.G.....########..",
+                "......G...V....G...V....G......",
+                "...............G...............",
+                "DGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+                "...............G...............",
+                "......G...V....G....V...G......",
+                "...#######.....G.....########..",
+                "...#######.....G.....########..",
+                "...#######.....G.....########..",
+                "...#######.....V.....########..",
+                ".T.#######.....G.....########T.",
+                "...#######.T...G...T.########..",
+                "...............G...............",
+                ".D.............G..............."
         ],
-        spawn: { x: 14.5, y: 15.5 },
-        exits: [
-            { x: 14, y: 0, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 15.5, message: "The Main Trail continues toward Stonehaven." },
-            { x: 14, y: 16, targetMap: "route_westmere_dunridge", targetX: 14.5, targetY: 1.5, message: "You return toward Westmere." }
+        "spawn": {
+                "x": 2.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 1,
+                        "y": 20,
+                        "targetMap": "route_westmere_dunridge",
+                        "targetX": 28.5,
+                        "targetY": 0.5,
+                        "message": "You return toward Westmere."
+                },
+                {
+                        "x": 0,
+                        "y": 10,
+                        "targetMap": "route_dunridge_settlement2_stonehaven",
+                        "targetX": 28.5,
+                        "targetY": 9.5,
+                        "message": "You continue west toward the next Dunridge settlement."
+                }
         ],
-        encounters: []
-    },
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "dunridge9-elder",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Hill Elder",
+                        "x": 15,
+                        "y": 10,
+                        "color": "#806d58",
+                        "lines": [
+                                "Welcome to the first Dunridge settlement.",
+                                "Stonehaven lies farther along the western road."
+                        ]
+                },
+                {
+                        "id": "dunridge9-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Hill Merchant",
+                        "x": 24,
+                        "y": 10,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Travellers heading for Stonehaven often stop here."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "revivalTonic",
+                                        "capture"
+                                ]
+                        }
+                }
+        ]
+},
 
     route_dunridge_settlement2_stonehaven: {
         name: "Dunridge — Main Trail",
@@ -1749,92 +2128,127 @@ const maps = {
     },
 
     lume_city: {
-        name: "Lume — Port City",
-        handBuilt: true,
-        data: ['WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW', 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW', 'WWWW.......................WWWW', 'WWWW......T#########.......WWWW', 'WW.........#########........WWW', 'WW...#####.####D####.#####..WWW', 'WWWT.#####P....G....P#####T.WWW', 'WWW..#####GGGGGGGGGGG#####..WWW', 'WWW..##D##.GGGGGGGGG.##D##..WWW', 'WWW........GGGGGGGGG........WWW', 'WWW.....GGGGGGGGGGGGGGG.....WWW', 'WWW..#####.GGGGGGGGG.#####..WWW', 'WWW..#####.GGGGGGGGG.#####..WWW', 'WWW..####D.....G.....D####..WWW', 'WWW..#####GGGGGGGGGGG#####..WWW', 'WW...#####....GGG....#####..WWW', 'WW..T.....P..GGGG##D###P..T.WWW', 'WWWW.........GGGG######....WWWW', 'WWWW.........GGGG######....WWWW', 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW', 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW'],
-        spawn: { x: 15.5, y: 15.5 },
-        exits: [],
-        encounters: [],
-        npcs: [
-            {
-                id: "lume-ferry-return",
-                type: "ferry_return",
-                interaction: "ferry_return",
-                name: "Lume Ferrymaster",
-                x: 19,
-                y: 16,
-                color: "#4f8fb5",
-                lines: ["Ferries depart regularly for Kaleo's coastal ports.", "I can arrange your return crossing to the port you came from."]
-            },
-            {
-                id: "lume-portmaster",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Harbourmaster",
-                x: 8,
-                y: 13,
-                color: "#6f7d91",
-                lines: [
-                    "Welcome to Lume Port.",
-                    "Ships and ferries from across Kaleo pass through these docks.",
-                    "The city grew around the Central Sea trade routes."
-                ]
-            },
-            {
-                id: "lume-merchant",
-                type: "merchant",
-                interaction: "merchant",
-                name: "Harbour Merchant",
-                x: 23,
-                y: 7,
-                color: "#b88a52",
-                lines: [
-                    "Goods from every region eventually find their way to Lume.",
-                    "If you need supplies, you've come to the right city."
-                ],
-                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
-            },
-            {
-                id: "lume-innkeeper",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Innkeeper",
-                x: 7,
-                y: 7,
-                color: "#9a718c",
-                lines: [
-                    "Travellers call Lume the crossroads of the Central Sea.",
-                    "You can hear a dozen regional accents in this square on any given day."
-                ]
-            },
-            {
-                id: "lume-trader",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Sea Trader",
-                x: 23,
-                y: 13,
-                color: "#6b9ed2",
-                lines: [
-                    "Westmere, Greenvale, Northvale, Hawthorne... every route has something different to trade.",
-                    "Lume is where all those routes meet on the water."
-                ]
-            },
-            {
-                id: "lume-civic",
-                type: "npc",
-                interaction: "dialogue",
-                name: "Port Clerk",
-                x: 15,
-                y: 5,
-                color: "#7a7fa8",
-                lines: [
-                    "Lume is a city without a Gym, but don't mistake that for being unimportant.",
-                    "Its harbour is one of the busiest places in Kaleo."
-                ]
-            }
+        "name": "Lume — Port City",
+        "handBuilt": true,
+        "data": [
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+                "WWWWW.........................WWWWW",
+                "WWWWW........########.........WWWWW",
+                "WWW..#######.########..#######..WWW",
+                "WWWT.#######.########..#######T.WWW",
+                "WWW..#######.########..#######..WWW",
+                "WWW..#######.########..#######..WWW",
+                "WWW..#######....GG.....#######..WWW",
+                "WWW.....G....GGGGGGGGG....G.....WWW",
+                "WWW.........VGGGGGGGGG.V........WWW",
+                "WWW..GGGGGGGGGGGGGGGGGGGGGGGGG..WWW",
+                "WWW.......V..GGGGGGGGG.G.V......WWW",
+                "WWW.....G......G.G...######WWWWWWWW",
+                "WWW..######.#######..######WWWWWWWW",
+                "WWW..######G#######GG######WWWWWWWW",
+                "WWW..######.#######..######WWWWWWWW",
+                "WWWT.######.#######..######WWWWTWWW",
+                "WWW..######.#######.G.GGGGGGGWWWWWW",
+                "WWWWW.................#######WWWWWW",
+                "WWWWW.......T......T..#######.WWWWW",
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+        ],
+        "spawn": {
+                "x": 17.5,
+                "y": 17.5
+        },
+        "exits": [],
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "lume-ferry-return",
+                        "type": "ferry_return",
+                        "interaction": "ferry_return",
+                        "name": "Lume Ferrymaster",
+                        "x": 22,
+                        "y": 18,
+                        "color": "#4f8fb5",
+                        "lines": [
+                                "Ferries depart regularly for Kaleo’s coastal ports.",
+                                "I can arrange your return crossing to the port you came from."
+                        ]
+                },
+                {
+                        "id": "lume-portmaster",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Harbourmaster",
+                        "x": 7,
+                        "y": 11,
+                        "color": "#6f7d91",
+                        "lines": [
+                                "Welcome to Lume, the great port of the Central Sea.",
+                                "Ships and ferries from across Kaleo pass through these docks."
+                        ]
+                },
+                {
+                        "id": "lume-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Harbour Merchant",
+                        "x": 24,
+                        "y": 11,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Goods from every region eventually find their way to Lume.",
+                                "If you need supplies, this is the place."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "revivalTonic",
+                                        "capture"
+                                ]
+                        }
+                },
+                {
+                        "id": "lume-innkeeper",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Innkeeper",
+                        "x": 8,
+                        "y": 10,
+                        "color": "#9a718c",
+                        "lines": [
+                                "Travellers from every region share stories here.",
+                                "You can reach Lume from several ports around Kaleo."
+                        ]
+                },
+                {
+                        "id": "lume-sailor",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Sailor",
+                        "x": 27,
+                        "y": 17,
+                        "color": "#6b9ed2",
+                        "lines": [
+                                "The Central Sea connects more places than most people realize.",
+                                "Keep an eye on the weather before a long crossing."
+                        ]
+                },
+                {
+                        "id": "lume-citizen",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Lume Resident",
+                        "x": 17,
+                        "y": 10,
+                        "color": "#7a7fa8",
+                        "lines": [
+                                "Lume never really sleeps.",
+                                "There is always another ferry arriving."
+                        ]
+                }
         ]
-    },
+},
 
     route_15_hot_springs: {
         name: "Highreach — Hot Springs Trail",
