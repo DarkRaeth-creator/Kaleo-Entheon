@@ -674,33 +674,11 @@ const maps = {
     westmere_settlement2: {
         name: "Westmere — Settlement 2",
         handBuilt: true,
-        data: [
-            " D#############################",
-            "GGG............T..............#",
-            "#GGG....................T.....#",
-            "#..GGG.......#####............#",
-            "#....GG......#...#.....TT.....#",
-            "#.....GG.....#...#............#",
-            "#......GG....#...#............#",
-            "#.......GG...#####....VV......#",
-            "#........GGG...........VV.....#",
-            "#..........GGG................#",
-            "D...........GGG...............#",
-            "G...........GGG....WWWW......##",
-            "GG..........GGG....WWWW......##",
-            "#GGG........GGG..............##",
-            "#..GGG......GGG.....#####....##",
-            "#....GG.....GGG.....#...#....##",
-            "#.....GG....GGG.....#...#....##",
-            "#......GG...GGG.....#####....##",
-            "#.......GGGGGGG..............##",
-            "#............................##",
-            "###############################"
-        ],
-        spawn: { x: 3.5, y: 10.5 },
+        data: [' D############################ ', ' #...........................# ', ' #GT.#####..........#######T.# ', '  #G.#####..######..#######..# ', '  #.G#####..######.T#######..# ', '  #..##D##G.######..###D###..# ', '  #T.GG.....##D###...........# ', '  #.VG.G....................T# ', '  #..G..G.GGGGGGGGG..........# ', '  #..G...GGGGGGGGGG..........# ', 'DG#G......GGGGGGGGGGGGGGGGGGG# ', '  #G......GGGGGGGGG.####.....# ', '  #G.#####GGGGGGGGG.D###....T# ', '  #G.#####........G.####.....# ', '  #G.####D........GG####WWWWW# ', '  #G.#####...V..........WWWWW# ', '  #G.#####............GGGGGWW# ', '  #GT......T.....T....GGGGGWW# ', '    #...V...............WWWWW# ', '    #......................#   ', '    ########################   '],
+        spawn: { x: 14.5, y: 10.5 },
         exits: [
-            { x: 1, y: 0, targetMap: "route_everhope_settlement2", targetX: 28.5, targetY: 16.5, message: "You head back toward Everhope City." },
-            { x: 0, y: 10, targetMap: "route_settlement2_settlement3", targetX: 28.5, targetY: 8.5, message: "A western road leads toward Settlement 3." }
+            { x: 1, y: 0, targetMap: "route_everhope_settlement2", targetX: 28.5, targetY: 16.5, message: "You head back along the northwestern trail toward Everhope City." },
+            { x: 0, y: 10, targetMap: "route_settlement2_settlement3", targetX: 28.5, targetY: 8.5, message: "You leave Settlement 2 by the western road toward Settlement 3." }
         ],
         encounters: [],
         npcs: [
@@ -709,58 +687,70 @@ const maps = {
                 type: "restoration",
                 interaction: "restoration",
                 name: "Restoration Attendant",
-                x: 8,
-                y: 8,
+                x: 22,
+                y: 13,
                 color: "#69a9a0",
                 lines: [
                     "Welcome to Settlement 2's Restoration Hub.",
-                    "Your Entheon are ready for the road whenever you are."
+                    "The ferry makes this a popular stopping point for travellers."
                 ]
             },
             {
                 id: "settlement2-merchant",
                 type: "merchant",
                 interaction: "merchant",
-                name: "Local Merchant",
-                x: 24,
-                y: 9,
+                name: "Market Merchant",
+                x: 23,
+                y: 6,
                 color: "#b88a52",
                 lines: [
-                    "We get plenty of travellers passing through here.",
-                    "Need supplies before you continue west?"
+                    "Fresh supplies, ferry snacks and travel gear — all in one place.",
+                    "Lume traders bring half their stock through this town."
                 ],
-                shop: { inventory: ["recoveryTonic", "capture"] }
+                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
             },
             {
                 id: "settlement2-ferrymaster",
                 type: "ferry",
                 interaction: "ferry",
                 name: "Lume Ferrymaster",
-                x: 21,
-                y: 12,
+                x: 25,
+                y: 16,
                 color: "#4f8fb5",
                 destinationMap: "lume_city",
-                destinationX: 14.5,
+                destinationX: 15.5,
                 destinationY: 15.5,
-                returnX: 21.5,
-                returnY: 12.5,
+                returnX: 25.5,
+                returnY: 16.5,
                 lines: [
-                    "The ferry to Lume departs from here.",
-                    "It is a long crossing, but much faster than travelling around the sea."
+                    "The Lume ferry departs from the southeastern pier.",
+                    "Ready to cross the Central Sea?"
                 ]
             },
             {
-                id: "settlement2-resident",
+                id: "settlement2-innkeeper",
                 type: "npc",
                 interaction: "dialogue",
-                name: "Local Gardener",
-                x: 15,
+                name: "Innkeeper",
+                x: 7,
                 y: 5,
-                color: "#7b9a61",
+                color: "#9a718c",
                 lines: [
-                    "Settlement 2 sits right on one of Westmere's old travel lines.",
-                    "Traders heading toward Lume often stop here before taking the ferry.",
-                    "The western road eventually reaches Settlement 3."
+                    "Travellers usually stay here before catching the ferry.",
+                    "Everhope feels far away once you can smell the sea air."
+                ]
+            },
+            {
+                id: "settlement2-mayor",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Town Steward",
+                x: 14,
+                y: 6,
+                color: "#7a7fa8",
+                lines: [
+                    "Settlement 2 grew around an old road and an even older ferry crossing.",
+                    "The western road leads onward to Settlement 3, while the ferry links us to Lume."
                 ]
             },
             {
@@ -768,12 +758,12 @@ const maps = {
                 type: "npc",
                 interaction: "dialogue",
                 name: "Travelling Trainer",
-                x: 6,
-                y: 15,
+                x: 12,
+                y: 10,
                 color: "#6b9ed2",
                 lines: [
-                    "Everhope is the big city, but I actually prefer the smaller settlements.",
-                    "Less crowded, easier to hear yourself think."
+                    "This is a good place to stock up before choosing your next direction.",
+                    "West to Settlement 3, or southeast across the sea to Lume."
                 ]
             }
         ]
@@ -1759,27 +1749,10 @@ const maps = {
     },
 
     lume_city: {
-        name: "Lume",
-        data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#........GGGG................#",
-            "#........GGGG................#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#..............GGGG..........#",
-            "#..............GGGG..........#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "##############D###############"
-        ],
-        spawn: { x: 14.5, y: 15.5 },
+        name: "Lume — Port City",
+        handBuilt: true,
+        data: ['WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW', 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW', 'WWWW.......................WWWW', 'WWWW......T#########.......WWWW', 'WW.........#########........WWW', 'WW...#####.####D####.#####..WWW', 'WWWT.#####P....G....P#####T.WWW', 'WWW..#####GGGGGGGGGGG#####..WWW', 'WWW..##D##.GGGGGGGGG.##D##..WWW', 'WWW........GGGGGGGGG........WWW', 'WWW.....GGGGGGGGGGGGGGG.....WWW', 'WWW..#####.GGGGGGGGG.#####..WWW', 'WWW..#####.GGGGGGGGG.#####..WWW', 'WWW..####D.....G.....D####..WWW', 'WWW..#####GGGGGGGGGGG#####..WWW', 'WW...#####....GGG....#####..WWW', 'WW..T.....P..GGGG##D###P..T.WWW', 'WWWW.........GGGG######....WWWW', 'WWWW.........GGGG######....WWWW', 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW', 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW'],
+        spawn: { x: 15.5, y: 15.5 },
         exits: [],
         encounters: [],
         npcs: [
@@ -1788,10 +1761,77 @@ const maps = {
                 type: "ferry_return",
                 interaction: "ferry_return",
                 name: "Lume Ferrymaster",
-                x: 18,
-                y: 8,
+                x: 19,
+                y: 16,
                 color: "#4f8fb5",
-                lines: ["I can arrange your return ferry to your previous port."]
+                lines: ["Ferries depart regularly for Kaleo's coastal ports.", "I can arrange your return crossing to the port you came from."]
+            },
+            {
+                id: "lume-portmaster",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Harbourmaster",
+                x: 8,
+                y: 13,
+                color: "#6f7d91",
+                lines: [
+                    "Welcome to Lume Port.",
+                    "Ships and ferries from across Kaleo pass through these docks.",
+                    "The city grew around the Central Sea trade routes."
+                ]
+            },
+            {
+                id: "lume-merchant",
+                type: "merchant",
+                interaction: "merchant",
+                name: "Harbour Merchant",
+                x: 23,
+                y: 7,
+                color: "#b88a52",
+                lines: [
+                    "Goods from every region eventually find their way to Lume.",
+                    "If you need supplies, you've come to the right city."
+                ],
+                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
+            },
+            {
+                id: "lume-innkeeper",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Innkeeper",
+                x: 7,
+                y: 7,
+                color: "#9a718c",
+                lines: [
+                    "Travellers call Lume the crossroads of the Central Sea.",
+                    "You can hear a dozen regional accents in this square on any given day."
+                ]
+            },
+            {
+                id: "lume-trader",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Sea Trader",
+                x: 23,
+                y: 13,
+                color: "#6b9ed2",
+                lines: [
+                    "Westmere, Greenvale, Northvale, Hawthorne... every route has something different to trade.",
+                    "Lume is where all those routes meet on the water."
+                ]
+            },
+            {
+                id: "lume-civic",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Port Clerk",
+                x: 15,
+                y: 5,
+                color: "#7a7fa8",
+                lines: [
+                    "Lume is a city without a Gym, but don't mistake that for being unimportant.",
+                    "Its harbour is one of the busiest places in Kaleo."
+                ]
             }
         ]
     },
