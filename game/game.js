@@ -5827,19 +5827,52 @@ function useLumeFerry(npc) {
 }
 
 function returnFromLumeFerry() {
-    if (!gameState.ferryReturnMap || !maps[gameState.ferryReturnMap]) {
-        showWorldMessage("The return ferry route is not available yet.");
+    // Lume is the central ferry hub. Do not automatically send the player
+    // back to whichever port they arrived from: let them choose from all
+    // five established Lume ferry destinations.
+    const ferryChoices = [
+        { locationId: "settlement-2", name: "Settlement 2", mapId: "westmere_settlement2", x: 22.5, y: 17.5 },
+        { locationId: "settlement-7", name: "Settlement 7", mapId: "greenvale_settlement7", x: 22.5, y: 17.5 },
+        { locationId: "settlement-18", name: "Settlement 18", mapId: "northvale_settlement18", x: 14.5, y: 15.5 },
+        { locationId: "settlement-22", name: "Settlement 22", mapId: null, x: 14.5, y: 15.5 },
+        { locationId: "settlement-24", name: "Settlement 24", mapId: null, x: 14.5, y: 15.5 }
+    ];
+
+    const available = ferryChoices.filter(choice => maps[choice.mapId]);
+    if (!available.length) {
+        showWorldMessage("No Lume ferry destinations are available in this build yet.");
         return;
     }
 
-    const confirmed = window.confirm("Return by ferry to your previous port?");
-    if (!confirmed) return;
+    const lines = ferryChoices.map((choice, index) => {
+        const status = maps[choice.mapId] ? "" : " (not available yet)";
+        return `${index + 1}. ${choice.name}${status}`;
+    });
 
-    const targetMap = gameState.ferryReturnMap;
-    const targetX = gameState.ferryReturnX ?? 14.5;
-    const targetY = gameState.ferryReturnY ?? 15.5;
+    const answer = window.prompt(
+        "Lume Ferry Terminal\n\nWhere would you like to travel?\n\n" + lines.join("\n") + "\n\nEnter a number (1–5), or Cancel to stay in Lume.",
+        "1"
+    );
 
-    transitionTo(targetMap, targetX, targetY, "The ferry carries you back to your previous port.");
+    if (answer === null) return;
+    const index = Number.parseInt(answer, 10) - 1;
+    if (!Number.isInteger(index) || index < 0 || index >= ferryChoices.length) {
+        showWorldMessage("Please choose one of the numbered ferry destinations.");
+        return;
+    }
+
+    const choice = ferryChoices[index];
+    if (!maps[choice.mapId]) {
+        showWorldMessage(`${choice.name} is part of Lume's ferry network, but that location has not been built in the current game build yet.`);
+        return;
+    }
+
+    transitionTo(
+        choice.mapId,
+        choice.x,
+        choice.y,
+        `The ferry carries you from Lume to ${choice.name}.`
+    );
 }
 
 function interact() {
