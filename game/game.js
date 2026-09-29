@@ -1783,9 +1783,9 @@ const maps = {
                 "I have three young Entheon here who are ready to meet a new trainer.",
                 "When you are ready, take a look at them and choose the companion you connect with."
             ]},
-            { id: "starter-nimblet", type: "starter", species: "Nimblet", name: "Nimblet", x: 10, y: 4, color: "#d3a65f", lines: ["Nimblet watches you curiously.", "It seems comfortable around you."] },
-            { id: "starter-pipiri", type: "starter", species: "Pipiri", name: "Pipiri", x: 12, y: 4, color: "#78a9d8", lines: ["Pipiri looks up at you.", "It gives a small, energetic chirp."] },
-            { id: "starter-morrowe", type: "starter", species: "Morrowe", name: "Morrowe", x: 14, y: 4, color: "#6e5b82", lines: ["Morrowe studies you quietly.", "There is something calm and watchful about it."] },
+            { id: "starter-nimblet", type: "starter", species: "Nimblet", name: "Nimblet", x: 10, y: 7, color: "#d3a65f", lines: ["Nimblet watches you curiously.", "It seems comfortable around you."] },
+            { id: "starter-pipiri", type: "starter", species: "Pipiri", name: "Pipiri", x: 12, y: 7, color: "#78a9d8", lines: ["Pipiri looks up at you.", "It gives a small, energetic chirp."] },
+            { id: "starter-morrowe", type: "starter", species: "Morrowe", name: "Morrowe", x: 14, y: 7, color: "#6e5b82", lines: ["Morrowe studies you quietly.", "There is something calm and watchful about it."] },
             { id: "assistant", type: "npc", interaction: "dialogue", name: "Research Assistant", x: 18, y: 7, color: "#5d9f9b", lines: [
                 "Most of our work involves observing Entheon in their natural habitats.",
                 "The more trainers explore, the more we learn.",
