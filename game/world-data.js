@@ -84,10 +84,10 @@ const KALEO_WORLD = {
 
         // Greenvale
         { id: "settlement-4", number: 4, region: "greenvale", type: "settlement", name: "Settlement 4", mapId: "greenvale_settlement4" },
-        { id: "harveston-city", region: "greenvale", type: "major-city", name: "Harveston", mapId: null, gymId: "harveston-gym" },
-        { id: "settlement-5", number: 5, region: "greenvale", type: "settlement", name: "Settlement 5", mapId: null },
-        { id: "settlement-6", number: 6, region: "greenvale", type: "settlement", name: "Settlement 6", mapId: null },
-        { id: "settlement-7", number: 7, region: "greenvale", type: "settlement", name: "Settlement 7", mapId: null, portTo: "lume-city" },
+        { id: "harveston-city", region: "greenvale", type: "major-city", name: "Harveston", mapId: "harveston_city", gymId: "harveston-gym" },
+        { id: "settlement-5", number: 5, region: "greenvale", type: "settlement", name: "Settlement 5", mapId: "greenvale_settlement5" },
+        { id: "settlement-6", number: 6, region: "greenvale", type: "settlement", name: "Settlement 6", mapId: "greenvale_settlement6" },
+        { id: "settlement-7", number: 7, region: "greenvale", type: "settlement", name: "Settlement 7", mapId: "greenvale_settlement7", portTo: "lume-city" },
 
         // Dunridge
         { id: "settlement-9", number: 9, region: "dunridge", type: "settlement", name: "Settlement 9", mapId: "dunridge_settlement2" },
@@ -163,10 +163,10 @@ const KALEO_WORLD = {
 
         // Westmere branch into Greenvale
         { id: "route-3-4", from: "settlement-3", to: "settlement-4", direction: "southwest", reverseDirection: "northeast", kind: "secondary-trail", mapId: "route_settlement3_greenvale", mapSections: ["route_settlement3_greenvale"] },
-        { id: "route-4-harveston", from: "settlement-4", to: "harveston-city", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-harveston-5", from: "harveston-city", to: "settlement-5", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-5-6", from: "settlement-5", to: "settlement-6", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-6-7", from: "settlement-6", to: "settlement-7", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-4-harveston", from: "settlement-4", to: "harveston-city", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_4_harveston", mapSections: [] },
+        { id: "route-harveston-5", from: "harveston-city", to: "settlement-5", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_harveston_5", mapSections: [] },
+        { id: "route-5-6", from: "settlement-5", to: "settlement-6", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_5_6", mapSections: [] },
+        { id: "route-6-7", from: "settlement-6", to: "settlement-7", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_6_7", mapSections: [] },
 
         // Westmere -> Dunridge
         { id: "route-3-9", from: "settlement-3", to: "settlement-9", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: "route_westmere_dunridge", mapSections: [] },

@@ -1020,35 +1020,35 @@ const maps = {
         "name": "Westmere → Greenvale — Southern Trail",
         "handBuilt": true,
         "data": [
-                ".............................D.",
-                "...............................",
-                "..........................GGG..",
-                ".........................G.....",
-                "...T....................GT.....",
-                "...........T...........G.......",
-                "......................G...V....",
-                ".............V.......G.........",
-                ".......T..........GGG..........",
-                ".................G.............",
-                "................G..........T...",
-                ".........V.....G......V........",
-                "...........GGGG................",
-                "..........G........T...........",
-                ".........G.....................",
-                "......GGG.........V....T.......",
-                "....VG.........................",
-                "....G..........T...............",
-                "...G...........................",
-                "..G............................",
-                ".D............................."
+                "############################D##",
+                "#.........................GGG.#",
+                "#........................GGG..#",
+                "#....T..................GGG...#",
+                "#................T.....GGG....#",
+                "#.....................GGG.....#",
+                "#....................GGG......#",
+                "#..................GGG..T.....#",
+                "#.................GGG.........#",
+                "#................GGG..........#",
+                "#...............GGG...........#",
+                "#.......T......GGG............#",
+                "#.............GGG.............#",
+                "#............GGG..............#",
+                "#..........GGG.....T..........#",
+                "#.........GGG.................#",
+                "#........GGG..................#",
+                "#...T...GGG..............T....#",
+                "#......GGG....................#",
+                "#.....GGG.....................#",
+                "#D#############################"
         ],
         "spawn": {
-                "x": 28.5,
-                "y": 2.5
+                "x": 27.5,
+                "y": 1.5
         },
         "exits": [
                 {
-                        "x": 29,
+                        "x": 28,
                         "y": 0,
                         "targetMap": "westmere_settlement3",
                         "targetX": 1.5,
@@ -1059,108 +1059,115 @@ const maps = {
                         "x": 1,
                         "y": 20,
                         "targetMap": "greenvale_settlement4",
-                        "targetX": 28.5,
-                        "targetY": 0.5,
-                        "message": "You arrive at Settlement 4 in Greenvale."
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You arrive in Greenvale."
                 }
         ],
-        "encounters": [
-                {
-                        "species": "Brindlew",
-                        "minLevel": 5,
-                        "maxLevel": 7,
-                        "weight": 70
-                }
-        ],
-        "npcs": [
-                {
-                        "id": "greenvale-ranger",
-                        "type": "npc",
-                        "interaction": "dialogue",
-                        "name": "Border Ranger",
-                        "x": 15,
-                        "y": 12,
-                        "color": "#5f9360",
-                        "lines": [
-                                "The land becomes greener as you descend toward Greenvale.",
-                                "The next settlement is not far now."
-                        ]
-                }
-        ]
+        "encounters": []
 },
 
     greenvale_settlement4: {
         "name": "Greenvale — Settlement 4",
         "handBuilt": true,
         "data": [
-                ".............................D.",
-                "...............................",
-                ".T.............................",
-                "..#######.T.......T..#######...",
-                "..#######............#######.T.",
-                "..#######............#######...",
-                "..#######............#######...",
-                "..#######.V..........#######...",
-                ".....G.........G...V....G......",
-                "...............G...............",
-                "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-                "...............G...........V...",
-                ".....G.........G..V.....G......",
-                "..#######......G....########...",
-                "..#######...V..G....########...",
-                "..#######......G....########...",
-                "..#######......G....########.T.",
-                "..#######......G....########...",
-                "..#######.T....G..T.########...",
-                "...............G...............",
-                "...............G..............."
+                "###############D###############",
+                "#.............GG..............#",
+                "#.T...........GG..............#",
+                "#..#######..T.GG.....#######..#",
+                "#..#######....GG..T..#######..#",
+                "#..#######....GG.....#######..#",
+                "#..#######....GG.....#######..#",
+                "#.............GG..............#",
+                "#.............GG............T.#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "DGGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#..#######....GG.....#######..#",
+                "#..#######....GG.....#######..#",
+                "#..#######....GG.....#######..#",
+                "#..#######....GG.....#######..#",
+                "#..#######....GG.....#######..#",
+                "#.T...........GG............T.#",
+                "#.............GG..............#",
+                "###############D###############"
         ],
         "spawn": {
-                "x": 28.5,
-                "y": 1.5
+                "x": 15.5,
+                "y": 18.5
         },
         "exits": [
                 {
-                        "x": 29,
+                        "x": 15,
                         "y": 0,
                         "targetMap": "route_settlement3_greenvale",
-                        "targetX": 1.5,
+                        "targetX": 28.5,
                         "targetY": 19.5,
-                        "message": "You return toward Settlement 3."
+                        "message": "You return north toward Settlement 3."
+                },
+                {
+                        "x": 0,
+                        "y": 10,
+                        "targetMap": "route_4_harveston",
+                        "targetX": 28.5,
+                        "targetY": 10.5,
+                        "message": "The southern road leads deeper into Greenvale."
+                },
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_4_harveston",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "The road continues toward Harveston."
                 }
         ],
         "encounters": [],
         "npcs": [
                 {
-                        "id": "settlement4-farmer",
-                        "type": "npc",
-                        "interaction": "dialogue",
-                        "name": "Farmer",
-                        "x": 7,
+                        "id": "s4-rest",
+                        "type": "restoration",
+                        "interaction": "restoration",
+                        "name": "Restoration Attendant",
+                        "x": 6,
                         "y": 10,
-                        "color": "#8f704b",
+                        "color": "#69a9a0",
                         "lines": [
-                                "Greenvale country is rich with fields and open pasture."
+                                "Welcome to Settlement 4.",
+                                "Greenvale roads are quieter than Westmere, but the wilds are closer here."
                         ]
                 },
                 {
-                        "id": "settlement4-trainer",
-                        "type": "trainer",
-                        "interaction": "trainer",
-                        "name": "Greenvale Trainer",
-                        "x": 20,
+                        "id": "s4-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Greenvale Trader",
+                        "x": 24,
                         "y": 10,
-                        "color": "#6b9ed2",
+                        "color": "#b88a52",
                         "lines": [
-                                "A friendly battle before you continue?"
+                                "Farmers and travellers both stop here for supplies."
                         ],
-                        "team": [
-                                {
-                                        "species": "Brindlew",
-                                        "level": 7
-                                }
-                        ],
-                        "rewardVale": 220
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "capture"
+                                ]
+                        }
+                },
+                {
+                        "id": "s4-ranger",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Greenvale Ranger",
+                        "x": 15,
+                        "y": 8,
+                        "color": "#5f9360",
+                        "lines": [
+                                "The Great Windmill lies farther south.",
+                                "Keep following the green road and you will find Harveston."
+                        ]
                 }
         ]
 },
@@ -1242,80 +1249,79 @@ const maps = {
         "name": "Dunridge — Settlement 9",
         "handBuilt": true,
         "data": [
-                "...............G...............",
-                "...............G...............",
-                "..........T....G.............T.",
-                "...#######.#####.....########..",
-                ".T.#######.#####..T..########..",
-                "...#######.#####.....########..",
-                "...#######.#####.....########..",
-                "...#######...G.G.....########..",
-                "......G...V....G...V....G......",
-                "...............G...............",
-                "DGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-                "...............G...............",
-                "......G...V....G....V...G......",
-                "...#######.....G.....########..",
-                "...#######.....G.....########..",
-                "...#######.....G.....########..",
-                "...#######.....V.....########..",
-                ".T.#######.....G.....########T.",
-                "...#######.T...G...T.########..",
-                "...............G...............",
-                ".D.............G..............."
+                "###############D###############",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.########..T.GG.....########.#",
+                "#.########....GG..T..########.#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.########..T.GG...T.########.#",
+                "#.########....GG.....########.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "###############D###############"
         ],
         "spawn": {
-                "x": 2.5,
+                "x": 15.5,
                 "y": 18.5
         },
         "exits": [
                 {
-                        "x": 1,
-                        "y": 20,
-                        "targetMap": "route_westmere_dunridge",
-                        "targetX": 28.5,
-                        "targetY": 0.5,
-                        "message": "You return toward Westmere."
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "route_dunridge_settlement2_stonehaven",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "The northern Dunridge road continues."
                 },
                 {
-                        "x": 0,
-                        "y": 10,
-                        "targetMap": "route_dunridge_settlement2_stonehaven",
-                        "targetX": 28.5,
-                        "targetY": 9.5,
-                        "message": "You continue west toward the next Dunridge settlement."
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_westmere_dunridge",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward the southern Dunridge road."
                 }
         ],
         "encounters": [],
         "npcs": [
                 {
-                        "id": "dunridge9-elder",
+                        "id": "dunridge_settlement2-farmer",
                         "type": "npc",
                         "interaction": "dialogue",
-                        "name": "Hill Elder",
-                        "x": 15,
+                        "name": "Dunridge Farmer",
+                        "x": 10,
                         "y": 10,
-                        "color": "#806d58",
+                        "color": "#8a7655",
                         "lines": [
-                                "Welcome to the first Dunridge settlement.",
-                                "Stonehaven lies farther along the western road."
+                                "Dunridge is hill country and old farmland.",
+                                "Stonehaven is the region's major crossroads."
                         ]
                 },
                 {
-                        "id": "dunridge9-merchant",
+                        "id": "dunridge_settlement2-trader",
                         "type": "merchant",
                         "interaction": "merchant",
-                        "name": "Hill Merchant",
-                        "x": 24,
+                        "name": "Dunridge Trader",
+                        "x": 25,
                         "y": 10,
                         "color": "#b88a52",
                         "lines": [
-                                "Travellers heading for Stonehaven often stop here."
+                                "Supplies for the mountain roads."
                         ],
                         "shop": {
                                 "inventory": [
                                         "recoveryTonic",
-                                        "revivalTonic",
                                         "capture"
                                 ]
                         }
@@ -1353,33 +1359,88 @@ const maps = {
     },
 
     dunridge_settlement1: {
-        name: "Dunridge — Southwestern Settlement",
-        data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#....GGGG....................#",
-            "#....GGGG....................#",
-            "#....GGGG....................#",
-            "#....GGGG....................#",
-            "#............................#",
-            "#........TT..................#",
-            "#........TT..................#",
-            "#............................#",
-            "#..............VVVV..........#",
-            "#..............VVVV..........#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "##############D###############"
+        "name": "Dunridge — Settlement 10",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.########..T.GG.....########.#",
+                "#.########....GG..T..########.#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.########..T.GG...T.########.#",
+                "#.########....GG.....########.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "###############D###############"
         ],
-        spawn: { x: 14.5, y: 15.5 },
-        exits: [
-            { x: 14, y: 0, targetMap: "route_dunridge_settlement1_stonehaven", targetX: 14.5, targetY: 15.5, message: "The trail continues north toward Stonehaven." },
-            { x: 14, y: 16, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to the eastern Dunridge settlement." }
+        "spawn": {
+                "x": 15.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "route_dunridge_settlement1_stonehaven",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "The northern Dunridge road continues."
+                },
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_dunridge_settlement2_stonehaven",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward the southern Dunridge road."
+                }
         ],
-        encounters: []
-    },
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "dunridge_settlement1-farmer",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Dunridge Farmer",
+                        "x": 10,
+                        "y": 10,
+                        "color": "#8a7655",
+                        "lines": [
+                                "Dunridge is hill country and old farmland.",
+                                "Stonehaven is the region's major crossroads."
+                        ]
+                },
+                {
+                        "id": "dunridge_settlement1-trader",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Dunridge Trader",
+                        "x": 25,
+                        "y": 10,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Supplies for the mountain roads."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "capture"
+                                ]
+                        }
+                }
+        ]
+},
 
     route_dunridge_settlement1_stonehaven: {
         name: "Dunridge — Trail to Stonehaven",
@@ -1411,35 +1472,120 @@ const maps = {
     },
 
     stonehaven: {
-        name: "Stonehaven",
-        data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#........GGGG................#",
-            "#........GGGG................#",
-            "#........GGGG................#",
-            "#............................#",
-            "D....TT......................#",
-            "#....TT......................#",
-            "#............................#",
-            "#..............GGGG..........#",
-            "#..............GGGG..........#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "##############D###############"
+        "name": "Dunridge — Stonehaven",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.########.T..GG.....########.#",
+                "#.########....GG...T.########.#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "DGGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.########....GG.....########.#",
+                "#.########.T..GG....T########.#",
+                "#.########....GG.....########.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "###############D###############"
         ],
-        spawn: { x: 14.5, y: 15.5 },
-        exits: [
-            { x: 14, y: 0, targetMap: "route_stonehaven_highreach", targetX: 14.5, targetY: 15.5, message: "You leave Stonehaven and follow the trail toward Highreach." },
-            { x: 14, y: 16, targetMap: "route_dunridge_settlement2_stonehaven", targetX: 14.5, targetY: 1.5, message: "You return to the Dunridge settlement." },
-            { x: 0, y: 7, targetMap: "route_stonehaven_seawick", targetX: 28.5, targetY: 7.5, message: "A western coastal trail leads toward Seawick." }
+        "spawn": {
+                "x": 15.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_dunridge_settlement1_stonehaven",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward the Dunridge settlements."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "route_stonehaven_highreach",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "The northeastern road climbs toward Highreach."
+                },
+                {
+                        "x": 0,
+                        "y": 10,
+                        "targetMap": "route_stonehaven_seawick",
+                        "targetX": 28.5,
+                        "targetY": 10.5,
+                        "message": "The western coastal road leads toward Seawick."
+                }
         ],
-        encounters: [],
-        npcs: []
-    },
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "stone-rest",
+                        "type": "restoration",
+                        "interaction": "restoration",
+                        "name": "Stonehaven Restorer",
+                        "x": 6,
+                        "y": 10,
+                        "color": "#69a9a0",
+                        "lines": [
+                                "Welcome to Stonehaven. Rest up before choosing your road."
+                        ]
+                },
+                {
+                        "id": "stone-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Stonehaven Merchant",
+                        "x": 24,
+                        "y": 10,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Stonehaven sits between the coast, Dunridge and Highreach."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "revivalTonic",
+                                        "capture"
+                                ]
+                        }
+                },
+                {
+                        "id": "stone-ranger",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Road Warden",
+                        "x": 15,
+                        "y": 7,
+                        "color": "#5f9360",
+                        "lines": [
+                                "Three roads leave Stonehaven. West to Seawick, northeast to Highreach, and south into Dunridge."
+                        ]
+                },
+                {
+                        "id": "stone-resident",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Stonehaven Resident",
+                        "x": 15,
+                        "y": 13,
+                        "color": "#6b9ed2",
+                        "lines": [
+                                "Stonehaven is where travellers decide which part of the northern world they want to see next."
+                        ]
+                }
+        ]
+},
 
     route_stonehaven_seawick: {
         name: "Stonehaven → Mullhaven — Coastal Trail",
@@ -2306,6 +2452,614 @@ const maps = {
         encounters: [],
         npcs: []
     },
+
+    route_4_harveston: {
+        "name": "Greenvale — Road to Harveston",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.....T.......GGG.......T.....#",
+                "#.............GGG.............#",
+                "#.............GGG....VV.......#",
+                "#..T..........GGG....VV.......#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGGGGGGGG.......#",
+                "#.............GGGGGGGGG.......#",
+                "#.............GGG.............#",
+                "#.............GGG.....T.......#",
+                "#.............GGG.............#",
+                "#.....T.......GGG........T....#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 19.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "greenvale_settlement4",
+                        "targetX": 15.5,
+                        "targetY": 18.5,
+                        "message": "You return to Settlement 4."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "harveston_city",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "Harveston lies ahead."
+                }
+        ],
+        "encounters": [
+                {
+                        "species": "Brindlew",
+                        "minLevel": 6,
+                        "maxLevel": 8,
+                        "weight": 70
+                },
+                {
+                        "species": "Nimblet",
+                        "minLevel": 6,
+                        "maxLevel": 8,
+                        "weight": 30
+                }
+        ]
+},
+
+    harveston_city: {
+        "name": "Greenvale — Harveston",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######..T..GG......#######.#",
+                "#.#######.....GG...T..#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######..T..GG....T.#######.#",
+                "#.#######.....GG......#######.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_4_harveston",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward Settlement 4."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "route_harveston_5",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "The southern road continues toward Settlement 5."
+                }
+        ],
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "harv-rest",
+                        "type": "restoration",
+                        "interaction": "restoration",
+                        "name": "Harveston Restorer",
+                        "x": 5,
+                        "y": 10,
+                        "color": "#69a9a0",
+                        "lines": [
+                                "Harveston is Greenvale's farming heart."
+                        ]
+                },
+                {
+                        "id": "harv-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Harvest Merchant",
+                        "x": 25,
+                        "y": 10,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Fresh produce, supplies and capture crystals."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "revivalTonic",
+                                        "capture"
+                                ]
+                        }
+                },
+                {
+                        "id": "harv-ranger",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Windmill Keeper",
+                        "x": 15,
+                        "y": 7,
+                        "color": "#7b9b63",
+                        "lines": [
+                                "The Great Windmill is the pride of Greenvale.",
+                                "The southern road follows the old farm route."
+                        ]
+                },
+                {
+                        "id": "harv-gym",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Gym Attendant",
+                        "x": 15,
+                        "y": 12,
+                        "color": "#7a7fb0",
+                        "lines": [
+                                "Harveston will eventually host Greenvale's Gym challenge."
+                        ]
+                }
+        ]
+},
+
+    route_harveston_5: {
+        "name": "Greenvale — Farm Road to Settlement 5",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.....VV......GGG.............#",
+                "#.....VV......GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#.....VV....GGG...............#",
+                "#.....VV....GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 19.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "harveston_city",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward Harveston."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "greenvale_settlement5",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "You reach Settlement 5."
+                }
+        ],
+        "encounters": [
+                {
+                        "species": "Brindlew",
+                        "minLevel": 8,
+                        "maxLevel": 10,
+                        "weight": 60
+                },
+                {
+                        "species": "Pipiri",
+                        "minLevel": 8,
+                        "maxLevel": 10,
+                        "weight": 40
+                }
+        ]
+},
+
+    route_5_6: {
+        "name": "Greenvale — Southern Road to Settlement 6",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.....VV......GGG.............#",
+                "#.....VV......GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#.....VV....GGG...............#",
+                "#.....VV....GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "#...........GGG...............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 19.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "greenvale_settlement5",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward Settlement 5."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "greenvale_settlement6",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "You reach Settlement 6."
+                }
+        ],
+        "encounters": [
+                {
+                        "species": "Brindlew",
+                        "minLevel": 8,
+                        "maxLevel": 10,
+                        "weight": 60
+                },
+                {
+                        "species": "Pipiri",
+                        "minLevel": 8,
+                        "maxLevel": 10,
+                        "weight": 40
+                }
+        ]
+},
+
+    greenvale_settlement5: {
+        "name": "Greenvale — Settlement 5",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######.....GG......#######.#",
+                "#.#######..T..GG...T..#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######..T..GG...T..#######.#",
+                "#.#######.....GG......#######.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_harveston_5",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return along the road."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "route_5_6",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "The road continues south."
+                }
+        ],
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "greenvale_settlement5-resident",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Greenvale Resident",
+                        "x": 15,
+                        "y": 8,
+                        "color": "#6b9ed2",
+                        "lines": [
+                                "Life here follows the farms, roads and seasons.",
+                                "The Great Windmill is never far from travellers' minds."
+                        ]
+                },
+                {
+                        "id": "greenvale_settlement5-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Local Trader",
+                        "x": 25,
+                        "y": 10,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Supplies for the long road."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "capture"
+                                ]
+                        }
+                }
+        ]
+},
+
+    greenvale_settlement6: {
+        "name": "Greenvale — Settlement 6",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######.....GG......#######.#",
+                "#.#######..T..GG...T..#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######..T..GG...T..#######.#",
+                "#.#######.....GG......#######.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_5_6",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return along the road."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "route_6_7",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "The road continues south."
+                }
+        ],
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "greenvale_settlement6-resident",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Greenvale Resident",
+                        "x": 15,
+                        "y": 8,
+                        "color": "#6b9ed2",
+                        "lines": [
+                                "Life here follows the farms, roads and seasons.",
+                                "The Great Windmill is never far from travellers' minds."
+                        ]
+                },
+                {
+                        "id": "greenvale_settlement6-merchant",
+                        "type": "merchant",
+                        "interaction": "merchant",
+                        "name": "Local Trader",
+                        "x": 25,
+                        "y": 10,
+                        "color": "#b88a52",
+                        "lines": [
+                                "Supplies for the long road."
+                        ],
+                        "shop": {
+                                "inventory": [
+                                        "recoveryTonic",
+                                        "capture"
+                                ]
+                        }
+                }
+        ]
+},
+
+    greenvale_settlement7: {
+        "name": "Greenvale — Settlement 7",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######.....GG......#######.#",
+                "#.#######..T..GG...T..#######.#",
+                "#.#######.....GG......#######.#",
+                "#.#######.....GG......#######.#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGG#",
+                "#GGGGGGGGGGGGGGGGGGGGGGGGGGGGGD",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "#.#######.....GG..............#",
+                "#.#######.....GG..............#",
+                "#.#######.....GG..............#",
+                "#.#######..T..GG..............#",
+                "#.#######.....GG..............#",
+                "#.............GG..............#",
+                "#.............GG..............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 18.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "route_6_7",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward Settlement 6."
+                }
+        ],
+        "encounters": [],
+        "npcs": [
+                {
+                        "id": "s7-ferry",
+                        "type": "ferry",
+                        "interaction": "ferry",
+                        "name": "Lume Ferrymaster",
+                        "x": 25,
+                        "y": 10,
+                        "color": "#4f8fb5",
+                        "destinationMap": "lume_city",
+                        "destinationX": 7.5,
+                        "destinationY": 18.5,
+                        "returnX": 25.5,
+                        "returnY": 10.5,
+                        "lines": [
+                                "The ferry crosses the Central Sea to Lume.",
+                                "This is Greenvale's southern port."
+                        ]
+                },
+                {
+                        "id": "s7-res",
+                        "type": "npc",
+                        "interaction": "dialogue",
+                        "name": "Dock Resident",
+                        "x": 15,
+                        "y": 8,
+                        "color": "#6b9ed2",
+                        "lines": [
+                                "The sea makes this little settlement busier than it looks."
+                        ]
+                }
+        ]
+},
+
+    route_6_7: {
+        "name": "Greenvale — Road to Southern Port",
+        "handBuilt": true,
+        "data": [
+                "###############D###############",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "#.............GGG.............#",
+                "###############D###############"
+        ],
+        "spawn": {
+                "x": 15.5,
+                "y": 19.5
+        },
+        "exits": [
+                {
+                        "x": 15,
+                        "y": 20,
+                        "targetMap": "greenvale_settlement6",
+                        "targetX": 15.5,
+                        "targetY": 1.5,
+                        "message": "You return toward Settlement 6."
+                },
+                {
+                        "x": 15,
+                        "y": 0,
+                        "targetMap": "greenvale_settlement7",
+                        "targetX": 15.5,
+                        "targetY": 19.5,
+                        "message": "You arrive at Greenvale's southern port settlement."
+                }
+        ],
+        "encounters": [
+                {
+                        "species": "Brindlew",
+                        "minLevel": 10,
+                        "maxLevel": 12,
+                        "weight": 70
+                },
+                {
+                        "species": "Pipiri",
+                        "minLevel": 10,
+                        "maxLevel": 12,
+                        "weight": 30
+                }
+        ]
+},
 
     research_center: {
         name: "Entheon Research Center",
