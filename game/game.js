@@ -1823,29 +1823,49 @@ function routeForMapId(mapId) {
 }
 
 function directionalExitInfo(mapId, exit) {
+    const routes = window.KALEO_WORLD?.routes || [];
+
+    // First handle a playable route map. A route map has one authoritative
+    // graph entry, and its exits lead back to the two endpoint locations.
     const route = routeForMapId(mapId);
-    if (!route) return null;
+    if (route) {
+        const fromMap = mapIdForLocation(route.from);
+        const toMap = mapIdForLocation(route.to);
 
-    const fromMap = mapIdForLocation(route.from);
-    const toMap = mapIdForLocation(route.to);
-
-    // Location -> route map.
-    if (mapId === fromMap && exit.targetMap === route.mapId) {
-        return { direction: route.direction };
-    }
-    if (mapId === toMap && exit.targetMap === route.mapId) {
-        return { direction: route.reverseDirection };
-    }
-
-    // Route map -> location.
-    if (mapId === route.mapId && exit.targetMap === fromMap) {
-        return { direction: route.reverseDirection };
-    }
-    if (mapId === route.mapId && exit.targetMap === toMap) {
-        return { direction: route.direction };
+        if (exit.targetMap === fromMap) {
+            return { direction: route.reverseDirection };
+        }
+        if (exit.targetMap === toMap) {
+            return { direction: route.direction };
+        }
+        return null;
     }
 
-    return null;
+    // Location maps can have several outgoing routes. The old implementation
+    // only looked up a route by *route-map id*, which meant location exits
+    // silently kept whatever coordinates happened to be in the placeholder
+    // map. That is why a Settlement 2 branch could still appear at the top
+    // of the map instead of leaving west/east according to the world map.
+    const location = window.KALEO_WORLD?.locations?.find(loc => loc.mapId === mapId);
+    if (!location) return null;
+
+    const matchingRoute = routes.find(candidate => {
+        if (candidate.from === location.id) {
+            return exit.targetMap === candidate.mapId;
+        }
+        if (candidate.to === location.id) {
+            return exit.targetMap === candidate.mapId;
+        }
+        return false;
+    });
+
+    if (!matchingRoute) return null;
+
+    return {
+        direction: matchingRoute.from === location.id
+            ? matchingRoute.direction
+            : matchingRoute.reverseDirection
+    };
 }
 
 function applyDirectionalRouteLayout() {
