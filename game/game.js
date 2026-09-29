@@ -878,7 +878,7 @@ const maps = {
     },
 
     route_stonehaven_seawick: {
-        name: "Stonehaven → Seawick — Coastal Trail",
+        name: "Stonehaven → Mullhaven — Coastal Trail",
         data: [
             "##############################",
             "#............................#",
@@ -887,7 +887,7 @@ const maps = {
             "#............................#",
             "#....TT......................#",
             "#....TT......................#",
-            "D............................D",
+            "#............................#",
             "#..............GGGG..........#",
             "#..............GGGG..........#",
             "#............................#",
@@ -898,16 +898,16 @@ const maps = {
             "#............................#",
             "##############################"
         ],
-        spawn: { x: 28.5, y: 7.5 },
+        spawn: { x: 28.5, y: 15.5 },
         exits: [
-            { x: 0, y: 7, targetMap: "stonehaven", targetX: 1.5, targetY: 7.5, message: "You return to Stonehaven." },
-            { x: 29, y: 7, targetMap: "seawick_settlement11", targetX: 1.5, targetY: 7.5, message: "You arrive at Settlement 11 in Seawick." }
+            { x: 28, y: 16, targetMap: "stonehaven", targetX: 28.5, targetY: 7.5, message: "You return to Stonehaven along the coastal trail." },
+            { x: 1, y: 0, targetMap: "seawick_settlement11", targetX: 1.5, targetY: 15.5, message: "You arrive at Mullhaven in Seawick." }
         ],
         encounters: []
     },
 
     seawick_settlement11: {
-        name: "Seawick — Settlement 11",
+        name: "Seawick — Mullhaven",
         data: [
             "##############################",
             "#............................#",
@@ -2279,6 +2279,16 @@ function buildNaturalMap(mapId, map) {
 }
 
 Object.entries(maps).forEach(([mapId, map]) => buildNaturalMap(mapId, map));
+Object.values(maps).forEach(map => ensureAllExitCorridors(map));
+
+// Final world-graph normalization pass.
+// Natural terrain generation can rebuild the physical map after the first
+// directional pass. Re-apply the authoritative route directions afterwards
+// so every route keeps the correct compass exits AND arrival side.
+// This is especially important for diagonal routes such as
+// Stonehaven ↔ Mullhaven, which must use northwest/southeast entrances
+// rather than the old east/west placeholder doors.
+applyDirectionalRouteLayout();
 Object.values(maps).forEach(map => ensureAllExitCorridors(map));
 
 let currentMap = maps.town;

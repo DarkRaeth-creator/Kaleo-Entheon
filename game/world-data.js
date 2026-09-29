@@ -95,7 +95,7 @@ const KALEO_WORLD = {
         { id: "stonehaven-city", region: "dunridge", type: "major-city", name: "Stonehaven", mapId: "stonehaven" },
 
         // Seawick
-        { id: "settlement-11", number: 11, region: "seawick", type: "settlement", name: "Settlement 11", mapId: "seawick_settlement11" },
+        { id: "settlement-11", number: 11, region: "seawick", type: "settlement", name: "Mullhaven", mapId: "seawick_settlement11" },
         { id: "settlement-12", number: 12, region: "seawick", type: "settlement", name: "Settlement 12", mapId: "seawick_settlement12" },
         { id: "gullhaven-city", region: "seawick", type: "major-city", name: "Gullhaven", mapId: "gullhaven_city", gymId: "gullhaven-gym" },
         { id: "settlement-13", number: 13, region: "seawick", type: "settlement", name: "Settlement 13", mapId: null },
