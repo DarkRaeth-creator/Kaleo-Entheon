@@ -601,76 +601,180 @@ const maps = {
     },
 
     route_everhope_settlement2: {
-        name: "Westmere — Main Trail to Settlement 2",
+        name: "Westmere — Northwesterly Trail to Settlement 2",
+        handBuilt: true,
         data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "##############D###############"
+            "#D#############################",
+            "#GGG.........................T#",
+            "#..GGG.......................T#",
+            "#....GGG......................#",
+            "#......GGG.......V...........T#",
+            "#........GGG.................##",
+            "#..........GGG.....TT........##",
+            "#............GGG.............##",
+            "#..............GGG...........##",
+            "#................GGG........###",
+            "#.................GGG...V...###",
+            "#...................GGG.....###",
+            "#.....................GGG...###",
+            "#.......................GGG.###",
+            "#.........................GG###",
+            "#..........................G###",
+            "#........................GGG###",
+            "#.......................GGGG###",
+            "#############################D#"
         ],
-        spawn: { x: 14.5, y: 15.5 },
+        spawn: { x: 28.5, y: 16.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "everhope_city", targetX: 14.5, targetY: 1.5, message: "You return to Everhope City." },
-            { x: 14, y: 0, targetMap: "westmere_settlement2", targetX: 14.5, targetY: 15.5, message: "You arrive at Settlement 2 in Westmere." }
+            { x: 1, y: 0, targetMap: "everhope_city", targetX: 28.5, targetY: 16.5, message: "You return toward Everhope City along the northwestern trail." },
+            { x: 29, y: 18, targetMap: "westmere_settlement2", targetX: 1.5, targetY: 11.5, message: "The trail bends southeast toward Settlement 2." }
         ],
-        encounters: []
+        encounters: [
+            { species: "Brindlew", minLevel: 5, maxLevel: 6, weight: 35 },
+            { species: "Orven", minLevel: 5, maxLevel: 7, weight: 25 },
+            { species: "Meliu", minLevel: 5, maxLevel: 7, weight: 20 },
+            { species: "Virel", minLevel: 6, maxLevel: 8, weight: 20 }
+        ],
+        npcs: [
+            {
+                id: "settlement2-trainer",
+                type: "trainer",
+                interaction: "trainer",
+                name: "Hiker Rowan",
+                x: 16,
+                y: 9,
+                color: "#8b6b4f",
+                lines: [
+                    "The trail gets busier once you get closer to Settlement 2.",
+                    "Let's see whether you're ready for the Trainers further north."
+                ],
+                battle: {
+                    reward: 120,
+                    team: [{ species: "Orven", level: 6 }],
+                    victory: "Not bad. Settlement 2 isn't far now.",
+                    defeat: "The trail can wait. Take some time to prepare."
+                }
+            },
+            {
+                id: "trail-ranger-2",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Westmere Ranger",
+                x: 11,
+                y: 6,
+                color: "#5f8f62",
+                lines: [
+                    "This stretch of Westmere is still mostly woodland and open country.",
+                    "Stay on the trail when you can. The wild Entheon here are getting more varied."
+                ]
+            }
+        ]
     },
 
     westmere_settlement2: {
         name: "Westmere — Settlement 2",
+        handBuilt: true,
         data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "##############D###############"
+            " D#############################",
+            "GGG............T..............#",
+            "#GGG....................T.....#",
+            "#..GGG.......#####............#",
+            "#....GG......#...#.....TT.....#",
+            "#.....GG.....#...#............#",
+            "#......GG....#...#............#",
+            "#.......GG...#####....VV......#",
+            "#........GGG...........VV.....#",
+            "#..........GGG................#",
+            "D...........GGG...............#",
+            "G...........GGG....WWWW......##",
+            "GG..........GGG....WWWW......##",
+            "#GGG........GGG..............##",
+            "#..GGG......GGG.....#####....##",
+            "#....GG.....GGG.....#...#....##",
+            "#.....GG....GGG.....#...#....##",
+            "#......GG...GGG.....#####....##",
+            "#.......GGGGGGG..............##",
+            "#............................##",
+            "###############################"
         ],
-        spawn: { x: 14.5, y: 15.5 },
+        spawn: { x: 3.5, y: 10.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "route_everhope_settlement2", targetX: 14.5, targetY: 1.5, message: "You return toward Everhope City." },
-            { x: 14, y: 0, targetMap: "route_settlement2_settlement3", targetX: 14.5, targetY: 15.5, message: "You leave Settlement 2 along the Main Trail." }
+            { x: 1, y: 0, targetMap: "route_everhope_settlement2", targetX: 28.5, targetY: 16.5, message: "You head back toward Everhope City." },
+            { x: 0, y: 10, targetMap: "route_settlement2_settlement3", targetX: 28.5, targetY: 8.5, message: "A western road leads toward Settlement 3." }
         ],
         encounters: [],
         npcs: [
             {
-                id: "lume-ferry-settlement2",
+                id: "settlement2-restoration",
+                type: "restoration",
+                interaction: "restoration",
+                name: "Restoration Attendant",
+                x: 8,
+                y: 8,
+                color: "#69a9a0",
+                lines: [
+                    "Welcome to Settlement 2's Restoration Hub.",
+                    "Your Entheon are ready for the road whenever you are."
+                ]
+            },
+            {
+                id: "settlement2-merchant",
+                type: "merchant",
+                interaction: "merchant",
+                name: "Local Merchant",
+                x: 24,
+                y: 9,
+                color: "#b88a52",
+                lines: [
+                    "We get plenty of travellers passing through here.",
+                    "Need supplies before you continue west?"
+                ],
+                shop: { inventory: ["recoveryTonic", "capture"] }
+            },
+            {
+                id: "settlement2-ferrymaster",
                 type: "ferry",
                 interaction: "ferry",
                 name: "Lume Ferrymaster",
-                x: 22,
-                y: 8,
+                x: 21,
+                y: 12,
                 color: "#4f8fb5",
                 destinationMap: "lume_city",
                 destinationX: 14.5,
                 destinationY: 15.5,
-                returnX: 14.5,
-                returnY: 8.5,
-                lines: ["The ferry to Lume is ready to depart."]
+                returnX: 21.5,
+                returnY: 12.5,
+                lines: [
+                    "The ferry to Lume departs from here.",
+                    "It is a long crossing, but much faster than travelling around the sea."
+                ]
+            },
+            {
+                id: "settlement2-resident",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Local Gardener",
+                x: 15,
+                y: 5,
+                color: "#7b9a61",
+                lines: [
+                    "Settlement 2 sits right on one of Westmere's old travel lines.",
+                    "Traders heading toward Lume often stop here before taking the ferry.",
+                    "The western road eventually reaches Settlement 3."
+                ]
+            },
+            {
+                id: "settlement2-traveller",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Travelling Trainer",
+                x: 6,
+                y: 15,
+                color: "#6b9ed2",
+                lines: [
+                    "Everhope is the big city, but I actually prefer the smaller settlements.",
+                    "Less crowded, easier to hear yourself think."
+                ]
             }
         ]
     },
