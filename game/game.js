@@ -3634,6 +3634,109 @@ function buildNaturalMap(mapId, map) {
     map.data = grid.map(row => row.join(""));
 }
 
+
+// ============================================================
+// FULL-WORLD CONTENT PASS
+// Build any remaining graph locations/routes that do not yet have a
+// hand-authored map. These are deliberately content-rich themed maps,
+// not blank placeholders, and they inherit their exits from the
+// authoritative world graph so the physical world follows the map.
+// ============================================================
+function slugMapId(id) { return String(id).replace(/[^a-zA-Z0-9_-]/g, "_"); }
+function regionTheme(region) {
+    return {
+        westmere:"forest", greenvale:"grassland", dunridge:"hill", seawick:"coast",
+        highreach:"mountain", northvale:"north", isen:"frost", hawthorne:"lake", eastmere:"coast", lume:"coast"
+    }[region] || "grassland";
+}
+function directionPoint(dir, w=31, h=21, inset=2) {
+    const cx=Math.floor(w/2), cy=Math.floor(h/2);
+    return {
+        north:{x:cx,y:0,ix:cx,iy:3}, south:{x:cx,y:h-1,ix:cx,iy:h-4},
+        east:{x:w-1,y:cy,ix:w-4,iy:cy}, west:{x:0,y:cy,ix:3,iy:cy},
+        northeast:{x:w-1-inset,y:inset,ix:w-5,iy:3}, northwest:{x:inset,y:inset,ix:4,iy:3},
+        southeast:{x:w-1-inset,y:h-1-inset,ix:w-5,iy:h-4}, southwest:{x:inset,y:h-1-inset,ix:4,iy:h-4}
+    }[dir] || {x:cx,y:0,ix:cx,iy:3};
+}
+function oppositeDir(dir){ return {north:"south",south:"north",east:"west",west:"east",northeast:"southwest",northwest:"southeast",southeast:"northwest",southwest:"northeast"}[dir] || "south"; }
+function autoMapIdForLocation(loc){ return loc.mapId || `${loc.region}_${slugMapId(loc.id.replace(/^.*?-/,'settlement_'))}`; }
+function autoMapIdForRoute(route){ return route.mapId || `route_${slugMapId(route.id)}`; }
+function ensureFullWorldMapIds(){
+    KALEO_WORLD.locations.forEach(loc=>{ if(!loc.mapId) loc.mapId=autoMapIdForLocation(loc); });
+    KALEO_WORLD.routes.forEach(route=>{ if(!route.mapId) route.mapId=autoMapIdForRoute(route); });
+}
+function themedBase(theme,w=31,h=21){
+    const rows=Array.from({length:h},()=>Array(w).fill(TILE.GRASS));
+    for(let x=0;x<w;x++){rows[0][x]=TILE.TREE; rows[h-1][x]=TILE.TREE;}
+    for(let y=0;y<h;y++){rows[y][0]=TILE.TREE; rows[y][w-1]=TILE.TREE;}
+    return rows;
+}
+function addBuilding(grid,x,y,w=5,h=3){
+    for(let yy=y;yy<y+h;yy++) for(let xx=x;xx<x+w;xx++) if(grid[yy]?.[xx]!==undefined) grid[yy][xx]=TILE.WALL;
+    const dx=x+Math.floor(w/2); if(grid[y+h]?.[dx]!==undefined) grid[y+h][dx]=TILE.DOOR;
+}
+function createAutoWorldMap(mapId,name,region,exits,kind){
+    const w=31,h=21, theme=regionTheme(region), grid=themedBase(theme,w,h);
+    // Broad central public space and themed terrain.
+    const seed=mapId.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){
+        const n=(x*37+y*53+seed*11)%101;
+        if(theme==='coast' && (x<4 || x>w-5) && n>62) grid[y][x]=TILE.WATER;
+        else if(theme==='mountain' && n>91) grid[y][x]=TILE.WALL;
+        else if((theme==='forest'||theme==='north'||theme==='frost') && n>84) grid[y][x]=TILE.TREE;
+        else if((theme==='forest'||theme==='grassland'||theme==='hill') && n>88) grid[y][x]=TILE.TALL_GRASS;
+        else if(theme==='lake' && n>90) grid[y][x]=TILE.WATER;
+    }
+    // Roads/trails are carved first and remain walkable.
+    exits.forEach(e=>{ const p=directionPoint(e.direction,w,h); e.x=p.x;e.y=p.y;e.innerX=p.ix;e.innerY=p.iy; carveCorridor(grid,p.x,p.y,p.ix,p.iy,2); });
+    if(exits.length>1){
+        const hub={x:Math.floor(w/2),y:Math.floor(h/2)};
+        exits.forEach(e=>carveCorridor(grid,e.innerX,e.innerY,hub.x,hub.y,2));
+    }
+    // Settlement/city architecture sits around the roads.
+    if(kind==='location'){
+        addBuilding(grid,4,3,5,3); addBuilding(grid,22,3,5,3); addBuilding(grid,4,14,5,3); addBuilding(grid,22,14,5,3);
+        for(let x=11;x<20;x++) for(let y=9;y<12;y++) if(grid[y][x]===TILE.GRASS) grid[y][x]=TILE.PATH;
+    }
+    exits.forEach(e=>{grid[e.y][e.x]=TILE.DOOR;});
+    const data=grid.map(r=>r.join(''));
+    const npcs=[];
+    if(kind==='location'){
+        npcs.push({id:`${mapId}-resident`,type:'npc',interaction:'dialogue',name:'Local Resident',x:Math.floor(w/2)-4,y:Math.floor(h/2),color:'#8b7653',lines:[`Welcome to ${name}.`, `The roads here connect to ${exits.length} direction${exits.length===1?'':'s'}.`]});
+        if(name.includes('City') || ['Harveston','Gullhaven','Thermalis','Northreach','Lakecrest City','Fairhaven','Winterhold'].includes(name)){
+            npcs.push({id:`${mapId}-shop`,type:'merchant',interaction:'merchant',name:'Local Merchant',x:24,y:10,color:'#b88a52',lines:['Need supplies for the road?'],shop:{inventory:['recoveryTonic','capture']}});
+            npcs.push({id:`${mapId}-restore`,type:'restoration',interaction:'restoration',name:'Restoration Attendant',x:7,y:10,color:'#69a9a0',lines:['Your Entheon are welcome here.']});
+        }
+    } else {
+        npcs.push({id:`${mapId}-ranger`,type:'npc',interaction:'dialogue',name:'Route Ranger',x:Math.floor(w/2),y:Math.floor(h/2)-3,color:'#6b8f5b',lines:['Keep to the trail and watch the tall grass.']});
+    }
+    return {name,theme,handBuilt:false,data,spawn:{x:Math.floor(w/2)+.5,y:Math.floor(h/2)+.5},exits:exits.map(e=>({x:e.x,y:e.y,targetMap:e.targetMap,targetX:e.targetX,targetY:e.targetY,message:e.message})),encounters:kind==='route'?[{species:region==='seawick'?'Brindlew':'Orrin',minLevel:6,maxLevel:12,weight:100}]:[],npcs};
+}
+function createFullWorldMaps(){
+    ensureFullWorldMapIds();
+    // Locations: every overland connection becomes a physical exit.
+    KALEO_WORLD.locations.forEach(loc=>{
+        const mapId=loc.mapId; if(maps[mapId]) return;
+        const connected=KALEO_WORLD.routes.filter(r=>r.from===loc.id || r.to===loc.id).map(r=>{
+            const from= r.from===loc.id, dir=from?r.direction:r.reverseDirection, other=from?r.to:r.from;
+            const target=KALEO_WORLD.getLocation(other); const p=directionPoint(dir);
+            return {direction:dir,x:p.x,y:p.y,targetMap:target.mapId,targetX:directionPoint(oppositeDir(dir)).ix+.5,targetY:directionPoint(oppositeDir(dir)).iy+.5,message:`You follow the ${r.kind==='secondary-trail'?'side trail':'route'} toward ${target.name}.`};
+        });
+        maps[mapId]=createAutoWorldMap(mapId,loc.name,loc.region,connected,'location');
+    });
+    // Routes: two exits, one back and one forward.
+    KALEO_WORLD.routes.forEach(r=>{
+        const mapId=r.mapId; if(maps[mapId]) return;
+        const a=KALEO_WORLD.getLocation(r.from), b=KALEO_WORLD.getLocation(r.to);
+        const p1=directionPoint(r.direction), p2=directionPoint(r.reverseDirection);
+        maps[mapId]=createAutoWorldMap(mapId,`${a.name} — Route to ${b.name}`,a.region,[
+            {direction:r.direction,x:p1.x,y:p1.y,targetMap:b.mapId,targetX:p2.ix+.5,targetY:p2.iy+.5,message:`You continue toward ${b.name}.`},
+            {direction:r.reverseDirection,x:p2.x,y:p2.y,targetMap:a.mapId,targetX:p1.ix+.5,targetY:p1.iy+.5,message:`You head back toward ${a.name}.`}
+        ],'route');
+    });
+}
+createFullWorldMaps();
+
 Object.entries(maps).forEach(([mapId, map]) => buildNaturalMap(mapId, map));
 Object.values(maps).forEach(map => ensureAllExitCorridors(map));
 
