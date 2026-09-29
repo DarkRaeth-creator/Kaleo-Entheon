@@ -1868,6 +1868,57 @@ function directionalExitInfo(mapId, exit) {
     };
 }
 
+
+function ensureExitApproach(map, exit) {
+    // Directional exits are not just visual markers: the player must have a
+    // walkable approach to every door. This matters especially for diagonal
+    // route exits, where a door near a corner can otherwise end up behind a
+    // wall/void section of an irregular map.
+    const width = map.data[0].length;
+    const height = map.data.length;
+    const direction = exit.direction;
+    if (!direction) return;
+
+    const inward = {
+        north: [0, 1],
+        northeast: [-1, 1],
+        east: [-1, 0],
+        southeast: [-1, -1],
+        south: [0, -1],
+        southwest: [1, -1],
+        west: [1, 0],
+        northwest: [1, 1]
+    }[direction];
+
+    if (!inward) return;
+
+    const rows = map.data.map(row => row.split(""));
+    let x = exit.x;
+    let y = exit.y;
+
+    const isWalkable = (tx, ty) => {
+        if (tx < 0 || tx >= width || ty < 0 || ty >= height) return false;
+        const tile = rows[ty][tx];
+        return tile !== TILE.WALL && tile !== TILE.VOID && tile !== TILE.TREE && tile !== TILE.WATER;
+    };
+
+    // Carve only until we hit existing walkable terrain. This preserves the
+    // hand-built terrain while guaranteeing a continuous route to the door.
+    for (let i = 0; i < Math.max(width, height); i++) {
+        const nx = x + inward[0];
+        const ny = y + inward[1];
+        if (nx < 0 || nx >= width || ny < 0 || ny >= height) break;
+
+        if (isWalkable(nx, ny)) break;
+
+        rows[ny][nx] = TILE.PATH;
+        x = nx;
+        y = ny;
+    }
+
+    map.data = rows.map(row => row.join(""));
+}
+
 function applyDirectionalRouteLayout() {
     Object.entries(maps).forEach(([mapId, map]) => {
         const exits = map.exits || [];
@@ -1884,6 +1935,10 @@ function applyDirectionalRouteLayout() {
 
             exit.x = point.x;
             exit.y = point.y;
+
+            // Ensure the directional doorway is physically reachable from
+            // the interior, including diagonal exits on irregular maps.
+            ensureExitApproach(map, exit);
 
             // Put the player's arrival point on the matching opposite edge
             // when this exit targets another route/location map. This keeps
