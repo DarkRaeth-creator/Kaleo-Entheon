@@ -1789,6 +1789,27 @@ function oppositeDirection(direction) {
     }[direction] || null;
 }
 
+// Return a player spawn point safely inside the map, rather than directly on
+// or immediately beside the doorway. This prevents an arrival from being
+// interpreted as another exit and sending the player straight back.
+function directionalSpawnPoint(direction, width, height) {
+    const inset = 2.5;
+    const centerX = (width - 1) / 2 + 0.5;
+    const centerY = (height - 1) / 2 + 0.5;
+
+    switch (direction) {
+        case "north": return { x: centerX, y: inset };
+        case "northeast": return { x: width - inset, y: inset };
+        case "east": return { x: width - inset, y: centerY };
+        case "southeast": return { x: width - inset, y: height - inset };
+        case "south": return { x: centerX, y: height - inset };
+        case "southwest": return { x: inset, y: height - inset };
+        case "west": return { x: inset, y: centerY };
+        case "northwest": return { x: inset, y: inset };
+        default: return null;
+    }
+}
+
 function directionalPoint(direction, width, height) {
     const spec = DIRECTIONAL_ROUTE_LAYOUT[direction];
     if (!spec) return null;
@@ -1950,30 +1971,10 @@ function applyDirectionalRouteLayout() {
                 const targetPoint = directionalPoint(entryDirection, targetWidth, targetHeight);
 
                 if (targetPoint) {
-                    exit.targetX = targetPoint.x + 0.5;
-                    exit.targetY = targetPoint.y + 0.5;
-
-                    // Move the spawn one tile inward where possible so the
-                    // player is not left standing inside a wall/door tile.
-                    if (entryDirection === "north") exit.targetY = 1.5;
-                    if (entryDirection === "south") exit.targetY = targetHeight - 1.5;
-                    if (entryDirection === "west") exit.targetX = 1.5;
-                    if (entryDirection === "east") exit.targetX = targetWidth - 1.5;
-                    if (entryDirection === "northeast") {
-                        exit.targetX = targetWidth - 1.5;
-                        exit.targetY = 1.5;
-                    }
-                    if (entryDirection === "northwest") {
-                        exit.targetX = 1.5;
-                        exit.targetY = 1.5;
-                    }
-                    if (entryDirection === "southeast") {
-                        exit.targetX = targetWidth - 1.5;
-                        exit.targetY = targetHeight - 1.5;
-                    }
-                    if (entryDirection === "southwest") {
-                        exit.targetX = 1.5;
-                        exit.targetY = targetHeight - 1.5;
+                    const spawn = directionalSpawnPoint(entryDirection, targetWidth, targetHeight);
+                    if (spawn) {
+                        exit.targetX = spawn.x;
+                        exit.targetY = spawn.y;
                     }
                 }
             }
@@ -2095,6 +2096,57 @@ function naturalFootprint(width, height, kind, seed) {
         }
     }
     return mask;
+}
+
+function ensureAllExitCorridors(map) {
+    if (!map?.data?.length) return;
+
+    const height = map.data.length;
+    const width = Math.max(...map.data.map(row => row.length));
+    const exits = map.exits || [];
+    if (!exits.length) return;
+
+    const grid = map.data.map(row => row.padEnd(width, TILE_VOID).split(""));
+    const isBlocked = (x, y) => {
+        if (x < 0 || y < 0 || x >= width || y >= height) return true;
+        return [TILE.WALL, TILE.VOID, TILE.TREE, TILE.WATER].includes(grid[y][x]);
+    };
+
+    // Carve from every boundary door toward the map's central road hub.
+    // This runs after terrain/buildings are generated, so later procedural
+    // decoration can never strand a doorway behind an inaccessible patch.
+    const hub = { x: Math.floor(width / 2), y: Math.floor(height / 2) };
+
+    exits.forEach(exit => {
+        const ex = Math.max(0, Math.min(width - 1, Math.round(exit.x)));
+        const ey = Math.max(0, Math.min(height - 1, Math.round(exit.y)));
+        let cx = ex;
+        let cy = ey;
+
+        for (let i = 0; i < width * height; i++) {
+            grid[cy][cx] = TILE.PATH;
+            if (cx === hub.x && cy === hub.y) break;
+
+            // Prefer moving toward the hub on the axis that is furthest away.
+            const dx = hub.x - cx;
+            const dy = hub.y - cy;
+            if (Math.abs(dx) >= Math.abs(dy) && dx !== 0) cx += Math.sign(dx);
+            else if (dy !== 0) cy += Math.sign(dy);
+            else break;
+
+            // Keep a one-tile trail width.
+            if (grid[cy]?.[cx] !== undefined) grid[cy][cx] = TILE.PATH;
+        }
+    });
+
+    // Reapply the actual doors after carving.
+    exits.forEach(exit => {
+        const x = Math.round(exit.x);
+        const y = Math.round(exit.y);
+        if (grid[y]?.[x] !== undefined) grid[y][x] = TILE.DOOR;
+    });
+
+    map.data = grid.map(row => row.join(""));
 }
 
 function buildNaturalMap(mapId, map) {
@@ -2227,6 +2279,7 @@ function buildNaturalMap(mapId, map) {
 }
 
 Object.entries(maps).forEach(([mapId, map]) => buildNaturalMap(mapId, map));
+Object.values(maps).forEach(map => ensureAllExitCorridors(map));
 
 let currentMap = maps.town;
 
@@ -2548,17 +2601,21 @@ function startOverworld() {
 }
 
 function findSafeSpawn(x, y) {
-    const candidates = [
-        [x, y],
-        [x, y + 0.55],
-        [x, y - 0.55],
-        [x + 0.55, y],
-        [x - 0.55, y],
-        [x, y + 1],
-        [x, y - 1],
-        [x + 1, y],
-        [x - 1, y]
-    ];
+    // Search outward instead of only checking a handful of offsets.
+    // Irregular route footprints can legitimately have a void/terrain patch
+    // near a directional entrance, so the arrival point should be the nearest
+    // genuinely walkable tile rather than a hard-coded fallback.
+    const candidates = [];
+    const maxRadius = 8;
+
+    for (let radius = 0; radius <= maxRadius; radius++) {
+        for (let dy = -radius; dy <= radius; dy++) {
+            for (let dx = -radius; dx <= radius; dx++) {
+                if (Math.max(Math.abs(dx), Math.abs(dy)) !== radius) continue;
+                candidates.push([x + dx, y + dy]);
+            }
+        }
+    }
 
     for (const [cx, cy] of candidates) {
         if (canMoveTo(cx, cy)) {
@@ -2566,8 +2623,9 @@ function findSafeSpawn(x, y) {
         }
     }
 
-    // Last resort: use the requested location. This should only be reached
-    // if a future map designer creates a completely enclosed spawn area.
+    // Last resort: use the requested location. This should only happen if a
+    // future map is completely enclosed, which should be caught during map
+    // testing rather than during normal travel.
     return { x, y };
 }
 
