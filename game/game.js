@@ -1793,22 +1793,25 @@ function directionalPoint(direction, width, height) {
     const spec = DIRECTIONAL_ROUTE_LAYOUT[direction];
     if (!spec) return null;
 
-    // Keep corner exits one tile away from the extreme corner so the player
-    // can approach them naturally instead of being trapped against two walls.
-    const inset = 1;
-    let x;
-    let y;
+    // Cardinal exits sit in the middle of their boundary. Diagonal exits
+    // sit near the corresponding corner, but NEVER on the literal corner
+    // tile. A corner door is unreachable on these maps because the two
+    // perpendicular boundary tiles beside it are walls. Keeping one tile
+    // of horizontal/vertical clearance makes every directional exit
+    // physically reachable while preserving its intended compass direction.
+    if (direction === "north") return { x: Math.floor(width / 2), y: 0 };
+    if (direction === "south") return { x: Math.floor(width / 2), y: height - 1 };
+    if (direction === "west") return { x: 0, y: Math.floor(height / 2) };
+    if (direction === "east") return { x: width - 1, y: Math.floor(height / 2) };
 
-    if (spec.x === 0) x = 0;
-    else if (spec.x === 1) x = width - 1;
-    else x = Math.floor(width / 2);
+    const edgeInset = 1;
 
-    if (spec.y === 0) y = 0;
-    else if (spec.y === 1) y = height - 1;
-    else y = Math.floor(height / 2);
+    if (direction === "northwest") return { x: edgeInset, y: 0 };
+    if (direction === "northeast") return { x: width - 1 - edgeInset, y: 0 };
+    if (direction === "southwest") return { x: edgeInset, y: height - 1 };
+    if (direction === "southeast") return { x: width - 1 - edgeInset, y: height - 1 };
 
-    // For cardinal exits, centre them. For diagonals, use the actual corner.
-    return { x, y };
+    return null;
 }
 
 function mapIdForLocation(locationId) {
@@ -1925,6 +1928,230 @@ function applyDirectionalRouteLayout() {
 }
 
 applyDirectionalRouteLayout();
+
+// ============================================================
+// NATURAL WORLD MAP GEOMETRY
+// ============================================================
+// The prototype used rectangular rooms with a wall around every edge.
+// That was useful while validating connectivity, but it made overland
+// routes and settlements feel like boxes. The route graph remains the
+// authority for connectivity; this layer only gives each playable map an
+// irregular physical footprint and a believable path network.
+
+const TILE_VOID = " ";
+TILE.VOID = TILE_VOID;
+
+function stableNoise(x, y, seed = 1) {
+    const n = Math.sin((x * 127.1 + y * 311.7 + seed * 74.3)) * 43758.5453;
+    return n - Math.floor(n);
+}
+
+function mapTheme(mapId, mapName) {
+    const text = `${mapId} ${mapName}`.toLowerCase();
+    if (text.includes("seawick") || text.includes("gullhaven") || text.includes("lume")) return "coast";
+    if (text.includes("highreach") || text.includes("thermalis") || text.includes("winterhold")) return "mountain";
+    if (text.includes("northvale") || text.includes("northreach")) return "north";
+    if (text.includes("dunridge")) return "hill";
+    if (text.includes("greenvale")) return "forest";
+    if (text.includes("eastmere") || text.includes("lakecrest") || text.includes("hawthorne")) return "lake";
+    return "grassland";
+}
+
+function stepToward(x, y, tx, ty) {
+    return {
+        x: x + Math.sign(tx - x),
+        y: y + Math.sign(ty - y)
+    };
+}
+
+function carveCorridor(grid, x, y, tx, ty, width = 2) {
+    let cx = x;
+    let cy = y;
+    const maxSteps = grid.length * grid[0].length * 2;
+    for (let i = 0; i < maxSteps; i++) {
+        for (let oy = -width + 1; oy <= width - 1; oy++) {
+            for (let ox = -width + 1; ox <= width - 1; ox++) {
+                const gx = cx + ox;
+                const gy = cy + oy;
+                if (gy >= 0 && gy < grid.length && gx >= 0 && gx < grid[0].length) {
+                    grid[gy][gx] = TILE.PATH;
+                }
+            }
+        }
+        if (cx === tx && cy === ty) break;
+        const next = stepToward(cx, cy, tx, ty);
+        // Add a slight bend so routes don't look like perfectly straight
+        // hallways. The deterministic pattern keeps the result repeatable.
+        if (next.x !== cx && next.y !== cy && ((cx + cy) % 5 === 0)) {
+            cy += Math.sign(ty - cy);
+        } else if ((cx + cy) % 7 === 0 && next.x !== cx) {
+            cy += Math.sign(ty - cy);
+        } else {
+            cx = next.x;
+            cy = next.y;
+        }
+    }
+}
+
+function naturalFootprint(width, height, kind, seed) {
+    const mask = Array.from({ length: height }, () => Array(width).fill(false));
+    for (let y = 0; y < height; y++) {
+        const vertical = y / Math.max(1, height - 1);
+        const wave = Math.sin((y + seed) * 0.65) * 1.6;
+        let left = 1.5 + wave;
+        let right = width - 2.5 - Math.cos((y + seed) * 0.47) * 1.4;
+
+        if (kind === "route") {
+            left += 1.5 * Math.sin(vertical * Math.PI);
+            right -= 1.0 * Math.sin(vertical * Math.PI);
+        } else {
+            left += (y < 3 ? 1.5 : 0);
+            right -= (y > height - 4 ? 1.5 : 0);
+        }
+
+        for (let x = 0; x < width; x++) {
+            let inside = x >= left && x <= right;
+            if (kind !== "route") {
+                const topNotch = y < 2 && (x < 4 || x > width - 5);
+                const bottomNotch = y > height - 3 && (x < 2 || x > width - 4);
+                inside = inside && !topNotch && !bottomNotch;
+            }
+            mask[y][x] = inside;
+        }
+    }
+    return mask;
+}
+
+function buildNaturalMap(mapId, map) {
+    if (!map?.data?.length) return;
+    if (mapId === "research_center") return;
+
+    const height = map.data.length;
+    const width = Math.max(...map.data.map(row => row.length));
+    const theme = mapTheme(mapId, map.name);
+    const isRoute = mapId.startsWith("route_");
+    const isCity = /city/i.test(map.name) || mapId === "town" || mapId.startsWith("westmere_settlement") || mapId.startsWith("greenvale_settlement") || mapId.startsWith("dunridge_settlement") || mapId.startsWith("highreach_settlement") || mapId.startsWith("northvale_settlement") || mapId.startsWith("seawick_settlement");
+    const seed = mapId.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+    const mask = naturalFootprint(width, height, isRoute ? "route" : "settlement", seed % 19);
+    const grid = Array.from({ length: height }, () => Array(width).fill(TILE_VOID));
+
+    // Turn the irregular footprint into walkable ground.
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (mask[y][x]) grid[y][x] = TILE.GRASS;
+        }
+    }
+
+    // Keep existing interior landmarks where the new footprint still contains
+    // them. This preserves the Research Center footprint in the starting town
+    // while allowing the outer landscape to become organic. Boundary walls and
+    // route doors are rebuilt by this geometry layer.
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < Math.min(width, map.data[y].length); x++) {
+            const old = map.data[y][x];
+            const boundary = x === 0 || y === 0 || x === width - 1 || y === height - 1;
+            if (old === TILE.TREE || old === TILE.WATER || old === TILE.TALL_GRASS) {
+                if (mask[y][x]) grid[y][x] = old;
+            } else if (!boundary && (old === TILE.WALL || old === TILE.DOOR)) {
+                grid[y][x] = old;
+            }
+        }
+    }
+
+    const exits = map.exits || [];
+    const interiorX = Math.floor(width / 2);
+    const interiorY = Math.floor(height / 2);
+
+    // Every exit gets a proper path that enters the map. For settlements this
+    // creates a road network; for routes it creates a trail between endpoints.
+    const hubs = [];
+    exits.forEach(exit => {
+        const ex = Math.max(0, Math.min(width - 1, Math.round(exit.x)));
+        const ey = Math.max(0, Math.min(height - 1, Math.round(exit.y)));
+        const targetX = isRoute && exits.length === 2
+            ? Math.round((ex + (exits.find(e => e !== exit)?.x ?? interiorX)) / 2)
+            : interiorX;
+        const targetY = isRoute && exits.length === 2
+            ? Math.round((ey + (exits.find(e => e !== exit)?.y ?? interiorY)) / 2)
+            : interiorY;
+        grid[ey][ex] = TILE.PATH;
+        carveCorridor(grid, ex, ey, targetX, targetY, isRoute ? 1 : 2);
+        hubs.push({ x: targetX, y: targetY });
+    });
+
+    // Connect route endpoints through the middle so a route is a continuous
+    // landscape rather than two disconnected strips.
+    if (isRoute && exits.length >= 2) {
+        const a = exits[0], b = exits[1];
+        carveCorridor(grid, Math.round(a.x), Math.round(a.y), Math.round(b.x), Math.round(b.y), 1);
+    }
+
+    // Add regional terrain away from the road. This is intentionally light:
+    // detailed settlement architecture and landmarks can be authored later.
+    const terrainDensity = isRoute ? 0.08 : 0.13;
+    for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+            if (grid[y][x] !== TILE.GRASS) continue;
+            if (stableNoise(x, y, seed) > terrainDensity) continue;
+
+            const nearPath = [
+                [x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]
+            ].some(([nx, ny]) => grid[ny]?.[nx] === TILE.PATH);
+            if (nearPath) continue;
+
+            if (theme === "coast" && (x < 4 || y > height - 5) && stableNoise(x + 3, y + 7, seed) > 0.35) {
+                grid[y][x] = TILE.WATER;
+            } else if (theme === "mountain" && stableNoise(x, y, seed + 4) > 0.58) {
+                grid[y][x] = TILE.WALL;
+            } else if (theme === "north" && stableNoise(x, y, seed + 8) > 0.60) {
+                grid[y][x] = TILE.TREE;
+            } else if (theme === "forest" || theme === "grassland") {
+                grid[y][x] = stableNoise(x, y, seed + 12) > 0.45 ? TILE.TREE : TILE.TALL_GRASS;
+            } else if (theme === "hill" || theme === "lake") {
+                grid[y][x] = stableNoise(x, y, seed + 16) > 0.55 ? TILE.TREE : TILE.TALL_GRASS;
+            }
+        }
+    }
+
+    // Settlements get a few compact building footprints rather than one
+    // giant empty rectangle. Do not place them on roads, exits or NPCs.
+    if (!isRoute && isCity) {
+        const reserved = new Set();
+        exits.forEach(e => reserved.add(`${Math.round(e.x)},${Math.round(e.y)}`));
+        (map.npcs || []).forEach(n => reserved.add(`${Math.round(n.x)},${Math.round(n.y)}`));
+
+        const buildingSeeds = [
+            [5, 4, 5, 3],
+            [width - 10, 4, 5, 3],
+            [5, height - 7, 6, 3],
+            [width - 11, height - 7, 6, 3]
+        ];
+        buildingSeeds.forEach(([bx, by, bw, bh], index) => {
+            for (let y = by; y < by + bh; y++) {
+                for (let x = bx; x < bx + bw; x++) {
+                    if (!mask[y]?.[x]) continue;
+                    if (reserved.has(`${x},${y}`)) continue;
+                    grid[y][x] = TILE.WALL;
+                }
+            }
+            const doorX = bx + Math.floor(bw / 2);
+            const doorY = index < 2 ? by + bh : by - 1;
+            if (mask[doorY]?.[doorX]) grid[doorY][doorX] = TILE.DOOR;
+        });
+    }
+
+    // Re-apply boundary exit tiles last. The automatic route system expects
+    // these exact coordinates to remain the transition points.
+    exits.forEach(exit => {
+        const x = Math.round(exit.x);
+        const y = Math.round(exit.y);
+        if (grid[y]?.[x] !== undefined) grid[y][x] = TILE.DOOR;
+    });
+
+    map.data = grid.map(row => row.join(""));
+}
+
+Object.entries(maps).forEach(([mapId, map]) => buildNaturalMap(mapId, map));
 
 let currentMap = maps.town;
 
@@ -2426,6 +2653,7 @@ function canMoveTo(x, y) {
         const tile = getTile(Math.floor(px), Math.floor(py));
 
         return tile !== TILE.WALL &&
+               tile !== TILE.VOID &&
                tile !== TILE.TREE &&
                tile !== TILE.WATER;
     });
@@ -2441,16 +2669,15 @@ function canMoveTo(x, y) {
 }
 
 function getTile(x, y) {
-    if (
-        y < 0 ||
-        y >= currentMap.data.length ||
-        x < 0 ||
-        x >= currentMap.data[0].length
-    ) {
+    if (y < 0 || y >= currentMap.data.length || x < 0) {
         return TILE.WALL;
     }
 
-    return currentMap.data[y][x];
+    const row = currentMap.data[y] || "";
+    if (x >= row.length) return TILE.WALL;
+
+    const tile = row[x];
+    return tile === TILE_VOID ? TILE.VOID : tile;
 }
 
 
@@ -4368,6 +4595,12 @@ function drawMap() {
 }
 
 function drawTile(tile, x, y) {
+    if (tile === TILE.VOID) {
+        ctx.fillStyle = "#0f1017";
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        return;
+    }
+
     if (tile === TILE.GRASS) {
         ctx.fillStyle = "#68a85a";
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
