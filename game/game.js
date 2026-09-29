@@ -331,90 +331,73 @@ const TILE = {
 
 const maps = {
     town: {
-        name: "Westmere — Southern Settlement",
+        name: "Westmere — Settlement 1",
+        handBuilt: true,
         data: [
-            "####################D####################",
-            "#......................................#",
-            "#......................................#",
-            "#..TT..............GGGG...............#",
-            "#..TT..............GGGG...............#",
-            "#.................GGGG................#",
-            "#.................GGGG................#",
-            "#.............####D....................#",
-            "#.............#...#...................#",
-            "#.............#...#...................#",
-            "#.............#####...................#",
-            "#....VVVVVV............................#",
-            "#....VVVVVV............................#",
-            "#....WWWW..............................#",
-            "#....WWWW..............................#",
-            "#....WWWW..............TT.............#",
-            "#......................TT.............#",
-            "#......................................#",
-            "#................GGGG....VVVVVV........#",
-            "#................GGGG....VVVVVV........#",
-            "#................GGGG..................#",
-            "#......................................#",
-            "#......................TT.............#",
-            "#......................TT.............#",
-            "#......................................#",
-            "#..........GGGG........................#",
-            "#..........GGGG........................#",
-            "#......................................#",
-            "#......................................#",
+            "####################D###################",
+            "#..................GGG.................#",
+            "#..T..T.......T....GGG....T.......T..T.#",
+            "#...............#########..............#",
+            "#...............#########..............#",
+            "#..#######......#########....#######...#",
+            "#..#######......#########....#######...#",
+            "#..#######......#########....#######...#",
+            "#..#######......####D####....#######...#",
+            "#..#######.........GGG.......#######...#",
+            "#.....G..G.........GGG.........GG......#",
+            "#..GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG...#",
+            "#..GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG...#",
+            "#..GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG...#",
+            "#........G.........GGG.........G.......#",
+            "#.....G..G..WWW....GGG.........GG......#",
+            "#..#######..WWWVV..GGG.VVVVV.#######...#",
+            "#..#######..WWWVV..GGG.VVVVV.#######...#",
+            "#..#######..WWWVV..GGG.VVVVV.#######...#",
+            "#..#######..VVVVV..GGG.VVVVV.#######...#",
+            "#..#######.........GGG.......#######...#",
+            "#..................GGG.................#",
+            "#..T...............GGG..............T..#",
             "########################################"
-        ],
-        spawn: { x: 4, y: 25 },
-        exit: null,
-        // World skeleton connection: the southern Westmere settlement
-        // connects northward to the route leading to Everhope City.
+],
+        spawn: { x: 20.5, y: 21.5 },
         exits: [
-            { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 14.5, targetY: 15.5, message: "You leave the southern Westmere settlement and follow the Main Trail toward Everhope City." },
-            { x: 18, y: 7, targetMap: "research_center", targetX: 10.5, targetY: 9.5, message: "You enter the Entheon Research Center." }
+            { x: 20, y: 0, targetMap: "route_south_everhope", targetX: 14.5, targetY: 15.5, message: "You leave Settlement 1 and follow the Main Trail toward Everhope City." },
+            { x: 20, y: 8, targetMap: "research_center", targetX: 10.5, targetY: 9.5, message: "You enter the Entheon Research Center." }
         ],
-        // Temporary encounter probabilities for the current starting area.
-        // Species eligibility comes from Westmere's canonical regional list;
-        // the exact habitat tables will be expanded as individual routes are built.
-        encounters: [
-            { species: "Nimblet", minLevel: 2, maxLevel: 3, weight: 2 },
-            { species: "Brindlew", minLevel: 2, maxLevel: 3, weight: 98 }
-        ],
+        encounters: [],
         npcs: [
             {
-                id: "trainer",
+                id: "town-trainer",
                 type: "trainer",
                 interaction: "trainer",
-                name: "Young Trainer",
-                x: 22,
-                y: 12,
+                name: "Mira",
+                x: 12,
+                y: 11,
                 color: "#d26b6b",
                 lines: [
-                    "Hey! You're a new trainer too, right?",
-                    "I've been exploring the area around town.",
-                    "Let's see how your Entheon handles a real trainer battle!"
+                    "You're the new Trainer everyone has been talking about, aren't you?",
+                    "The road north is a good place to get some practice in.",
+                    "Just remember that wild Entheon don't wait for you to be ready!"
                 ],
                 battle: {
-                    reward: 120,
-                    team: [
-                        { species: "Orrin", level: 3 },
-                        { species: "Brindlew", level: 4 }
-                    ],
-                    victory: "Not bad! I'll have to train harder next time.",
-                    defeat: "Looks like I need a lot more practice..."
+                    reward: 60,
+                    team: [{ species: "Brindlew", level: 3 }],
+                    victory: "Nice battle! I guess the road really is your next step.",
+                    defeat: "Don't worry. The road will still be there when you're ready."
                 }
             },
             {
-                id: "resident",
+                id: "town-resident",
                 type: "npc",
                 interaction: "dialogue",
-                name: "Kaleo Resident",
-                x: 27,
-                y: 21,
-                color: "#6b9ed2",
+                name: "Old Farmer",
+                x: 26,
+                y: 13,
+                color: "#8b7653",
                 lines: [
-                    "The paths around Kaleo connect to places far beyond this area.",
-                    "You should talk to people whenever you visit a new settlement.",
-                    "You never know what you might learn."
+                    "Westmere is mostly green country, but don't mistake that for being tame.",
+                    "The forests north of here get much denser.",
+                    "If you're heading toward Everhope, keep an eye out for the old Great Tree."
                 ]
             },
             {
@@ -422,91 +405,194 @@ const maps = {
                 type: "restoration",
                 interaction: "restoration",
                 name: "Restoration Attendant",
-                x: 31,
-                y: 24,
+                x: 7,
+                y: 13,
                 color: "#69a9a0",
-                lines: [
-                    "Welcome to the Restoration Hub.",
-                    "We can restore your Entheon to full health."
-                ]
+                lines: ["Welcome to the local Restoration Hub.", "We can restore your Entheon whenever you need it."]
             },
             {
                 id: "travelling-merchant",
                 type: "merchant",
                 interaction: "merchant",
                 name: "Travelling Merchant",
-                x: 34,
-                y: 10,
+                x: 33,
+                y: 13,
                 color: "#b88a52",
                 lines: [
-                    "Oh! A customer! Funny, I was just about to leave.",
-                    "I travel wherever trainers need supplies. Somehow, I always arrive at exactly the right place.",
-                    "I sell the essentials every travelling Trainer needs."
+                    "Supplies before you leave? Smart thinking.",
+                    "The road ahead has a habit of making Trainers spend more Capture Crystals than they expected."
                 ],
-                shop: {
-                    inventory: ["recoveryTonic", "revivalTonic", "capture"]
-                }
+                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
+            },
+            {
+                id: "town-child",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Local Child",
+                x: 14,
+                y: 5,
+                color: "#6b9ed2",
+                lines: [
+                    "The giant tree on the road is older than anyone in town.",
+                    "My dad says people used to use it as a meeting place long before there was a road here."
+                ]
             }
         ]
     },
 
     route_south_everhope: {
         name: "Westmere — Main Trail to Everhope City",
+        handBuilt: true,
         data: [
             "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
+            "#............GGG.............#",
+            "#.T..........GGG.............#",
+            "#...TTT.T...GGGG.......TVVV..#",
+            "#...TGT.....GGGG.......VVVV..#",
+            "#....G......GGGG...T...VVVT..#",
+            "#....G......GGG........VVVV..#",
+            "#....G...GGGGGG..............#",
+            "#....GGGGGGGGGG..............#",
+            "#........GGGGGG..............#",
+            "#........GGG........VTVVV....#",
+            "#.W......GGGGGGG....VVVVV.T..#",
+            "#.W......GGGGGGG....VVVVV....#",
+            "#.WT.....GGGGGGG....VVVVV....#",
+            "#.W..........GGG.......T.....#",
+            "#.W....T.....GGG.............#",
+            "#............GGG.............#",
             "##############D###############"
-        ],
+],
         spawn: { x: 14.5, y: 15.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "town", targetX: 20.5, targetY: 1.5, message: "You return to the southern Westmere settlement." },
-            { x: 14, y: 0, targetMap: "everhope_city", targetX: 14.5, targetY: 15.5, message: "The Main Trail brings you to Everhope City." }
+            { x: 14, y: 16, targetMap: "town", targetX: 20.5, targetY: 1.5, message: "You return to Settlement 1." },
+            { x: 14, y: 0, targetMap: "everhope_city", targetX: 14.5, targetY: 15.5, message: "The Main Trail continues north toward Everhope City." }
         ],
-        encounters: []
+        encounters: [
+            { species: "Brindlew", minLevel: 2, maxLevel: 3, weight: 100 }
+        ],
+        npcs: [
+            {
+                id: "route-trainer-1",
+                type: "trainer",
+                interaction: "trainer",
+                name: "Young Trainer Leo",
+                x: 18,
+                y: 9,
+                color: "#c66b6b",
+                lines: [
+                    "Hold up! You're travelling this way too?",
+                    "A quick battle makes the road a lot more interesting.",
+                    "Let's see what your partner can do!"
+                ],
+                battle: {
+                    reward: 90,
+                    team: [{ species: "Brindlew", level: 3 }],
+                    victory: "That was a good one! I'll keep training before I reach Everhope.",
+                    defeat: "Looks like I'm the one who needs more practice."
+                }
+            },
+            {
+                id: "great-tree-ranger",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Park Ranger",
+                x: 7,
+                y: 7,
+                color: "#5f8f62",
+                lines: [
+                    "This is the Great Tree clearing.",
+                    "Please treat the old tree and the surrounding habitat with respect.",
+                    "Westmere's wild Entheon depend on places like this remaining undisturbed."
+                ]
+            }
+        ]
     },
 
     everhope_city: {
-        name: "Everhope City",
+        name: "Westmere — Everhope City",
+        handBuilt: true,
         data: [
-            "##############D###############",
-            "#............................#",
-            "#............................#",
-            "#............................#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "#...........GGGG.............#",
-            "##############D###############"
-        ],
-        spawn: { x: 14.5, y: 15.5 },
+            "##################D#################",
+            "#................GGG...............#",
+            "#................GGG...............#",
+            "#...........#############..........#",
+            "#..#######..#############.#######..#",
+            "#..#######..#############.#######..#",
+            "#..#######..#############.#######..#",
+            "#..#######..#############.#######..#",
+            "#..#######.......GGG......#######..#",
+            "#.......G........GGG........G......#",
+            "#..GGGGGGGGGGGGGGGGGGGGGGGGGGGGG...#",
+            "#..GGGGGGGGGGGGGGGGGGGGGGGGGGGGG...#",
+            "#..GGGGGGGGGGGGGGGGGGGGGGGGGGGGG...#",
+            "#.......G........GGG........G......#",
+            "#.......G....T.T.TGT.T.T....G......#",
+            "#..########......GGG.....########..#",
+            "#..########...T..GGG..T..########..#",
+            "#..########......GGG.....########..#",
+            "#..########.....WWWWW....########..#",
+            "#..########......GGG.....########..#",
+            "#................GGG...............#",
+            "##################D#################"
+],
+        spawn: { x: 18.5, y: 20.5 },
         exits: [
-            { x: 14, y: 16, targetMap: "route_south_everhope", targetX: 14.5, targetY: 1.5, message: "You head back toward the southern Westmere settlement." },
-            { x: 14, y: 0, targetMap: "route_everhope_settlement2", targetX: 14.5, targetY: 15.5, message: "You leave Everhope City along the Main Trail." }
+            { x: 18, y: 21, targetMap: "route_south_everhope", targetX: 14.5, targetY: 1.5, message: "You head back toward Settlement 1." },
+            { x: 18, y: 0, targetMap: "route_everhope_settlement2", targetX: 14.5, targetY: 15.5, message: "You leave Everhope City along the Main Trail toward Settlement 2." }
         ],
         encounters: [],
-        npcs: []
+        npcs: [
+            {
+                id: "everhope-restoration",
+                type: "restoration",
+                interaction: "restoration",
+                name: "Restoration Attendant",
+                x: 7,
+                y: 10,
+                color: "#69a9a0",
+                lines: ["Welcome to Everhope's Restoration Hub.", "Your Entheon are always welcome here."]
+            },
+            {
+                id: "everhope-merchant",
+                type: "merchant",
+                interaction: "merchant",
+                name: "City Merchant",
+                x: 28,
+                y: 10,
+                color: "#b88a52",
+                lines: ["Everhope has everything a travelling Trainer needs.", "Take a look before you head back onto the Main Trail."],
+                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
+            },
+            {
+                id: "everhope-gym-attendant",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Gym Attendant",
+                x: 18,
+                y: 9,
+                color: "#7a7fb0",
+                lines: [
+                    "Everhope Gym is home to Gym Leader Gale.",
+                    "The Gym specializes in Gale affinity battling.",
+                    "The Gym challenge itself will open once the Gym system is ready."
+                ]
+            },
+            {
+                id: "everhope-resident",
+                type: "npc",
+                interaction: "dialogue",
+                name: "Everhope Resident",
+                x: 12,
+                y: 12,
+                color: "#6b9ed2",
+                lines: [
+                    "Everhope is the biggest city in Westmere.",
+                    "Trainers from the smaller settlements come here for services they can't get locally.",
+                    "The Main Trail north eventually leads toward the rest of the region."
+                ]
+            }
+        ]
     },
 
     route_everhope_settlement2: {
@@ -2151,7 +2237,7 @@ function ensureAllExitCorridors(map) {
 
 function buildNaturalMap(mapId, map) {
     if (!map?.data?.length) return;
-    if (mapId === "research_center") return;
+    if (mapId === "research_center" || map.handBuilt) return;
 
     const height = map.data.length;
     const width = Math.max(...map.data.map(row => row.length));
