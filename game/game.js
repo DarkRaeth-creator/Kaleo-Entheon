@@ -3135,6 +3135,11 @@ function ensureCreatureProgressionData(member) {
 
 function awardExperience(member, amount) {
     ensureCreatureProgressionData(member);
+
+    const beforeLevel = member.level;
+    const beforeStats = { ...member.stats };
+    const beforeMoveNames = new Set((member.moves || []).map(move => move.name));
+
     member.xp += amount;
     const levels = [];
 
@@ -3153,12 +3158,28 @@ function awardExperience(member, amount) {
         member.moves = getMoveSetForLevel(member.species, member.level);
     }
 
+    const learnedMoves = (member.moves || []).filter(move => !beforeMoveNames.has(move.name));
+    const statGains = {
+        hp: Math.max(0, (member.stats?.hp || 0) - (beforeStats.hp || 0)),
+        attack: Math.max(0, (member.stats?.attack || 0) - (beforeStats.attack || 0)),
+        defense: Math.max(0, (member.stats?.defense || 0) - (beforeStats.defense || 0)),
+        specialAttack: Math.max(0, (member.stats?.specialAttack || 0) - (beforeStats.specialAttack || 0)),
+        specialDefense: Math.max(0, (member.stats?.specialDefense || 0) - (beforeStats.specialDefense || 0)),
+        speed: Math.max(0, (member.stats?.speed || 0) - (beforeStats.speed || 0))
+    };
+
     if (levels.length > 0) {
         markEvolutionEligibility(member);
     }
 
     member.xpToNext = xpRequiredForLevel(member.level);
-    return { gained: amount, levels };
+    return {
+        gained: amount,
+        levels,
+        beforeLevel,
+        learnedMoves,
+        statGains
+    };
 }
 
 function getDamageForMove(attacker, defender, move) {
@@ -3897,6 +3918,9 @@ function endTrainerBattle(victory) {
             const xpGain = trainerBattle.team.reduce((sum, entry) => sum + 35 + entry.level * 14, 0);
             const result = awardExperience(activeMember, xpGain);
             const levelText = result.levels.length ? ` ${activeMember.species} reached Level ${result.levels.join(", ")}!` : "";
+            const moveText = result.learnedMoves.length
+                ? ` Learned: ${result.learnedMoves.map(move => move.name).join(", ")}.`
+                : "";
             gameState.vale += trainerBattle.reward;
             gameState.trainerBattle = null;
             gameState.battle = null;
@@ -3905,7 +3929,7 @@ function endTrainerBattle(victory) {
             overworldScreen.classList.remove("hidden");
             gameState.encounterCooldown = 1200;
             renderParty();
-            showWorldMessage(`${trainerBattle.npc.name} was defeated! You received ${trainerBattle.reward} Vale and ${xpGain} XP.${levelText}`);
+            showWorldMessage(`${trainerBattle.npc.name} was defeated! You received ${trainerBattle.reward} Vale and ${xpGain} XP.${levelText}${moveText}`);
             drawGame();
             if (activeMember.pendingEvolution) setTimeout(() => createEvolutionPrompt(activeMember), 900);
             return;
@@ -4270,7 +4294,10 @@ function endWildEncounter(message) {
                 const result = awardExperience(activeMember, xpGain);
 
                 if (result.levels.length > 0) {
-                    message = `${activeMember.species} gained ${xpGain} XP and reached Level ${result.levels.join(", ")}!`;
+                    const moveText = result.learnedMoves.length
+                        ? ` Learned: ${result.learnedMoves.map(move => move.name).join(", ")}.`
+                        : "";
+                    message = `${activeMember.species} gained ${xpGain} XP and reached Level ${result.levels.join(", ")}!${moveText}`;
                 } else {
                     message = `${activeMember.species} gained ${xpGain} XP.`;
                 }
