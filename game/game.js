@@ -581,7 +581,7 @@ const maps = {
                 lines: [
                     "Everhope Gym is home to Gym Leader Gale.",
                     "The Gym specializes in Gale affinity battling.",
-                    "The Gym challenge itself will open once the Gym system is ready."
+                    "Gym Leader Gale is ready for your challenge."
                 ]
             },
             {
@@ -4238,7 +4238,7 @@ Object.values(maps).forEach(map=>ensureAllExitCorridors(map));
 // GYM LEADERS / BADGES
 // ============================================================
 const gymLeaders = [
-    { map:'everhope_city', id:'gale', name:'Gym Leader Gale', badgeId:'gale-badge', badgeName:'Gale Badge', x:18, y:7, color:'#7b9ed8', levels:[8,9], team:['Virel','Brindlew'], reward:900, lines:['Welcome to Everhope Gym.','We test movement, timing and control through Gale-aligned battles.','If you are ready, let us battle for the Gale Badge.'] },
+    { map:'everhope_city', id:'gale', name:'Gym Leader Gale', badgeId:'gale-badge', badgeName:'Gale Badge', x:19, y:9, color:'#7b9ed8', levels:[8,9], team:['Virel','Brindlew'], reward:900, lines:['Welcome to Everhope Gym.','We test movement, timing and control through Gale-aligned battles.','If you are ready, let us battle for the Gale Badge.'] },
     { map:'harveston_city', id:'verdant', name:'Gym Leader Flora', badgeId:'verdant-badge', badgeName:'Verdant Badge', x:15, y:11, color:'#6b9b58', levels:[10,11], team:['Pipiri','Meliu'], reward:1200, lines:['Welcome to Harveston Gym.','Verdant battles reward patience and steady pressure.','Show me what your team has learned.'] },
     { map:'gullhaven_city', id:'tide', name:'Gym Leader Marina', badgeId:'tide-badge', badgeName:'Tide Badge', x:15, y:10, color:'#4f8fa8', levels:[12,13], team:['Pipiri','Orven'], reward:1500, lines:['The sea never stays still.','A Tide battle is about adapting to change.','Earn your Tide Badge if you can keep your footing.'] },
     { map:'thermalis_city', id:'thermalis', name:'Gym Leader Cinder', badgeId:'thermalis-badge', badgeName:'Thermalis Badge', x:15, y:10, color:'#b5654a', levels:[14,15], team:['Brindlew','Orven'], reward:1900, lines:['Thermalis tests strength under pressure.','Flame and Stone demand commitment.','Let us see whether your team can withstand the heat.'] },
