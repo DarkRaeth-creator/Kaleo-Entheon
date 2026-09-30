@@ -18,6 +18,8 @@
                     <span id="area-status">Kaleo</span>
                     <span class="status-divider"> · </span>
                     <span id="starter-status">Starter: —</span>
+                    <span class="status-divider"> · </span>
+                    <span id="badge-status">Badges: 0/7</span>
                 </div>
             </header>
 
@@ -41,6 +43,7 @@
                     
                         <button id="party-button" class="ui-small-button" type="button">Party</button>
                         <button id="inventory-button" class="ui-small-button" type="button">Inventory</button>
+                        <button id="badge-button" class="ui-small-button" type="button">Badges</button>
                         <button id="world-map-button" class="ui-small-button" type="button">Map</button></div>
 
                     <div id="world-message" class="world-message hidden"></div>
@@ -132,6 +135,17 @@
     </div>
     <div id="inventory-list" class="inventory-list"></div>
     <div id="inventory-target" class="inventory-target hidden"></div>
+</section>
+
+<section id="badge-screen" class="badge-screen hidden" aria-label="Gym Badges">
+    <div class="badge-screen-header">
+        <div>
+            <h2>Gym Badges</h2>
+            <p>Your earned Gym Crests and the challenges they represent.</p>
+        </div>
+        <button id="badge-close-button" class="ui-small-button" type="button">Close</button>
+    </div>
+    <div id="badge-list" class="badge-list"></div>
 </section>
 
 <section id="party-screen" class="party-screen hidden" aria-label="Entheon Party Screen">

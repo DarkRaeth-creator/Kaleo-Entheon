@@ -88,6 +88,11 @@ const inventoryScreen = document.getElementById("inventory-screen");
 const inventoryList = document.getElementById("inventory-list");
 const inventoryCloseButton = document.getElementById("inventory-close-button");
 const inventoryTarget = document.getElementById("inventory-target");
+const badgeButton = document.getElementById("badge-button");
+const badgeScreen = document.getElementById("badge-screen");
+const badgeCloseButton = document.getElementById("badge-close-button");
+const badgeList = document.getElementById("badge-list");
+const badgeStatus = document.getElementById("badge-status");
 const shopScreen = document.getElementById("shop-screen");
 const shopList = document.getElementById("shop-list");
 const shopVale = document.getElementById("shop-vale");
@@ -4238,20 +4243,87 @@ Object.values(maps).forEach(map=>ensureAllExitCorridors(map));
 // GYM LEADERS / BADGES
 // ============================================================
 const gymLeaders = [
-    { map:'everhope_city', id:'gale', name:'Gym Leader Gale', badgeId:'gale-badge', badgeName:'Gale Badge', x:19, y:9, color:'#7b9ed8', levels:[8,9], team:['Nimblet','Brindlew'], reward:900, lines:['Welcome to Everhope Gym.','We test movement, timing and control through Gale-aligned battles.','If you are ready, let us battle for the Gale Badge.'] },
-    { map:'harveston_city', id:'verdant', name:'Gym Leader Flora', badgeId:'verdant-badge', badgeName:'Verdant Badge', x:15, y:11, color:'#6b9b58', levels:[10,11], team:['Pipiri','Brindlew'], reward:1200, lines:['Welcome to Harveston Gym.','Verdant battles reward patience and steady pressure.','Show me what your team has learned.'] },
-    { map:'gullhaven_city', id:'tide', name:'Gym Leader Marina', badgeId:'tide-badge', badgeName:'Tide Badge', x:15, y:10, color:'#4f8fa8', levels:[12,13], team:['Pipiri','Orrin'], reward:1500, lines:['The sea never stays still.','A Tide battle is about adapting to change.','Earn your Tide Badge if you can keep your footing.'] },
-    { map:'thermalis_city', id:'thermalis', name:'Gym Leader Cinder', badgeId:'thermalis-badge', badgeName:'Thermalis Badge', x:15, y:10, color:'#b5654a', levels:[14,15], team:['Brindlew','Orrin'], reward:1900, lines:['Thermalis tests strength under pressure.','Flame and Stone demand commitment.','Let us see whether your team can withstand the heat.'] },
-    { map:'northreach_city', id:'northreach', name:'Gym Leader Skadi', badgeId:'northreach-badge', badgeName:'Northreach Badge', x:15, y:10, color:'#71879a', levels:[16,17], team:['Morrowe','Orrin'], reward:2300, lines:['Northreach is where preparation matters.','Metal and Frost punish careless decisions.','If you want this badge, prove you can adapt.'] },
-    { map:'lakecrest_city', id:'lakecrest', name:'Gym Leader Volt', badgeId:'lakecrest-badge', badgeName:'Lakecrest Badge', x:15, y:9, color:'#c59b3e', levels:[18,19], team:['Nimblet','Pipiri'], reward:2700, lines:['Welcome to Lakecrest Gym.','Volt battles reward momentum and decisive turns.','Show me that you can keep control of the battle.'] },
-    { map:'fairhaven_city', id:'fairhaven', name:'Gym Leader Mira', badgeId:'fairhaven-badge', badgeName:'Fairhaven Badge', x:15, y:9, color:'#8669a8', levels:[20,21], team:['Pipiri','Morrowe'], reward:3200, lines:['Fairhaven Gym is built around Mystic affinity.','Prediction matters as much as power here.','If you want this badge, read the battle carefully.'] }
+    {
+        gymNumber: 1, map:'everhope_city', id:'everhope', name:'Rowan Vale', badgeId:'gale-badge', badgeName:'Gale Crest', x:19, y:9, color:'#7b9ed8',
+        format: '3v3', activeCount: 3, reward: 900,
+        roster:['Nymbril','Rookane','Avenn','Sovel','Caelune','Quiblet'], levels:[10,11,12,13,14,16],
+        lines:['Welcome to Everhope Gym.','You cannot control the wind. You can only learn how to move with it.','Show me how well you adapt when your plan stops working.']
+    },
+    {
+        gymNumber: 2, map:'gullhaven_city', id:'gullhaven', name:'Maya Corwin', badgeId:'tide-badge', badgeName:'Tide Crest', x:15, y:10, color:'#4f8fa8',
+        format: '3v3', activeCount: 3, reward: 1500,
+        roster:['Vessa','Koroa','Selka','Veysha','Mirel','Pirello'], levels:[14,15,16,17,18,20],
+        lines:['The sea never stays still.','Read the water, adapt to the current, and know when to change direction.','Let us see how you and your Entheon handle the flow.']
+    },
+    {
+        gymNumber: 3, map:'thermalis_city', id:'thermalis', name:'Darius Voss', badgeId:'thermalis-badge', badgeName:'Thermalis Crest', x:15, y:10, color:'#b5654a',
+        format: '3v3', activeCount: 3, reward: 1900,
+        roster:['Dovik','Arko','Braska','Brindrel','Tarnelle','Quivane'], levels:[20,21,22,23,24,26],
+        lines:['Heat reveals what something is made of. Pressure reveals what it can become.','Stay calm when the pressure rises.','Let us see what your team is made of.']
+    },
+    {
+        gymNumber: 4, map:'harveston_city', id:'harveston', name:'Elara Greenfield', badgeId:'verdant-badge', badgeName:'Verdant Crest', x:15, y:11, color:'#6b9b58',
+        format: '4v4', activeCount: 4, reward: 2300,
+        roster:['Meliu','Orven','Mirel','Rilsa','Brindrel','Virenne'], levels:[24,25,26,27,28,30],
+        lines:['You cannot force something to grow. You can only give it what it needs.','Every Entheon develops differently.','Show me that you understand your partners rather than simply commanding them.']
+    },
+    {
+        gymNumber: 5, map:'lakecrest_city', id:'lakecrest', name:'Lena Hartwell', badgeId:'lakecrest-badge', badgeName:'Lakecrest Crest', x:15, y:9, color:'#c59b3e',
+        format: '4v4', activeCount: 4, reward: 2700,
+        roster:['Tivvi','Keln','Avenn','Rookane','Veyro','Dragon Stage 2'], levels:[28,29,30,31,32,34],
+        lines:['Understand the system. Then break the pattern.','Watch carefully. Once you think you understand my strategy, I will change it.','Let us see whether you can adapt to the pattern breaking.']
+    },
+    {
+        gymNumber: 6, map:'northreach_city', id:'northreach', name:'Magnus Veyr', badgeId:'northreach-badge', badgeName:'Northreach Crest', x:15, y:10, color:'#71879a',
+        format: '6v6', activeCount: 6, reward: 3200,
+        roster:['Keln','Talvi','Pellune','Rookane','Fennovar','Ruun'], levels:[34,35,36,37,38,40],
+        lines:['Steel is forged by what it survives. Frost hardens those it faces.','Prepare yourself, conserve your strength, and keep thinking when conditions change.','This is a full six-Entheon assessment. Show me you can endure it.']
+    },
+    {
+        gymNumber: 7, map:'fairhaven_city', id:'fairhaven', name:'Celeste Laurent', badgeId:'fairhaven-badge', badgeName:'Fairhaven Crest', x:15, y:9, color:'#8669a8',
+        format: '6v6', activeCount: 6, reward: 3800,
+        roster:['Veysha','Thessane','Elvarin','Lumaryn','Yori','Uveryn'], levels:[40,41,42,43,44,46],
+        lines:['The moment you believe you understand what you see, you have already given me an advantage.','Do not mistake confidence for certainty.','Let us see what you do when the battle refuses to mean what you expect.']
+    }
 ];
+
+// The core design establishes a six-Entheon roster for every Gym Leader, while
+// the official Gym format determines how many are actually deployed:
+// Gyms 1–3 = 3v3, Gyms 4–5 = 4v4, Gyms 6–7 = 6v6.
+// The prototype uses the established roster in order for now; later challenger-
+// aware selection can choose a different subset without changing the rosters.
+function getGymBattleTeam(gym) {
+    const count = gym.activeCount || gym.roster.length;
+    return gym.roster.slice(0, count).map((species, i) => ({
+        species,
+        level: gym.levels[i] || gym.levels[gym.levels.length - 1] || 1
+    }));
+}
+
+function renderBadges() {
+    if (!badgeList) return;
+    const earned = gameState.badges || [];
+    badgeList.innerHTML = gymLeaders.map(gym => {
+        const isEarned = earned.includes(gym.badgeId);
+        const initial = gym.badgeName.replace(/\s+Badge$/i, "").charAt(0);
+        return `<div class="badge-card${isEarned ? " earned" : ""}" style="--badge-color:${gym.color}">
+            <div class="badge-crest" title="${isEarned ? gym.badgeName : "Unawarded"}">${isEarned ? initial : "?"}</div>
+            <div class="badge-info">
+                <strong>${gym.badgeName}</strong>
+                <span>${maps[gym.map]?.name || gym.map}</span>
+                <div class="badge-status-label">${isEarned ? "EARNED" : "NOT YET EARNED"}</div>
+            </div>
+        </div>`;
+    }).join("");
+    if (badgeStatus) badgeStatus.textContent = `Crests: ${earned.length}/${gymLeaders.length}`;
+}
+
 for (const gym of gymLeaders) {
     const map = maps[gym.map];
     if (!map) continue;
     map.npcs = Array.isArray(map.npcs) ? map.npcs : [];
     if (map.npcs.some(n => n.id === `gym-leader-${gym.id}`)) continue;
-    map.npcs.push({id:`gym-leader-${gym.id}`,type:'gym',interaction:'gym',name:gym.name,x:gym.x,y:gym.y,color:gym.color,badgeId:gym.badgeId,badgeName:gym.badgeName,lines:gym.lines,battle:{reward:gym.reward,team:gym.team.map((species,i)=>({species,level:gym.levels[i]})),victory:`You have earned the ${gym.badgeName}!`,defeat:'Train, recover, and return when you are ready.'}});
+    map.npcs.push({id:`gym-leader-${gym.id}`,type:'gym',interaction:'gym',name:gym.name,x:gym.x,y:gym.y,color:gym.color,badgeId:gym.badgeId,badgeName:gym.badgeName,lines:gym.lines,battle:{reward:gym.reward,format:gym.format,team:getGymBattleTeam(gym),victory:`You have earned the ${gym.badgeName}!`,defeat:'Train, recover, and return when you are ready.'}});
 }
 
 
@@ -4627,6 +4699,7 @@ function loadMap(mapId, spawnX = null, spawnY = null) {
     gameState.transitionCooldown = 300;
 
     areaStatus.textContent = currentMap.name;
+    renderBadges();
 
     closeNpcDialogue();
     updateCamera();
@@ -5244,6 +5317,26 @@ if (shopCloseButton) {
     });
 }
 
+if (badgeButton) {
+    badgeButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        renderBadges();
+        badgeScreen?.classList.remove("hidden");
+        overworldScreen?.classList.add("hidden");
+    });
+}
+
+if (badgeCloseButton) {
+    badgeCloseButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        badgeScreen?.classList.add("hidden");
+        overworldScreen?.classList.remove("hidden");
+        drawGame();
+    });
+}
+
 if (partyButton) {
     partyButton.addEventListener("click", (event) => {
         event.preventDefault();
@@ -5783,6 +5876,40 @@ function wildBattleAttack() {
     );
 }
 
+function ensureGymSpeciesBattleData(species, level) {
+    if (speciesBattleData[species]) return speciesBattleData[species];
+
+    // Some canonical Gym rosters contain species whose detailed numeric battle
+    // data has not yet been entered into the prototype. Do not silently remove
+    // those Entheon from a Gym team. Give them temporary, deterministic
+    // prototype battle data so the canonical roster and official battle format
+    // remain intact until their full species data is implemented.
+    const name = String(species || 'Entheon');
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    const levelValue = Math.max(1, Number(level) || 1);
+    const spread = n => 34 + ((hash >>> n) % 18);
+    const hp = 30 + ((hash >>> 3) % 12);
+    speciesBattleData[species] = {
+        level: levelValue,
+        baseStats: {
+            hp,
+            attack: spread(0),
+            defense: spread(5),
+            specialAttack: spread(10),
+            specialDefense: spread(15),
+            speed: spread(20)
+        },
+        moves: [
+            { level: 1, name: 'Tackle', category: 'Physical', power: 40, accuracy: 100, effect: '—' },
+            { level: 1, name: 'Focus', category: 'Status', power: 0, accuracy: 100, effect: 'Raises Attack and accuracy' },
+            { level: 7, name: 'Guard Break', category: 'Physical', power: 50, accuracy: 95, effect: '—' },
+            { level: 13, name: 'Signature Pulse', category: 'Special', power: 55, accuracy: 100, effect: '—' }
+        ]
+    };
+    return speciesBattleData[species];
+}
+
 function startTrainerBattle(npc) {
     const team = Array.isArray(npc.battle?.team) ? npc.battle.team : [];
     if (!team.length) return;
@@ -5802,9 +5929,12 @@ function startTrainerBattle(npc) {
     // species must never leave the game in a half-switched battle/overworld
     // state. This also makes future Trainer teams safer while species data is
     // still being authored.
-    const playableTeam = team.filter(entry => speciesBattleData[entry.species]);
-    if (!playableTeam.length || playableTeam.length !== team.length) {
-        console.error("Trainer has species without battle data:", npc.name, team);
+    const playableTeam = team.map(entry => {
+        ensureGymSpeciesBattleData(entry.species, entry.level);
+        return entry;
+    });
+    if (!playableTeam.length) {
+        console.error("Trainer has no battle team:", npc.name, team);
         showWorldMessage(`${npc.name} is not ready for a battle yet.`);
         return;
     }
@@ -5820,6 +5950,7 @@ function startTrainerBattle(npc) {
         team: playableTeam,
         index: 0,
         reward: Number(npc.battle.reward || 0),
+        format: npc.battle.format || `${playableTeam.length}v${playableTeam.length}`,
         won: false
     };
 
@@ -5854,7 +5985,7 @@ function startTrainerBattle(npc) {
 
     battleScreen.classList.remove("hidden");
     overworldScreen.classList.add("hidden");
-    renderBattle(`${npc.name} challenges you! ${npc.name} sent out ${first.species}!`);
+    renderBattle(`${npc.name} challenges you! ${npc.name} sent out ${first.species}! (${gameState.trainerBattle.format})`);
 }
 
 function handleTrainerCreatureDefeat() {
@@ -5907,6 +6038,7 @@ function endTrainerBattle(victory) {
             gameState.vale += trainerBattle.reward;
             if (trainerBattle.npc.interaction === "gym" && trainerBattle.npc.badgeId && !gameState.badges.includes(trainerBattle.npc.badgeId)) {
                 gameState.badges.push(trainerBattle.npc.badgeId);
+                renderBadges();
             }
             gameState.trainerBattle = null;
             gameState.battle = null;
@@ -7057,6 +7189,8 @@ function restartGame() {
 
     starterStatus.textContent = "Starter: —";
     areaStatus.textContent = "Westmere — Southern Settlement";
+    gameState.badges = [];
+    renderBadges();
 
     npcDialogue.classList.add("hidden");
     overworldScreen.classList.add("hidden");
