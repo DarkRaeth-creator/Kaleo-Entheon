@@ -3282,6 +3282,94 @@ const maps = {
 })();
 
 // ============================================================
+// COMPLETE LOCATION <-> ROUTE WIRING
+// ============================================================
+// Every endpoint in the authoritative route graph must expose a physical
+// overland exit. Some older city/settlement maps only had their original
+// return route, which made the world appear to stop there (notably
+// Northreach). This pass derives the missing exits directly from the world
+// graph, so a future route cannot silently exist without a way to enter it.
+(function ensureAllWorldRouteExits() {
+    if (!window.KALEO_WORLD?.routes) return;
+
+    function dimensions(map) {
+        return { w: map.data?.[0]?.length || 31, h: map.data?.length || 21 };
+    }
+    function pointForDirection(direction, w, h) {
+        if (direction === 'north') return {x:Math.floor(w/2),y:0};
+        if (direction === 'south') return {x:Math.floor(w/2),y:h-1};
+        if (direction === 'west') return {x:0,y:Math.floor(h/2)};
+        if (direction === 'east') return {x:w-1,y:Math.floor(h/2)};
+        if (direction === 'northwest') return {x:1,y:0};
+        if (direction === 'northeast') return {x:w-2,y:0};
+        if (direction === 'southwest') return {x:1,y:h-1};
+        if (direction === 'southeast') return {x:w-2,y:h-1};
+        return {x:Math.floor(w/2),y:0};
+    }
+    function safeInside(direction,w,h) {
+        if(direction==='north') return {x:Math.floor(w/2)+0.5,y:2.5};
+        if(direction==='south') return {x:Math.floor(w/2)+0.5,y:h-3.5};
+        if(direction==='west') return {x:2.5,y:Math.floor(h/2)+0.5};
+        if(direction==='east') return {x:w-3.5,y:Math.floor(h/2)+0.5};
+        if(direction==='northwest') return {x:3.5,y:2.5};
+        if(direction==='northeast') return {x:w-4.5,y:2.5};
+        if(direction==='southwest') return {x:3.5,y:h-4.5};
+        if(direction==='southeast') return {x:w-4.5,y:h-4.5};
+        return {x:Math.floor(w/2)+0.5,y:2.5};
+    }
+    function carveToEdge(map,p) {
+        const rows=map.data.map(r=>r.split(''));
+        const {w,h}=dimensions(map);
+        const candidates=[];
+        const add=(x,y)=>{if(x>=1&&x<w-1&&y>=1&&y<h-1)candidates.push([x,y]);};
+        add(Math.round(p.x),Math.round(p.y));
+        for(let r=1;r<=5;r++) for(let oy=-r;oy<=r;oy++) for(let ox=-r;ox<=r;ox++) add(Math.round(p.x)+ox,Math.round(p.y)+oy);
+        for(const [x,y] of candidates){
+            if(!['#','W','T'].includes(rows[y]?.[x])){
+                rows[y][x]='.';
+                // connect to the nearest boundary door with a simple L-shaped corridor
+                let cx=x,cy=y;
+                const tx=p.x<2?1:p.x>w-3?w-2:Math.round(p.x);
+                const ty=p.y<2?1:p.y>h-3?h-2:Math.round(p.y);
+                const steps=Math.max(Math.abs(tx-cx),Math.abs(ty-cy));
+                for(let i=0;i<=steps;i++){
+                    const t=steps?i/steps:0, xx=Math.round(cx+(tx-cx)*t), yy=Math.round(cy+(ty-cy)*t);
+                    if(rows[yy]?.[xx]!==undefined && rows[yy][xx]!=='W') rows[yy][xx]='.';
+                }
+                break;
+            }
+        }
+        map.data=rows.map(r=>r.join(''));
+    }
+
+    window.KALEO_WORLD.routes.forEach(route => {
+        const endpoints=[
+            {location:route.from,direction:route.direction,targetX:route.mapId ? safeInside(route.reverseDirection, (maps[route.mapId]?.data?.[0]?.length||31), (maps[route.mapId]?.data?.length||21)).x : 15.5,targetY:route.mapId ? safeInside(route.reverseDirection, (maps[route.mapId]?.data?.[0]?.length||31), (maps[route.mapId]?.data?.length||21)).y : 10.5},
+            {location:route.to,direction:route.reverseDirection,targetX:route.mapId ? safeInside(route.direction, (maps[route.mapId]?.data?.[0]?.length||31), (maps[route.mapId]?.data?.length||21)).x : 15.5,targetY:route.mapId ? safeInside(route.direction, (maps[route.mapId]?.data?.[0]?.length||31), (maps[route.mapId]?.data?.length||21)).y : 10.5}
+        ];
+        endpoints.forEach(ep=>{
+            const loc=window.KALEO_WORLD.getLocation(ep.location);
+            const map=loc?.mapId ? maps[loc.mapId] : null;
+            if(!map || !route.mapId) return;
+            const {w,h}=dimensions(map);
+            const pos=pointForDirection(ep.direction,w,h);
+            map.exits=Array.isArray(map.exits)?map.exits:[];
+            const existing=map.exits.find(e=>e.targetMap===route.mapId);
+            if(existing){
+                existing.x=pos.x; existing.y=pos.y; existing.direction=ep.direction;
+                existing.targetX=ep.targetX; existing.targetY=ep.targetY;
+            } else {
+                map.exits.push({x:pos.x,y:pos.y,targetMap:route.mapId,targetX:ep.targetX,targetY:ep.targetY,direction:ep.direction,message:`You follow the route toward ${loc?.name ? (ep.location===route.from ? window.KALEO_WORLD.getLocation(route.to)?.name : window.KALEO_WORLD.getLocation(route.from)?.name) : 'the next area'}.`});
+            }
+            const rows=map.data.map(r=>r.split(''));
+            rows[pos.y][pos.x]='D';
+            map.data=rows.map(r=>r.join(''));
+            carveToEdge(map,safeInside(ep.direction,w,h));
+        });
+    });
+})();
+
+// ============================================================
 // DIRECTIONAL WORLD ROUTE LAYOUT
 // ============================================================
 // The world map is authoritative for the direction in which a route leaves
