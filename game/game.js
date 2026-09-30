@@ -4159,31 +4159,71 @@ function revampRouteMap(mapId, map) {
         return {...npc,x,y};
     });
 
-    // Add one or two contextual route characters if the existing route was sparse.
-    if(npcs.length<2){
-        npcs.push({id:`${mapId}-ranger`,type:'npc',interaction:'dialogue',name:theme==='coast'?'Coastal Ranger':theme==='mountain'?'Trail Guide':theme==='snow'?'Winter Ranger':'Route Ranger',x:Math.floor(w*0.42),y:Math.floor(h*0.58),color:'#6b8f5b',lines:[
-            theme==='coast'?'The sea changes the weather quickly out here. Keep an eye on the trail.':
+    // Route content pass: every substantial route gets a trainer and a contextual
+    // guide/ranger.  The aim is that travelling itself provides progression, not
+    // just a visual corridor between settlements.
+    const levelBase = theme==='snow' ? 12 : theme==='mountain' ? 9 : theme==='coast' ? 8 : 5;
+    const trainerSpecies = theme==='snow' ? 'Morrowe' : theme==='mountain' ? 'Orrin' : theme==='coast' ? 'Pipiri' : 'Brindlew';
+    const trainerName = theme==='snow' ? 'Northern Scout' : theme==='mountain' ? 'Cliffside Trainer' : theme==='coast' ? 'Coastal Trainer' : 'Trail Trainer';
+    if(!npcs.some(n=>n.interaction==='trainer')){
+        let tx=Math.floor(w*0.60), ty=Math.floor(h*0.52);
+        if([TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[ty]?.[tx])){
+            outer: for(let r=1;r<8;r++) for(let oy=-r;oy<=r;oy++) for(let ox=-r;ox<=r;ox++){
+                const nx=tx+ox,ny=ty+oy;
+                if(![TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[ny]?.[nx])){tx=nx;ty=ny;break outer;}
+            }
+        }
+        npcs.push({id:`${mapId}-trainer`,type:'trainer',interaction:'trainer',name:trainerName,x:tx,y:ty,color:'#c66b6b',lines:[
+            theme==='coast'?'A coastal route is a good place to test whether your team can handle different terrain.':
+            theme==='mountain'?'The climb is only half the challenge. Let us see how your Entheon handle a battle.':
+            theme==='snow'?'Cold weather rewards preparation. Show me what you brought for the northern roads.':
+            'You have come this far. Let us see what your team can do on the road.'
+        ],battle:{reward:100+levelBase*8,team:[{species:trainerSpecies,level:levelBase}],victory:'Good battle. The road ahead will keep getting tougher.',defeat:'Take a breather and prepare before you continue.'}});
+    }
+    if(!npcs.some(n=>n.id===`${mapId}-ranger`)){
+        let rx=Math.floor(w*0.36), ry=Math.floor(h*0.66);
+        if([TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[ry]?.[rx])){
+            outer: for(let r=1;r<8;r++) for(let oy=-r;oy<=r;oy++) for(let ox=-r;ox<=r;ox++){
+                const nx=rx+ox,ny=ry+oy;
+                if(![TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[ny]?.[nx])){rx=nx;ry=ny;break outer;}
+            }
+        }
+        npcs.push({id:`${mapId}-ranger`,type:'npc',interaction:'dialogue',name:theme==='coast'?'Coastal Ranger':theme==='mountain'?'Trail Guide':theme==='snow'?'Winter Ranger':'Route Ranger',x:rx,y:ry,color:'#6b8f5b',lines:[
+            theme==='coast'?'The sea changes the weather quickly out here. Keep an eye on the shoreline and the trail.':
             theme==='mountain'?'Watch your footing. The safest path is rarely the straightest one.':
             theme==='snow'?'Snow can hide old paths and loose ground. Stay alert.':
             'There are more little paths through this area than most travellers notice.'
         ]});
     }
 
-    // Add a visible optional detour item where there is open space.
-    const hasItem=npcs.some(n=>n.type==='item');
+    // Keep the optional detour item as a simple discoverable dialogue object.
+    const hasItem=npcs.some(n=>n.id===`${mapId}-detour-item`);
     if(!hasItem){
         let ix=Math.floor(w*0.78), iy=Math.floor(h*0.30);
         if([TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[iy]?.[ix])){ ix=Math.floor(w*0.25); iy=Math.floor(h*0.72); }
-        npcs.push({id:`${mapId}-item`,type:'item',interaction:'item',name:'Roadside Item',x:ix,y:iy,color:'#d5b35f',lines:['You found an item tucked beside the trail.']});
+        npcs.push({id:`${mapId}-detour-item`,type:'npc',interaction:'dialogue',name:'Trail Find',x:ix,y:iy,color:'#d5b35f',lines:['You find a useful supply tucked beside the trail.','It looks like another traveller left it here for someone who needed it.']});
     }
 
     exits.forEach(e=>{grid[e.y][e.x]=TILE.DOOR;});
     map.data=grid.map(r=>r.join(''));
     map.exits=exits;
     map.npcs=npcs;
-    // Preserve the existing encounter table, but ensure route encounters exist.
+    // Regional encounter progression. Only species with battle data in the
+    // current prototype are used, so every encounter is immediately playable.
     if(!map.encounters?.length){
-        map.encounters=[{species:theme==='coast'?'Brindlew':theme==='mountain'?'Morravyn':theme==='snow'?'Sairune':'Orrin',minLevel:4,maxLevel:10,weight:100}];
+        const pools={
+            westmere:[['Orrin',5,7,35],['Brindlew',5,8,35],['Pipiri',6,8,15],['Morrowe',5,7,15]],
+            greenvale:[['Brindlew',7,10,40],['Orrin',7,9,25],['Pipiri',8,10,20],['Morrowe',8,10,15]],
+            dunridge:[['Orrin',8,11,45],['Brindlew',9,11,25],['Morrowe',9,12,20],['Pipiri',8,10,10]],
+            seawick:[['Pipiri',9,12,45],['Orrin',9,11,20],['Brindlew',10,12,20],['Morrowe',10,12,15]],
+            highreach:[['Orrin',10,13,35],['Morrowe',11,14,30],['Brindlew',10,13,20],['Pipiri',11,13,15]],
+            northvale:[['Morrowe',12,15,40],['Orrin',12,14,25],['Pipiri',13,15,20],['Brindlew',12,14,15]],
+            isen:[['Morrowe',14,17,50],['Pipiri',14,16,25],['Orrin',14,16,15],['Brindlew',15,17,10]],
+            hawthorne:[['Pipiri',15,18,40],['Brindlew',15,18,25],['Orrin',15,17,20],['Morrowe',16,18,15]],
+            eastmere:[['Morrowe',17,20,35],['Pipiri',17,20,30],['Brindlew',18,20,20],['Orrin',17,19,15]]
+        };
+        const region=Object.keys(pools).find(r=>map.name.toLowerCase().includes(r)) || 'westmere';
+        map.encounters=pools[region].map(([species,minLevel,maxLevel,weight])=>({species,minLevel,maxLevel,weight}));
     }
 }
 
