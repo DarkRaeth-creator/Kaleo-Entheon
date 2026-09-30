@@ -98,7 +98,7 @@ const KALEO_WORLD = {
         { id: "settlement-11", number: 11, region: "seawick", type: "settlement", name: "Mullhaven", mapId: "seawick_settlement11" },
         { id: "settlement-12", number: 12, region: "seawick", type: "settlement", name: "Settlement 12", mapId: "seawick_settlement12" },
         { id: "gullhaven-city", region: "seawick", type: "major-city", name: "Gullhaven", mapId: "gullhaven_city", gymId: "gullhaven-gym" },
-        { id: "settlement-13", number: 13, region: "seawick", type: "settlement", name: "Settlement 13", mapId: null },
+        { id: "settlement-13", number: 13, region: "seawick", type: "settlement", name: "Settlement 13", mapId: "seawick_settlement13" },
 
         // Highreach
         { id: "settlement-14", number: 14, region: "highreach", type: "settlement", name: "Settlement 14", mapId: "highreach_settlement1" },
@@ -116,17 +116,17 @@ const KALEO_WORLD = {
         { id: "winterhold-city", region: "isen", type: "major-city", name: "Winterhold", mapId: "winterhold_city" },
 
         // Hawthorne
-        { id: "settlement-20", number: 20, region: "hawthorne", type: "settlement", name: "Settlement 20", mapId: null },
-        { id: "lakecrest-city", region: "hawthorne", type: "major-city", name: "Lakecrest City", mapId: null, gymId: "lakecrest-gym" },
-        { id: "settlement-21", number: 21, region: "hawthorne", type: "settlement", name: "Settlement 21", mapId: null },
-        { id: "settlement-22", number: 22, region: "hawthorne", type: "settlement", name: "Settlement 22", mapId: null, portTo: "lume-city" },
-        { id: "settlement-23", number: 23, region: "hawthorne", type: "settlement", name: "Settlement 23", mapId: null },
+        { id: "settlement-20", number: 20, region: "hawthorne", type: "settlement", name: "Settlement 20", mapId: "hawthorne_settlement20" },
+        { id: "lakecrest-city", region: "hawthorne", type: "major-city", name: "Lakecrest City", mapId: "lakecrest_city", gymId: "lakecrest-gym" },
+        { id: "settlement-21", number: 21, region: "hawthorne", type: "settlement", name: "Settlement 21", mapId: "hawthorne_settlement21" },
+        { id: "settlement-22", number: 22, region: "hawthorne", type: "settlement", name: "Settlement 22", mapId: "hawthorne_settlement22", portTo: "lume-city" },
+        { id: "settlement-23", number: 23, region: "hawthorne", type: "settlement", name: "Settlement 23", mapId: "hawthorne_settlement23" },
 
         // Eastmere
-        { id: "settlement-26", number: 26, region: "eastmere", type: "settlement", name: "Settlement 26", mapId: null },
-        { id: "fairhaven-city", region: "eastmere", type: "major-city", name: "Fairhaven", mapId: null, gymId: "fairhaven-gym" },
-        { id: "settlement-25", number: 25, region: "eastmere", type: "settlement", name: "Settlement 25", mapId: null },
-        { id: "settlement-24", number: 24, region: "eastmere", type: "settlement", name: "Settlement 24", mapId: null, portTo: "lume-city" },
+        { id: "settlement-26", number: 26, region: "eastmere", type: "settlement", name: "Settlement 26", mapId: "eastmere_settlement26" },
+        { id: "fairhaven-city", region: "eastmere", type: "major-city", name: "Fairhaven", mapId: "fairhaven_city", gymId: "fairhaven-gym" },
+        { id: "settlement-25", number: 25, region: "eastmere", type: "settlement", name: "Settlement 25", mapId: "eastmere_settlement25" },
+        { id: "settlement-24", number: 24, region: "eastmere", type: "settlement", name: "Settlement 24", mapId: "eastmere_settlement24", portTo: "lume-city" },
 
         // Lume
         { id: "lume-city", region: "lume", type: "major-city", name: "Lume", mapId: "lume_city" }
@@ -177,7 +177,7 @@ const KALEO_WORLD = {
         { id: "route-stonehaven-11", from: "stonehaven-city", to: "settlement-11", direction: "northwest", reverseDirection: "southeast", kind: "main-trail", mapId: "route_stonehaven_seawick", mapSections: ["route_stonehaven_seawick"] },
         { id: "route-11-12", from: "settlement-11", to: "settlement-12", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_11_12", mapSections: ["route_11_12"] },
         { id: "route-12-gullhaven", from: "settlement-12", to: "gullhaven-city", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_12_gullhaven", mapSections: ["route_12_gullhaven"] },
-        { id: "route-gullhaven-13", from: "gullhaven-city", to: "settlement-13", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-gullhaven-13", from: "gullhaven-city", to: "settlement-13", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_gullhaven_13", mapSections: [] },
 
         // Stonehaven -> Highreach
         { id: "route-stonehaven-14", from: "stonehaven-city", to: "settlement-14", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: "route_stonehaven_highreach", mapSections: [] },
@@ -196,20 +196,20 @@ const KALEO_WORLD = {
         { id: "route-18-19", from: "settlement-18", to: "settlement-19", direction: "east", reverseDirection: "west", kind: "main-trail", mapId: "route_18_19", mapSections: ["route_18_19"] },
         { id: "route-19-northreach", from: "settlement-19", to: "northreach-city", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_19_northreach", mapSections: ["route_19_northreach"] },
         { id: "route-19-winterhold", from: "settlement-19", to: "winterhold-city", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: "route_19_winterhold", mapSections: ["route_19_winterhold"] },
-        { id: "route-northreach-20", from: "northreach-city", to: "settlement-20", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-northreach-20", from: "northreach-city", to: "settlement-20", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_northreach_20", mapSections: [] },
 
         // Hawthorne
-        { id: "route-20-lakecrest", from: "settlement-20", to: "lakecrest-city", direction: "southwest", reverseDirection: "northeast", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-lakecrest-21", from: "lakecrest-city", to: "settlement-21", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-21-22", from: "settlement-21", to: "settlement-22", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: null, mapSections: [] },
-        { id: "route-21-23", from: "settlement-21", to: "settlement-23", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
+        { id: "route-20-lakecrest", from: "settlement-20", to: "lakecrest-city", direction: "southwest", reverseDirection: "northeast", kind: "main-trail", mapId: "route_20_lakecrest", mapSections: [] },
+        { id: "route-lakecrest-21", from: "lakecrest-city", to: "settlement-21", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_lakecrest_21", mapSections: [] },
+        { id: "route-21-22", from: "settlement-21", to: "settlement-22", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: "route_21_22", mapSections: [] },
+        { id: "route-21-23", from: "settlement-21", to: "settlement-23", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_21_23", mapSections: [] },
 
         // Lakecrest -> Eastmere branch
-        { id: "route-lakecrest-26", from: "lakecrest-city", to: "settlement-26", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-26-fairhaven", from: "settlement-26", to: "fairhaven-city", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-fairhaven-25", from: "fairhaven-city", to: "settlement-25", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-fairhaven-24", from: "fairhaven-city", to: "settlement-24", direction: "southwest", reverseDirection: "northeast", kind: "main-trail", mapId: null, mapSections: [] },
-        { id: "route-24-23", from: "settlement-24", to: "settlement-23", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: null, mapSections: [] }
+        { id: "route-lakecrest-26", from: "lakecrest-city", to: "settlement-26", direction: "northeast", reverseDirection: "southwest", kind: "main-trail", mapId: "route_lakecrest_26", mapSections: [] },
+        { id: "route-26-fairhaven", from: "settlement-26", to: "fairhaven-city", direction: "southeast", reverseDirection: "northwest", kind: "main-trail", mapId: "route_26_fairhaven", mapSections: [] },
+        { id: "route-fairhaven-25", from: "fairhaven-city", to: "settlement-25", direction: "south", reverseDirection: "north", kind: "main-trail", mapId: "route_fairhaven_25", mapSections: [] },
+        { id: "route-fairhaven-24", from: "fairhaven-city", to: "settlement-24", direction: "southwest", reverseDirection: "northeast", kind: "main-trail", mapId: "route_fairhaven_24", mapSections: [] },
+        { id: "route-24-23", from: "settlement-24", to: "settlement-23", direction: "northwest", reverseDirection: "southeast", kind: "secondary-trail", mapId: "route_24_23", mapSections: [] }
     ],
 
     // ========================================================

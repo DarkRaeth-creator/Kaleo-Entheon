@@ -3109,6 +3109,179 @@ const maps = {
 
 
 // ============================================================
+// FULL-WORLD CONTENT PASS — REMAINING LOCATIONS
+// These maps complete the currently missing playable nodes in the
+// authoritative world graph. The route graph remains the source of truth;
+// these are the physical environments layered on top of it.
+// ============================================================
+(function buildRemainingWorldMaps() {
+    const W = 31, H = 21;
+    const DIR = {
+        north: { x: 15, y: 0 }, south: { x: 15, y: H - 1 },
+        west: { x: 0, y: 10 }, east: { x: W - 1, y: 10 },
+        northwest: { x: 1, y: 0 }, northeast: { x: W - 2, y: 0 },
+        southwest: { x: 1, y: H - 1 }, southeast: { x: W - 2, y: H - 1 }
+    };
+    const inward = {
+        north: { x: 15, y: 2 }, south: { x: 15, y: H - 3 },
+        west: { x: 2, y: 10 }, east: { x: W - 3, y: 10 },
+        northwest: { x: 3, y: 2 }, northeast: { x: W - 4, y: 2 },
+        southwest: { x: 3, y: H - 3 }, southeast: { x: W - 4, y: H - 3 }
+    };
+    function blank(fill='G') {
+        return Array.from({length:H},()=>Array(W).fill(fill));
+    }
+    function border(a) {
+        for(let x=0;x<W;x++){a[0][x]='#';a[H-1][x]='#';}
+        for(let y=0;y<H;y++){a[y][0]='#';a[y][W-1]='#';}
+    }
+    function carve(a,x,y,r=1,ch='.') {
+        for(let yy=y-r;yy<=y+r;yy++) for(let xx=x-r;xx<=x+r;xx++)
+            if(xx>=1&&xx<W-1&&yy>=1&&yy<H-1) a[yy][xx]=ch;
+    }
+    function building(a,x,y,w,h) {
+        for(let yy=y;yy<y+h;yy++) for(let xx=x;xx<x+w;xx++)
+            if(xx>=1&&xx<W-1&&yy>=1&&yy<H-1) a[yy][xx]='#';
+        // front entrance/opening
+        const ex=Math.floor(x+w/2);
+        if(y+h<H-1) a[y+h][ex]='.';
+    }
+    function path(a, points, width=2) {
+        for(let i=0;i<points.length-1;i++) {
+            let [x,y]=points[i], [tx,ty]=points[i+1];
+            const steps=Math.max(Math.abs(tx-x),Math.abs(ty-y));
+            for(let n=0;n<=steps;n++) {
+                const t=steps? n/steps:0, px=Math.round(x+(tx-x)*t), py=Math.round(y+(ty-y)*t);
+                carve(a,px,py,width,'.');
+            }
+        }
+    }
+    function addExit(a, dir){ const p=DIR[dir]; a[p.y][p.x]='D'; carve(a,inward[dir].x,inward[dir].y,1,'.'); }
+    function town(id,name,region,dirs,theme,extraNpcs=[]) {
+        const a=blank(theme==='coast'?'G':'G'); border(a);
+        // Town-first layout: roads are carved before buildings.
+        path(a, [[15,2],[15,10],[15,18]], 2);
+        path(a, [[3,10],[15,10],[27,10]], 2);
+        path(a, [[7,4],[7,10]],1); path(a, [[23,4],[23,10]],1);
+        path(a, [[7,10],[7,17]],1); path(a, [[23,10],[23,17]],1);
+        building(a,3,3,7,4); building(a,21,3,7,4);
+        building(a,3,13,7,4); building(a,21,13,7,4);
+        // central civic building
+        building(a,12,6,7,4);
+        // water/harbour strip for coastal towns
+        if(theme==='coast') {
+            for(let y=15;y<19;y++) for(let x=24;x<30;x++) a[y][x]='W';
+            for(let x=23;x<29;x++) a[14][x]='.';
+        }
+        // greenery in spare corners
+        for(const [x,y] of [[2,2],[10,2],[20,2],[29,2],[2,18],[10,18],[20,18],[29,18],[11,12],[19,12]]) a[y][x]='G';
+        dirs.forEach(d=>addExit(a,d));
+        return {
+            name, handBuilt:true, data:a.map(r=>r.join('')),
+            spawn:{x:15.5,y:17.5},
+            exits: dirs.map(d=>({x:DIR[d].x,y:DIR[d].y,targetMap:null,direction:d,message:''})),
+            npcs:[
+                {id:id+'-resident',type:'npc',interaction:'dialogue',name:'Local Resident',x:8,y:11,color:'#8b7653',lines:[
+                    `Welcome to ${name}.`,
+                    `The roads here connect this part of ${region} to the wider world.`,
+                    `There is always another trail worth exploring.`
+                ]},
+                {id:id+'-merchant',type:'merchant',interaction:'merchant',name:'Local Merchant',x:22,y:11,color:'#b88a52',lines:['Need supplies before heading out? We have the basics.'],shop:{inventory:['recoveryTonic','revivalTonic','capture']}},
+                {id:id+'-restoration',type:'restoration',interaction:'restoration',name:'Restoration Attendant',x:15,y:5,color:'#69a9a0',lines:['We can restore your Entheon before you continue your journey.']},
+                ...extraNpcs
+            ],
+            encounters:[{species:'Brindlew',minLevel:10,maxLevel:14,weight:70},{species:'Virel',minLevel:10,maxLevel:14,weight:30}]
+        };
+    }
+    function route(id,name,fromMap,toMap,dir,rev,theme='forest') {
+        const a=blank('G'); border(a);
+        // Build a broad, continuous trail before adding decorative terrain.
+        const p1=DIR[rev], p2=DIR[dir], i1=inward[rev], i2=inward[dir];
+        path(a, [[p1.x,p1.y],[i1.x,i1.y],[15,10],[i2.x,i2.y],[p2.x,p2.y]], 2);
+        // Side terrain patches
+        const tall = theme==='snow'?'G':'V';
+        for(let y=3;y<H-3;y+=4) for(let x=3;x<W-3;x+=7) {
+            if(a[y][x]==='G') { a[y][x]=tall; if(x+1<W-1&&a[y][x+1]==='G') a[y][x+1]=tall; }
+        }
+        if(theme==='coast') for(let y=2;y<7;y++) for(let x=24;x<29;x++) if(a[y][x]==='G') a[y][x]='W';
+        if(theme==='mountain') for(const [x,y] of [[4,4],[7,5],[24,4],[26,6],[4,16],[25,16]]) if(a[y][x]==='G') a[y][x]='#';
+        addExit(a,dir); addExit(a,rev);
+        return {name,handBuilt:true,data:a.map(r=>r.join('')),spawn:{x:15.5,y:10.5},exits:[
+            {x:DIR[rev].x,y:DIR[rev].y,targetMap:fromMap,targetX:15.5,targetY:10.5,message:`You return toward the previous location.`},
+            {x:DIR[dir].x,y:DIR[dir].y,targetMap:toMap,targetX:15.5,targetY:10.5,message:`You continue along the trail toward the next location.`}
+        ],encounters:[{species:'Brindlew',minLevel:12,maxLevel:16,weight:60},{species:'Virel',minLevel:12,maxLevel:16,weight:40}],npcs:[
+            {id:id+'-trainer',type:'trainer',interaction:'trainer',name:'Trail Trainer',x:15,y:7,color:'#d26b6b',lines:['This route is a good place to test your team.'],battle:{reward:180,team:[{species:'Brindlew',level:13}],victory:'Well fought! Keep exploring.',defeat:'The road goes both ways. Try again when you are ready.'}},
+            {id:id+'-ranger',type:'npc',interaction:'dialogue',name:'Ranger',x:9,y:12,color:'#5d9f9b',lines:['Stay on the trail when you can, and watch the grass for wild Entheon.']}
+        ]};
+    }
+    function wire(map, list){ map.exits.forEach((e,i)=>{ const target=list[i]; if(target){e.targetMap=target.map;e.targetX=target.x??15.5;e.targetY=target.y??10.5;e.message=target.message||e.message;} }); }
+
+    // Remaining route maps, in world-graph order.
+    maps.route_gullhaven_13 = route('route_gullhaven_13','Southern Seawick Trail','gullhaven_city','seawick_settlement13','south','north','coast');
+    maps.route_northreach_20 = route('route_northreach_20','Northreach to Settlement 20','northreach_city','hawthorne_settlement20','southeast','northwest','forest');
+    maps.route_20_lakecrest = route('route_20_lakecrest','Lake Road to Lakecrest City','hawthorne_settlement20','lakecrest_city','southwest','northeast','forest');
+    maps.route_lakecrest_21 = route('route_lakecrest_21','Southern Lakecrest Road','lakecrest_city','hawthorne_settlement21','south','north','forest');
+    maps.route_21_22 = route('route_21_22','Northwest Branch to Settlement 22','hawthorne_settlement21','hawthorne_settlement22','northwest','southeast','forest');
+    maps.route_21_23 = route('route_21_23','Southern Hawthorne Trail','hawthorne_settlement21','hawthorne_settlement23','south','north','forest');
+    maps.route_lakecrest_26 = route('route_lakecrest_26','Eastmere Road','lakecrest_city','eastmere_settlement26','northeast','southwest','forest');
+    maps.route_26_fairhaven = route('route_26_fairhaven','Fairhaven Approach','eastmere_settlement26','fairhaven_city','southeast','northwest','coast');
+    maps.route_fairhaven_25 = route('route_fairhaven_25','Southern Fairhaven Road','fairhaven_city','eastmere_settlement25','south','north','coast');
+    maps.route_fairhaven_24 = route('route_fairhaven_24','Southwest Coastal Road','fairhaven_city','eastmere_settlement24','southwest','northeast','coast');
+    maps.route_24_23 = route('route_24_23','Lake-to-Coast Side Route','eastmere_settlement24','hawthorne_settlement23','northwest','southeast','forest');
+
+    // Remaining settlements and cities.
+    maps.seawick_settlement13 = town('seawick_settlement13','Settlement 13','Seawick',['north'],'coast',[
+        {id:'s13-fisher',type:'npc',interaction:'dialogue',name:'Fisher',x:25,y:16,color:'#587c9c',lines:['The southern waters get rougher, but there is always something interesting out there.']}
+    ]);
+    maps.hawthorne_settlement20 = town('hawthorne_settlement20','Settlement 20','Hawthorne',['northwest','southwest'],'forest');
+    maps.lakecrest_city = town('lakecrest_city','Lakecrest City','Hawthorne',['northeast','south'],'forest',[
+        {id:'lakecrest-gym-guide',type:'npc',interaction:'dialogue',name:'Gym Attendant',x:25,y:6,color:'#8b6bbd',lines:['The Lakecrest Gym specializes in Volt-aligned Entheon. The challenge is ahead when you are ready.']}
+    ]);
+    maps.hawthorne_settlement21 = town('hawthorne_settlement21','Settlement 21','Hawthorne',['north','northwest','south'],'forest');
+    maps.hawthorne_settlement22 = town('hawthorne_settlement22','Settlement 22','Hawthorne',['southeast'],'coast',[
+        {id:'s22-port',type:'npc',interaction:'ferry',name:'Portmaster',x:25,y:14,color:'#587c9c',lines:['The ferry to Lume is ready when you are.']}
+    ]);
+    maps.hawthorne_settlement23 = town('hawthorne_settlement23','Settlement 23','Hawthorne',['north','southeast'],'forest');
+    maps.eastmere_settlement26 = town('eastmere_settlement26','Settlement 26','Eastmere',['southwest','southeast'],'forest');
+    maps.fairhaven_city = town('fairhaven_city','Fairhaven','Eastmere',['northwest','south','southwest'],'coast',[
+        {id:'fairhaven-gym-guide',type:'npc',interaction:'dialogue',name:'Gym Attendant',x:25,y:6,color:'#8b6bbd',lines:['Fairhaven Gym is known for its Mystic-aligned trials.']}
+    ]);
+    maps.eastmere_settlement25 = town('eastmere_settlement25','Settlement 25','Eastmere',['north'],'forest');
+    maps.eastmere_settlement24 = town('eastmere_settlement24','Settlement 24','Eastmere',['northeast','northwest'],'coast',[
+        {id:'s24-port',type:'npc',interaction:'ferry',name:'Portmaster',x:25,y:14,color:'#587c9c',lines:['Lume is only a ferry ride away.']}
+    ]);
+
+    // Wire every new route to its actual endpoint map.
+    wire(maps.route_gullhaven_13,[{map:'gullhaven_city',x:15.5,y:17.5},{map:'seawick_settlement13',x:15.5,y:17.5}]);
+    wire(maps.route_northreach_20,[{map:'northreach_city'},{map:'hawthorne_settlement20'}]);
+    wire(maps.route_20_lakecrest,[{map:'hawthorne_settlement20'},{map:'lakecrest_city'}]);
+    wire(maps.route_lakecrest_21,[{map:'lakecrest_city'},{map:'hawthorne_settlement21'}]);
+    wire(maps.route_21_22,[{map:'hawthorne_settlement21'},{map:'hawthorne_settlement22'}]);
+    wire(maps.route_21_23,[{map:'hawthorne_settlement21'},{map:'hawthorne_settlement23'}]);
+    wire(maps.route_lakecrest_26,[{map:'lakecrest_city'},{map:'eastmere_settlement26'}]);
+    wire(maps.route_26_fairhaven,[{map:'eastmere_settlement26'},{map:'fairhaven_city'}]);
+    wire(maps.route_fairhaven_25,[{map:'fairhaven_city'},{map:'eastmere_settlement25'}]);
+    wire(maps.route_fairhaven_24,[{map:'fairhaven_city'},{map:'eastmere_settlement24'}]);
+    wire(maps.route_24_23,[{map:'eastmere_settlement24'},{map:'hawthorne_settlement23'}]);
+
+    // Correct settlement/city exit targets. Directional positions are kept
+    // in the same compass direction as the authoritative route graph.
+    wire(maps.seawick_settlement13,[{map:'route_gullhaven_13',x:15.5,y:2.5}]);
+    wire(maps.hawthorne_settlement20,[{map:'route_northreach_20',x:27.5,y:2.5},{map:'route_20_lakecrest',x:3.5,y:18.5}]);
+    wire(maps.lakecrest_city,[{map:'route_lakecrest_26',x:3.5,y:18.5},{map:'route_lakecrest_21',x:15.5,y:2.5}]);
+    wire(maps.hawthorne_settlement21,[{map:'route_lakecrest_21',x:15.5,y:18.5},{map:'route_21_22',x:27.5,y:2.5},{map:'route_21_23',x:15.5,y:2.5}]);
+    wire(maps.hawthorne_settlement22,[{map:'route_21_22',x:3.5,y:18.5}]);
+    wire(maps.hawthorne_settlement23,[{map:'route_21_23',x:15.5,y:18.5},{map:'route_24_23',x:27.5,y:2.5}]);
+    wire(maps.eastmere_settlement26,[{map:'route_lakecrest_26',x:27.5,y:2.5},{map:'route_26_fairhaven',x:3.5,y:18.5}]);
+    wire(maps.fairhaven_city,[{map:'route_26_fairhaven',x:27.5,y:2.5},{map:'route_fairhaven_25',x:15.5,y:2.5},{map:'route_fairhaven_24',x:3.5,y:18.5}]);
+    wire(maps.eastmere_settlement25,[{map:'route_fairhaven_25',x:15.5,y:18.5}]);
+    wire(maps.eastmere_settlement24,[{map:'route_fairhaven_24',x:27.5,y:2.5},{map:'route_24_23',x:3.5,y:2.5}]);
+
+    // Ensure newly built maps are discoverable through the existing map lookup.
+    window.KALEO_REMAINING_WORLD_BUILT = true;
+})();
+
+// ============================================================
 // DIRECTIONAL WORLD ROUTE LAYOUT
 // ============================================================
 // The world map is authoritative for the direction in which a route leaves
@@ -3749,6 +3922,188 @@ Object.values(maps).forEach(map => ensureAllExitCorridors(map));
 // rather than the old east/west placeholder doors.
 applyDirectionalRouteLayout();
 Object.values(maps).forEach(map => ensureAllExitCorridors(map));
+
+// ============================================================
+// ROUTE REVAMP — ADVENTURE-SIZED OVERLAND ROUTES
+// ============================================================
+// Routes are intentionally larger than settlements, but not simply giant
+// rectangles. Each route gets a distinct regional environment, a readable
+// main trail, optional detours, encounter pockets and breathing room around
+// landmarks/trainers. Connectivity remains driven by the authoritative
+// route graph above.
+function routeRevampTheme(map) {
+    const text = `${map.name} ${map.id || ""}`.toLowerCase();
+    if (text.includes("seawick") || text.includes("gullhaven") || text.includes("coast") || text.includes("mullhaven")) return "coast";
+    if (text.includes("highreach") || text.includes("thermalis") || text.includes("hot spring")) return "mountain";
+    if (text.includes("winterhold") || text.includes("isen")) return "snow";
+    if (text.includes("northvale") || text.includes("northreach")) return "north";
+    if (text.includes("dunridge") || text.includes("stonehaven")) return "hill";
+    if (text.includes("greenvale") || text.includes("harveston")) return "farmforest";
+    if (text.includes("hawthorne") || text.includes("lakecrest")) return "lake";
+    if (text.includes("eastmere") || text.includes("fairhaven")) return "east";
+    return "westmere";
+}
+
+function routeRevampSize(map, theme) {
+    const text = `${map.name} ${map.id || ""}`.toLowerCase();
+    let w = 44, h = 30;
+    if (text.includes("stonehaven") || text.includes("lakecrest") || text.includes("thermalis") || text.includes("winterhold")) { w = 50; h = 34; }
+    if (text.includes("seawick") || text.includes("gullhaven") || text.includes("mullhaven")) { w = 48; h = 32; }
+    if (text.includes("hot spring")) { w = 42; h = 30; }
+    if (theme === "snow") { w = 46; h = 34; }
+    return { w, h };
+}
+
+function routeRevampPoint(direction, w, h, index=0, count=1) {
+    const spread = count > 1 ? Math.round((index + 1) * ((direction.includes('north') || direction.includes('south')) ? (w-6)/(count+1) : (h-6)/(count+1))) : Math.floor(((direction.includes('north') || direction.includes('south')) ? w : h) / 2);
+    if (direction === 'north') return {x: Math.max(2, Math.min(w-3, spread)), y:0};
+    if (direction === 'south') return {x: Math.max(2, Math.min(w-3, spread)), y:h-1};
+    if (direction === 'east') return {x:w-1, y:Math.max(2, Math.min(h-3, spread))};
+    if (direction === 'west') return {x:0, y:Math.max(2, Math.min(h-3, spread))};
+    if (direction === 'northeast') return {x:w-2, y:1};
+    if (direction === 'northwest') return {x:1, y:1};
+    if (direction === 'southeast') return {x:w-2, y:h-2};
+    if (direction === 'southwest') return {x:1, y:h-2};
+    return {x:Math.floor(w/2),y:0};
+}
+
+function revampCarve(grid, x, y, tx, ty, width=1) {
+    let cx=x, cy=y;
+    const max=grid.length*grid[0].length*2;
+    for(let i=0;i<max;i++){
+        for(let oy=-width;oy<=width;oy++) for(let ox=-width;ox<=width;ox++){
+            const gx=cx+ox, gy=cy+oy;
+            if(grid[gy]?.[gx] !== undefined) grid[gy][gx]=TILE.PATH;
+        }
+        if(cx===tx && cy===ty) break;
+        const dx=Math.sign(tx-cx), dy=Math.sign(ty-cy);
+        // Deterministic bends make the trail meander without becoming confusing.
+        if(i%9===0 && dy!==0) cy+=dy;
+        else if(i%7===0 && dx!==0) cx+=dx;
+        else if(Math.abs(tx-cx)>=Math.abs(ty-cy) && dx) cx+=dx;
+        else if(dy) cy+=dy;
+        else if(dx) cx+=dx;
+    }
+}
+
+function revampRouteMap(mapId, map) {
+    if(!map || !mapId.startsWith('route_') || !map.exits?.length) return;
+    const theme=routeRevampTheme(map), {w,h}=routeRevampSize(map,theme);
+    const seed=Array.from(mapId).reduce((a,c)=>a+c.charCodeAt(0),17);
+    const grid=Array.from({length:h},()=>Array(w).fill(TILE.GRASS));
+
+    // Organic outer margins: the route remains open but has irregular edges.
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+        const edge=x<2||y<2||x>w-3||y>h-3;
+        const notch=(x<4&&y<4)|| (x>w-5&&y>h-5) || (x<3&&y>h-5);
+        if(edge && notch) grid[y][x]=TILE.VOID;
+        else if(edge) grid[y][x]=TILE.WALL;
+    }
+
+    // Region-specific base terrain.
+    for(let y=2;y<h-2;y++) for(let x=2;x<w-2;x++){
+        const n=stableNoise(x,y,seed);
+        if(theme==='coast' && (y>h-7 || x<5) && n>0.62) grid[y][x]=TILE.WATER;
+        else if(theme==='mountain' && n>0.77) grid[y][x]=TILE.WALL;
+        else if(theme==='snow' && n>0.84) grid[y][x]=TILE.WALL;
+        else if((theme==='farmforest'||theme==='westmere'||theme==='north') && n>0.76) grid[y][x]=TILE.TREE;
+        else if((theme==='lake'||theme==='east') && n>0.79) grid[y][x]=TILE.TREE;
+    }
+
+    const exits=map.exits.map((e,i)=>{
+        const dir=e.direction || 'north';
+        const p=routeRevampPoint(dir,w,h,i,map.exits.length);
+        return {...e,x:p.x,y:p.y};
+    });
+
+    // Main trail follows the actual geographic exit directions.
+    const hub={x:Math.floor(w/2),y:Math.floor(h/2)};
+    exits.forEach(e=>revampCarve(grid,e.x,e.y,hub.x,hub.y,1));
+    if(exits.length===2) {
+        // Add a second, gently offset trail segment to create visual variety.
+        const a=exits[0], b=exits[1];
+        const offset={x:Math.floor(w/2)+(seed%7)-3,y:Math.floor(h/2)+((seed>>2)%7)-3};
+        revampCarve(grid,a.x,a.y,offset.x,offset.y,1);
+        revampCarve(grid,offset.x,offset.y,b.x,b.y,1);
+    }
+
+    // Create side trails/detours away from the main path.
+    const detours = theme==='mountain'||theme==='snow' ? 4 : 3;
+    for(let i=0;i<detours;i++){
+        const sx=5+((seed+i*17)%(w-10)), sy=5+((seed*3+i*11)%(h-10));
+        const tx=Math.max(3,Math.min(w-4,sx+(i%2?7:-7))), ty=Math.max(3,Math.min(h-4,sy+(i%3?4:-5)));
+        if(grid[sy]?.[sx]===TILE.GRASS) revampCarve(grid,sx,sy,tx,ty,0);
+    }
+
+    // Encounter pockets: several separated grass patches rather than one carpet.
+    const grassPatches=theme==='coast'?4:5;
+    for(let i=0;i<grassPatches;i++){
+        const px=5+((seed+i*23)%(w-10)), py=4+((seed*2+i*13)%(h-8));
+        const rw=3+(i%3), rh=2+(i%2);
+        for(let yy=py;yy<py+rh;yy++) for(let xx=px;xx<px+rw;xx++){
+            if(grid[yy]?.[xx]===TILE.GRASS && stableNoise(xx,yy,seed+i)>0.18) grid[yy][xx]=TILE.TALL_GRASS;
+        }
+    }
+
+    // Re-seed a few regional landmarks into the route.
+    const landmarkText=`${map.name}`.toLowerCase();
+    if(landmarkText.includes('great tree')){
+        const cx=Math.floor(w*0.68), cy=Math.floor(h*0.42);
+        grid[cy][cx]=TILE.TREE; grid[cy-1][cx]=TILE.TREE; grid[cy][cx-1]=TILE.TREE; grid[cy][cx+1]=TILE.TREE;
+    }
+    if(theme==='coast'){
+        for(let x=7;x<w-7;x+=4) if(grid[h-6]?.[x]===TILE.GRASS) grid[h-6][x]=TILE.WATER;
+    }
+
+    // Scale existing NPCs into the new route rather than losing their battles/dialogue.
+    const oldW=map.data?.[0]?.length||30, oldH=map.data?.length||18;
+    const npcs=(map.npcs||[]).map((npc,i)=>{
+        let x=Math.round((npc.x/Math.max(1,oldW-1))*(w-5))+2;
+        let y=Math.round((npc.y/Math.max(1,oldH-1))*(h-5))+2;
+        x=Math.max(2,Math.min(w-3,x)); y=Math.max(2,Math.min(h-3,y));
+        // Keep route NPCs off water/walls/trees; walk to nearest path/grass.
+        if([TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[y]?.[x])){
+            outer: for(let r=1;r<8;r++) for(let oy=-r;oy<=r;oy++) for(let ox=-r;ox<=r;ox++){
+                const nx=x+ox,ny=y+oy;
+                if(![TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[ny]?.[nx])){x=nx;y=ny;break outer;}
+            }
+        }
+        return {...npc,x,y};
+    });
+
+    // Add one or two contextual route characters if the existing route was sparse.
+    if(npcs.length<2){
+        npcs.push({id:`${mapId}-ranger`,type:'npc',interaction:'dialogue',name:theme==='coast'?'Coastal Ranger':theme==='mountain'?'Trail Guide':theme==='snow'?'Winter Ranger':'Route Ranger',x:Math.floor(w*0.42),y:Math.floor(h*0.58),color:'#6b8f5b',lines:[
+            theme==='coast'?'The sea changes the weather quickly out here. Keep an eye on the trail.':
+            theme==='mountain'?'Watch your footing. The safest path is rarely the straightest one.':
+            theme==='snow'?'Snow can hide old paths and loose ground. Stay alert.':
+            'There are more little paths through this area than most travellers notice.'
+        ]});
+    }
+
+    // Add a visible optional detour item where there is open space.
+    const hasItem=npcs.some(n=>n.type==='item');
+    if(!hasItem){
+        let ix=Math.floor(w*0.78), iy=Math.floor(h*0.30);
+        if([TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[iy]?.[ix])){ ix=Math.floor(w*0.25); iy=Math.floor(h*0.72); }
+        npcs.push({id:`${mapId}-item`,type:'item',interaction:'item',name:'Roadside Item',x:ix,y:iy,color:'#d5b35f',lines:['You found an item tucked beside the trail.']});
+    }
+
+    exits.forEach(e=>{grid[e.y][e.x]=TILE.DOOR;});
+    map.data=grid.map(r=>r.join(''));
+    map.exits=exits;
+    map.npcs=npcs;
+    // Preserve the existing encounter table, but ensure route encounters exist.
+    if(!map.encounters?.length){
+        map.encounters=[{species:theme==='coast'?'Brindlew':theme==='mountain'?'Morravyn':theme==='snow'?'Sairune':'Orrin',minLevel:4,maxLevel:10,weight:100}];
+    }
+}
+
+Object.entries(maps).forEach(([mapId,map])=>revampRouteMap(mapId,map));
+
+// Re-run the final exit normalization after route dimensions have changed.
+applyDirectionalRouteLayout();
+Object.values(maps).forEach(map=>ensureAllExitCorridors(map));
 
 let currentMap = maps.town;
 
