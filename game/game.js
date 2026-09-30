@@ -315,27 +315,6 @@ function chooseStarter(name) {
 
 
 // ============================================================
-// GYM LEADERS / BADGES
-// ============================================================
-const gymLeaders = [
-    { map:'everhope_city', id:'gale', name:'Gym Leader Gale', badgeId:'gale-badge', badgeName:'Gale Badge', x:18, y:7, color:'#7b9ed8', levels:[8,9], team:['Virel','Brindlew'], reward:900, lines:['Welcome to Everhope Gym.','We test movement, timing and control through Gale-aligned battles.','If you are ready, let us battle for the Gale Badge.'] },
-    { map:'harveston_city', id:'verdant', name:'Gym Leader Flora', badgeId:'verdant-badge', badgeName:'Verdant Badge', x:15, y:11, color:'#6b9b58', levels:[10,11], team:['Pipiri','Meliu'], reward:1200, lines:['Welcome to Harveston Gym.','Verdant battles reward patience and steady pressure.','Show me what your team has learned.'] },
-    { map:'gullhaven_city', id:'tide', name:'Gym Leader Marina', badgeId:'tide-badge', badgeName:'Tide Badge', x:15, y:10, color:'#4f8fa8', levels:[12,13], team:['Pipiri','Orven'], reward:1500, lines:['The sea never stays still.','A Tide battle is about adapting to change.','Earn your Tide Badge if you can keep your footing.'] },
-    { map:'thermalis_city', id:'thermalis', name:'Gym Leader Cinder', badgeId:'thermalis-badge', badgeName:'Thermalis Badge', x:15, y:10, color:'#b5654a', levels:[14,15], team:['Brindlew','Orven'], reward:1900, lines:['Thermalis tests strength under pressure.','Flame and Stone demand commitment.','Let us see whether your team can withstand the heat.'] },
-    { map:'northreach_city', id:'northreach', name:'Gym Leader Skadi', badgeId:'northreach-badge', badgeName:'Northreach Badge', x:15, y:10, color:'#71879a', levels:[16,17], team:['Morrowe','Orven'], reward:2300, lines:['Northreach is where preparation matters.','Metal and Frost punish careless decisions.','If you want this badge, prove you can adapt.'] },
-    { map:'lakecrest_city', id:'lakecrest', name:'Gym Leader Volt', badgeId:'lakecrest-badge', badgeName:'Lakecrest Badge', x:15, y:9, color:'#c59b3e', levels:[18,19], team:['Virel','Meliu'], reward:2700, lines:['Welcome to Lakecrest Gym.','Volt battles reward momentum and decisive turns.','Show me that you can keep control of the battle.'] },
-    { map:'fairhaven_city', id:'fairhaven', name:'Gym Leader Mira', badgeId:'fairhaven-badge', badgeName:'Fairhaven Badge', x:15, y:9, color:'#8669a8', levels:[20,21], team:['Meliu','Morrowe'], reward:3200, lines:['Fairhaven Gym is built around Mystic affinity.','Prediction matters as much as power here.','If you want this badge, read the battle carefully.'] }
-];
-for (const gym of gymLeaders) {
-    const map = maps[gym.map];
-    if (!map) continue;
-    map.npcs = Array.isArray(map.npcs) ? map.npcs : [];
-    if (map.npcs.some(n => n.id === `gym-leader-${gym.id}`)) continue;
-    map.npcs.push({id:`gym-leader-${gym.id}`,type:'gym',interaction:'gym',name:gym.name,x:gym.x,y:gym.y,color:gym.color,badgeId:gym.badgeId,badgeName:gym.badgeName,lines:gym.lines,battle:{reward:gym.reward,team:gym.team.map((species,i)=>({species,level:gym.levels[i]})),victory:`You have earned the ${gym.badgeName}!`,defeat:'Train, recover, and return when you are ready.'}});
-}
-
-
-// ============================================================
 // MAP DATA
 // ============================================================
 
@@ -4254,6 +4233,27 @@ Object.entries(maps).forEach(([mapId,map])=>revampRouteMap(mapId,map));
 // Re-run the final exit normalization after route dimensions have changed.
 applyDirectionalRouteLayout();
 Object.values(maps).forEach(map=>ensureAllExitCorridors(map));
+
+// ============================================================
+// GYM LEADERS / BADGES
+// ============================================================
+const gymLeaders = [
+    { map:'everhope_city', id:'gale', name:'Gym Leader Gale', badgeId:'gale-badge', badgeName:'Gale Badge', x:18, y:7, color:'#7b9ed8', levels:[8,9], team:['Virel','Brindlew'], reward:900, lines:['Welcome to Everhope Gym.','We test movement, timing and control through Gale-aligned battles.','If you are ready, let us battle for the Gale Badge.'] },
+    { map:'harveston_city', id:'verdant', name:'Gym Leader Flora', badgeId:'verdant-badge', badgeName:'Verdant Badge', x:15, y:11, color:'#6b9b58', levels:[10,11], team:['Pipiri','Meliu'], reward:1200, lines:['Welcome to Harveston Gym.','Verdant battles reward patience and steady pressure.','Show me what your team has learned.'] },
+    { map:'gullhaven_city', id:'tide', name:'Gym Leader Marina', badgeId:'tide-badge', badgeName:'Tide Badge', x:15, y:10, color:'#4f8fa8', levels:[12,13], team:['Pipiri','Orven'], reward:1500, lines:['The sea never stays still.','A Tide battle is about adapting to change.','Earn your Tide Badge if you can keep your footing.'] },
+    { map:'thermalis_city', id:'thermalis', name:'Gym Leader Cinder', badgeId:'thermalis-badge', badgeName:'Thermalis Badge', x:15, y:10, color:'#b5654a', levels:[14,15], team:['Brindlew','Orven'], reward:1900, lines:['Thermalis tests strength under pressure.','Flame and Stone demand commitment.','Let us see whether your team can withstand the heat.'] },
+    { map:'northreach_city', id:'northreach', name:'Gym Leader Skadi', badgeId:'northreach-badge', badgeName:'Northreach Badge', x:15, y:10, color:'#71879a', levels:[16,17], team:['Morrowe','Orven'], reward:2300, lines:['Northreach is where preparation matters.','Metal and Frost punish careless decisions.','If you want this badge, prove you can adapt.'] },
+    { map:'lakecrest_city', id:'lakecrest', name:'Gym Leader Volt', badgeId:'lakecrest-badge', badgeName:'Lakecrest Badge', x:15, y:9, color:'#c59b3e', levels:[18,19], team:['Virel','Meliu'], reward:2700, lines:['Welcome to Lakecrest Gym.','Volt battles reward momentum and decisive turns.','Show me that you can keep control of the battle.'] },
+    { map:'fairhaven_city', id:'fairhaven', name:'Gym Leader Mira', badgeId:'fairhaven-badge', badgeName:'Fairhaven Badge', x:15, y:9, color:'#8669a8', levels:[20,21], team:['Meliu','Morrowe'], reward:3200, lines:['Fairhaven Gym is built around Mystic affinity.','Prediction matters as much as power here.','If you want this badge, read the battle carefully.'] }
+];
+for (const gym of gymLeaders) {
+    const map = maps[gym.map];
+    if (!map) continue;
+    map.npcs = Array.isArray(map.npcs) ? map.npcs : [];
+    if (map.npcs.some(n => n.id === `gym-leader-${gym.id}`)) continue;
+    map.npcs.push({id:`gym-leader-${gym.id}`,type:'gym',interaction:'gym',name:gym.name,x:gym.x,y:gym.y,color:gym.color,badgeId:gym.badgeId,badgeName:gym.badgeName,lines:gym.lines,battle:{reward:gym.reward,team:gym.team.map((species,i)=>({species,level:gym.levels[i]})),victory:`You have earned the ${gym.badgeName}!`,defeat:'Train, recover, and return when you are ready.'}});
+}
+
 
 let currentMap = maps.town;
 
