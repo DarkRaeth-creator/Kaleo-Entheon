@@ -206,7 +206,7 @@ function showNameEntry() {
     const previewGender = gameState.gender === "girl" ? "female" : "male";
     sceneText.innerHTML = `
         <div class="character-preview-card">
-            <img src="images/player/${previewGender}/down.png" class="character-preview-sprite" alt="Selected character preview">
+            <img src="../images/player/${previewGender}/down.png" class="character-preview-sprite" alt="Selected character preview">
             <div>
                 <p>What should people call you in Kaleo?</p>
                 <p class="character-preview-note">This is the default ${gameState.gender === "girl" ? "female" : "male"} character. We'll add the full appearance customization options next.</p>
@@ -266,7 +266,7 @@ function getCustomizationOptions() {
 function appearanceSpritePath(direction = "down") {
     const gender = gameState.gender === "girl" ? "female" : "male";
     const a = gameState.appearance || {};
-    return `images/player/${gender}/${direction}_${a.hair}_${a.eye}_${a.outfit}.png`;
+    return `../images/player/${gender}/${direction}_${a.hair}_${a.eye}_${a.outfit}.png`;
 }
 
 function renderCustomizationPreview() {
@@ -4658,7 +4658,7 @@ function refreshPlayerSprites() {
 ["male", "female"].forEach(gender => {
     ["down", "up", "left", "right"].forEach(direction => {
         const image = new Image();
-        image.src = `images/player/${gender}/${direction}.png`;
+        image.src = `../images/player/${gender}/${direction}.png`;
         playerSprites[gender][direction] = image;
     });
 });
