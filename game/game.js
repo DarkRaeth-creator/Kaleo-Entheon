@@ -4402,7 +4402,31 @@ function registerEntheon(name, status = "seen") {
 
 function syncDirectoryFromParty() {
     ensureDirectoryState();
+
+    // The party is the authoritative source for anything the player currently
+    // owns.  Some older prototype flows also kept the starter in starterData,
+    // so reconcile that object as well.
+    const ownedMembers = [];
+
     (gameState.party || []).forEach(member => {
+        if (member?.species) ownedMembers.push(member);
+    });
+
+    if (gameState.starterData?.species) {
+        const starterAlreadyListed = ownedMembers.some(member => member === gameState.starterData);
+        if (!starterAlreadyListed) ownedMembers.push(gameState.starterData);
+    }
+
+    ownedMembers.forEach(member => {
+        registerEntheon(member.species, "captured");
+    });
+
+    // Reconcile the currently owned species against the evolution registry too.
+    // This is deliberately based on the member's CURRENT species, so an
+    // evolution immediately becomes captured even if the evolution itself was
+    // triggered by the development/test evolution flow rather than by a wild
+    // capture.
+    ownedMembers.forEach(member => {
         if (!member?.species) return;
         registerEntheon(member.species, "captured");
     });
@@ -4432,6 +4456,10 @@ function renderDirectoryDetail(species) {
 }
 function renderDirectory() {
     if (!directoryList) return;
+
+    // Always reconcile ownership immediately before rendering. This means the
+    // Directory cannot show stale data after an evolution, even when it was
+    // opened from a different screen immediately after the evolution prompt.
     ensureDirectoryState();
     syncDirectoryFromParty();
     const seenCount = Object.values(gameState.entheonDirectory.seen).filter(Boolean).length;
