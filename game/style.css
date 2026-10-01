@@ -157,6 +157,71 @@ body {
     font-size: 13px;
 }
 
+#controls-help .menu-trigger-button {
+    width: auto;
+    min-width: 86px;
+    margin-left: auto;
+}
+
+.game-menu {
+    position: absolute;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(8, 10, 16, .72);
+    backdrop-filter: blur(3px);
+}
+
+.game-menu.hidden { display: none !important; }
+
+.game-menu-card {
+    width: min(420px, 92%);
+    max-height: 90%;
+    overflow: auto;
+    padding: 20px;
+    background: #252530;
+    border: 3px solid #111118;
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.55);
+}
+
+.game-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #41414f;
+}
+
+.game-menu-header h2 { margin: 0; font-size: 25px; }
+.game-menu-header p { margin: 5px 0 0; color: #bdbdc8; font-size: 13px; }
+
+.game-menu-options { display: grid; gap: 10px; }
+
+.game-menu-button {
+    width: 100%;
+    padding: 14px 16px;
+    background: #30303d;
+    color: #fff;
+    border: 2px solid #555565;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.game-menu-button:hover {
+    background: #454554;
+    border-color: #77778a;
+}
+
 .world-message,
 .battle-message {
     margin-top: 12px;
@@ -326,7 +391,7 @@ body {
 
 .party-screen {
     position: absolute;
-    inset: 8px;
+    inset: 0;
     z-index: 1000;
     background: #252530;
     border: 3px solid #111118;
