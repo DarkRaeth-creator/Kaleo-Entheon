@@ -26,14 +26,16 @@ const gameState = {
         capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 }
     },
     items: {
-        recoveryTonic: { id: "recoveryTonic", name: "Recovery Tonic", description: "Restores 25 HP to one Entheon.", quantity: 3, kind: "heal", amount: 25 },
-        revivalTonic: { id: "revivalTonic", name: "Revival Tonic", description: "Revives a fainted Entheon at 50% of its maximum HP.", quantity: 1, kind: "revive", amount: 0.5 }
+        basicRestore: { id: "basicRestore", name: "Basic Restore", description: "A field restorative for minor injuries. (Prototype: restores 25 HP.)", quantity: 3, kind: "heal", amount: 25 },
+        revitalizingElixir: { id: "revitalizingElixir", name: "Revitalizing Elixir", description: "A specialized restorative for an exhausted Entheon. (Prototype: revives at 50% HP.)", quantity: 1, kind: "revive", amount: 0.5 },
+        greaterRestore: { id: "greaterRestore", name: "Greater Restore", description: "A stronger restorative for more serious injuries. (Prototype: restores 60 HP.)", quantity: 0, kind: "heal", amount: 60 }
     },
     shop: {
         merchantId: "travelling-merchant",
         stock: {
-            recoveryTonic: { id: "recoveryTonic", name: "Recovery Tonic", description: "Restores 25 HP to one Entheon.", price: 100 },
-            revivalTonic: { id: "revivalTonic", name: "Revival Tonic", description: "Revives a fainted Entheon at 50% of its maximum HP.", price: 300 },
+            basicRestore: { id: "basicRestore", name: "Basic Restore", description: "A field restorative for minor injuries. (Prototype: restores 25 HP.)", price: 100 },
+            greaterRestore: { id: "greaterRestore", name: "Greater Restore", description: "A stronger restorative for more serious injuries. (Prototype: restores 60 HP.)", price: 220 },
+            revitalizingElixir: { id: "revitalizingElixir", name: "Revitalizing Elixir", description: "A specialized restorative for an exhausted Entheon. (Prototype: revives at 50% HP.)", price: 350 },
             capture: { id: "capture", name: "Capture Crystal", description: "Standard crystal used for Entheon resonance and capture.", price: 150 }
         }
     },
@@ -50,7 +52,8 @@ const gameState = {
     encounterCooldown: 0,
     battle: null,
     trainerBattle: null,
-    evolutionPromptOpen: false
+    evolutionPromptOpen: false,
+    collectedItems: {}
 };
 
 
@@ -433,7 +436,7 @@ const maps = {
                     "Supplies before you leave? Smart thinking.",
                     "The road ahead has a habit of making Trainers spend more Capture Crystals than they expected."
                 ],
-                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
+                shop: { inventory: ["basicRestore", "revitalizingElixir", "capture"] }
             },
             {
                 id: "town-child",
@@ -573,7 +576,7 @@ const maps = {
                 y: 10,
                 color: "#b88a52",
                 lines: ["Everhope has everything a travelling Trainer needs.", "Take a look before you head back onto the Main Trail."],
-                shop: { inventory: ["recoveryTonic", "revivalTonic", "capture"] }
+                shop: { inventory: ["basicRestore", "revitalizingElixir", "capture"] }
             },
             {
                 id: "everhope-gym-attendant",
@@ -754,8 +757,8 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
-                                        "revivalTonic",
+                                        "basicRestore",
+                                        "revitalizingElixir",
                                         "capture"
                                 ]
                         }
@@ -995,7 +998,7 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
+                                        "basicRestore",
                                         "capture"
                                 ]
                         }
@@ -1157,7 +1160,7 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
+                                        "basicRestore",
                                         "capture"
                                 ]
                         }
@@ -1327,7 +1330,7 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
+                                        "basicRestore",
                                         "capture"
                                 ]
                         }
@@ -1440,7 +1443,7 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
+                                        "basicRestore",
                                         "capture"
                                 ]
                         }
@@ -1560,8 +1563,8 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
-                                        "revivalTonic",
+                                        "basicRestore",
+                                        "revitalizingElixir",
                                         "capture"
                                 ]
                         }
@@ -2354,8 +2357,8 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
-                                        "revivalTonic",
+                                        "basicRestore",
+                                        "revitalizingElixir",
                                         "capture"
                                 ]
                         }
@@ -2598,8 +2601,8 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
-                                        "revivalTonic",
+                                        "basicRestore",
+                                        "revitalizingElixir",
                                         "capture"
                                 ]
                         }
@@ -2836,7 +2839,7 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
+                                        "basicRestore",
                                         "capture"
                                 ]
                         }
@@ -2920,7 +2923,7 @@ const maps = {
                         ],
                         "shop": {
                                 "inventory": [
-                                        "recoveryTonic",
+                                        "basicRestore",
                                         "capture"
                                 ]
                         }
@@ -3192,7 +3195,7 @@ const maps = {
                     `The roads here connect this part of ${region} to the wider world.`,
                     `There is always another trail worth exploring.`
                 ]},
-                {id:id+'-merchant',type:'merchant',interaction:'merchant',name:'Local Merchant',x:22,y:11,color:'#b88a52',lines:['Need supplies before heading out? We have the basics.'],shop:{inventory:['recoveryTonic','revivalTonic','capture']}},
+                {id:id+'-merchant',type:'merchant',interaction:'merchant',name:'Local Merchant',x:22,y:11,color:'#b88a52',lines:['Need supplies before heading out? We have the basics.'],shop:{inventory:['basicRestore','revitalizingElixir','capture']}},
                 {id:id+'-restoration',type:'restoration',interaction:'restoration',name:'Restoration Attendant',x:15,y:5,color:'#69a9a0',lines:['We can restore your Entheon before you continue your journey.']},
                 ...extraNpcs
             ],
@@ -3971,7 +3974,7 @@ function createAutoWorldMap(mapId,name,region,exits,kind){
     if(kind==='location'){
         npcs.push({id:`${mapId}-resident`,type:'npc',interaction:'dialogue',name:'Local Resident',x:Math.floor(w/2)-4,y:Math.floor(h/2),color:'#8b7653',lines:[`Welcome to ${name}.`, `The roads here connect to ${exits.length} direction${exits.length===1?'':'s'}.`]});
         if(name.includes('City') || ['Harveston','Gullhaven','Thermalis','Northreach','Lakecrest City','Fairhaven','Winterhold'].includes(name)){
-            npcs.push({id:`${mapId}-shop`,type:'merchant',interaction:'merchant',name:'Local Merchant',x:24,y:10,color:'#b88a52',lines:['Need supplies for the road?'],shop:{inventory:['recoveryTonic','capture']}});
+            npcs.push({id:`${mapId}-shop`,type:'merchant',interaction:'merchant',name:'Local Merchant',x:24,y:10,color:'#b88a52',lines:['Need supplies for the road?'],shop:{inventory:['basicRestore','capture']}});
             npcs.push({id:`${mapId}-restore`,type:'restoration',interaction:'restoration',name:'Restoration Attendant',x:7,y:10,color:'#69a9a0',lines:['Your Entheon are welcome here.']});
         }
     } else {
@@ -4202,13 +4205,26 @@ function revampRouteMap(mapId, map) {
         ]});
     }
 
-    // Keep the optional detour item as a simple discoverable dialogue object.
-    const hasItem=npcs.some(n=>n.id===`${mapId}-detour-item`);
-    if(!hasItem){
-        let ix=Math.floor(w*0.78), iy=Math.floor(h*0.30);
-        if([TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID].includes(grid[iy]?.[ix])){ ix=Math.floor(w*0.25); iy=Math.floor(h*0.72); }
-        npcs.push({id:`${mapId}-detour-item`,type:'npc',interaction:'dialogue',name:'Trail Find',x:ix,y:iy,color:'#d5b35f',lines:['You find a useful supply tucked beside the trail.','It looks like another traveller left it here for someone who needed it.']});
-    }
+    // Real field pickups: routes now contain physical rewards rather than
+    // a decorative "Trail Find" NPC. They persist once collected.
+    const pickupSpecs = [
+        { itemId: theme === 'snow' || theme === 'east' || theme === 'lake' ? 'greaterRestore' : 'basicRestore',
+          label: 'Field Supply', icon: '✦', color: '#d5b35f', fx: 0.78, fy: 0.30 },
+        { itemId: 'capture', label: 'Capture Crystal', icon: '◇', color: '#8fc7df', fx: 0.24, fy: 0.72 }
+    ];
+    pickupSpecs.forEach((spec, index) => {
+        const pickupId = `${mapId}-pickup-${index}`;
+        if (gameState.collectedItems[pickupId]) return;
+        let ix = Math.floor(w * spec.fx), iy = Math.floor(h * spec.fy);
+        const blocked = tile => [TILE.WALL,TILE.WATER,TILE.TREE,TILE.VOID,TILE.DOOR].includes(tile);
+        if (blocked(grid[iy]?.[ix])) {
+            outer: for(let r=1;r<10;r++) for(let oy=-r;oy<=r;oy++) for(let ox=-r;ox<=r;ox++) {
+                const nx=ix+ox, ny=iy+oy;
+                if (grid[ny]?.[nx] !== undefined && !blocked(grid[ny][nx]) && !npcs.some(n=>Math.hypot(n.x-nx,n.y-ny)<2)) { ix=nx; iy=ny; break outer; }
+            }
+        }
+        npcs.push({ id: pickupId, type:'item', interaction:'item', name:spec.label, itemId:spec.itemId, x:ix, y:iy, color:spec.color, icon:spec.icon, lines:[] });
+    });
 
     exits.forEach(e=>{grid[e.y][e.x]=TILE.DOOR;});
     map.data=grid.map(r=>r.join(''));
@@ -4234,6 +4250,39 @@ function revampRouteMap(mapId, map) {
 }
 
 Object.entries(maps).forEach(([mapId,map])=>revampRouteMap(mapId,map));
+
+// Route trainers scale their team size with the world progression. This is
+// intentionally a prototype progression layer; canonical Gym rosters remain
+// controlled separately by the Gym core data.
+(function scaleRouteTrainerTeams(){
+    const pools={
+        westmere:['Brindlew','Orrin','Pipiri'],
+        greenvale:['Brindlew','Orrin','Pipiri'],
+        dunridge:['Orrin','Brindlew','Morrowe'],
+        seawick:['Pipiri','Orrin','Brindlew'],
+        highreach:['Orrin','Morrowe','Brindlew'],
+        northvale:['Morrowe','Orrin','Pipiri'],
+        isen:['Morrowe','Pipiri','Orrin'],
+        hawthorne:['Pipiri','Brindlew','Morrowe'],
+        eastmere:['Morrowe','Pipiri','Brindlew']
+    };
+    Object.entries(maps).forEach(([mapId,map])=>{
+        if(!mapId.startsWith('route_')) return;
+        const trainers=(map.npcs||[]).filter(n=>n.interaction==='trainer' && n.battle);
+        if(!trainers.length) return;
+        const text=`${map.name} ${mapId}`.toLowerCase();
+        const region=Object.keys(pools).find(r=>text.includes(r)) || 'westmere';
+        const pool=pools[region];
+        const existing=trainers[0].battle.team||[];
+        const base=existing[0]?.level || 8;
+        const desired=['highreach','northvale','isen','hawthorne','eastmere'].includes(region)?3:2;
+        while(existing.length<desired){
+            const species=pool[existing.length % pool.length];
+            existing.push({species,level:base+existing.length+1});
+        }
+        trainers.forEach(t=>{ t.battle.team=existing.map(e=>({...e})); });
+    });
+})();
 
 // Re-run the final exit normalization after route dimensions have changed.
 applyDirectionalRouteLayout();
@@ -4846,6 +4895,7 @@ function canMoveTo(x, y) {
     }
 
     return !getNpcs().some(npc => {
+        if (npc.interaction === 'item' || npc.type === 'item') return false;
         const distance = Math.hypot(x - npc.x, y - npc.y);
         return distance < 0.65;
     });
@@ -6555,12 +6605,47 @@ function handleNpcInteraction(npc) {
             returnFromLumeFerry();
             return;
 
+        case "item":
+            collectFieldItem(npc);
+            return;
+
         case "merchant":
         case "trainer":
         default:
             openNpcDialogue(npc);
             return;
     }
+}
+
+function collectFieldItem(npc) {
+    if (!npc?.itemId || gameState.collectedItems[npc.id]) return;
+
+    if (npc.itemId === 'capture') {
+        const crystals = getCrystalInventory();
+        if (!crystals.capture) crystals.capture = { id:'capture', name:'Capture Crystal', grade:'Capture', quantity:0 };
+        crystals.capture.quantity += 1;
+        gameState.captureDevices = getTotalCrystalCount();
+        gameState.collectedItems[npc.id] = true;
+        showWorldMessage('You found a Capture Crystal.');
+    } else {
+        const def = gameState.shop?.stock?.[npc.itemId];
+        if (!def) return;
+        const inventory = getItemInventory();
+        if (!inventory[npc.itemId]) {
+            inventory[npc.itemId] = {
+                id:npc.itemId, name:def.name, description:def.description, quantity:0,
+                kind:npc.itemId === 'greaterRestore' || npc.itemId === 'basicRestore' ? 'heal' : 'revive',
+                amount:npc.itemId === 'basicRestore' ? 25 : npc.itemId === 'greaterRestore' ? 60 : 0.5
+            };
+        }
+        inventory[npc.itemId].quantity += 1;
+        gameState.collectedItems[npc.id] = true;
+        showWorldMessage(`You found a ${def.name}.`);
+    }
+
+    renderInventoryList();
+    renderCrystalList();
+    drawGame();
 }
 
 function useLumeFerry(npc) {
@@ -6835,8 +6920,8 @@ function buyShopItem(itemId, npc = gameState.activeShopNpc) {
                 name: item.name,
                 description: item.description,
                 quantity: 0,
-                kind: itemId === "recoveryTonic" ? "heal" : "revive",
-                amount: itemId === "recoveryTonic" ? 25 : 0.5
+                kind: itemId === "basicRestore" || itemId === "greaterRestore" ? "heal" : "revive",
+                amount: itemId === "basicRestore" ? 25 : itemId === "greaterRestore" ? 60 : 0.5
             };
         }
         inventory[itemId].quantity++;
@@ -7071,6 +7156,26 @@ function drawNpcs() {
         ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
         ctx.fill();
 
+        if (npc.type === "item" || npc.interaction === "item") {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.20)";
+            ctx.beginPath();
+            ctx.ellipse(px, py + 7, 8, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = npc.color || '#d5b35f';
+            ctx.beginPath();
+            ctx.moveTo(px, py - 12);
+            ctx.lineTo(px + 9, py);
+            ctx.lineTo(px, py + 12);
+            ctx.lineTo(px - 9, py);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(npc.icon || '✦', px, py + 4);
+            return;
+        }
+
         if (npc.type === "starter") {
             ctx.fillStyle = npc.color;
             ctx.beginPath();
@@ -7164,8 +7269,9 @@ function restartGame() {
     gameState.captureDevices = 5;
     gameState.crystals = { capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 } };
     gameState.items = {
-        recoveryTonic: { id: "recoveryTonic", name: "Recovery Tonic", description: "Restores 25 HP to one Entheon.", quantity: 3, kind: "heal", amount: 25 },
-        revivalTonic: { id: "revivalTonic", name: "Revival Tonic", description: "Revives a fainted Entheon at 50% of its maximum HP.", quantity: 1, kind: "revive", amount: 0.5 }
+        basicRestore: { id: "basicRestore", name: "Basic Restore", description: "A field restorative for minor injuries. (Prototype: restores 25 HP.)", quantity: 3, kind: "heal", amount: 25 },
+        revitalizingElixir: { id: "revitalizingElixir", name: "Revitalizing Elixir", description: "A specialized restorative for an exhausted Entheon. (Prototype: revives at 50% HP.)", quantity: 1, kind: "revive", amount: 0.5 },
+        greaterRestore: { id: "greaterRestore", name: "Greater Restore", description: "A stronger restorative for more serious injuries. (Prototype: restores 60 HP.)", quantity: 0, kind: "heal", amount: 60 }
     };
     gameState.pendingItemId = null;
     gameState.inventoryBattleMode = false;
@@ -7190,6 +7296,7 @@ function restartGame() {
     starterStatus.textContent = "Starter: —";
     areaStatus.textContent = "Westmere — Southern Settlement";
     gameState.badges = [];
+    gameState.collectedItems = {};
     renderBadges();
 
     npcDialogue.classList.add("hidden");
@@ -7224,3 +7331,18 @@ function showWelcome() {
 // ============================================================
 
 showWelcome();
+// ============================================================
+// PROTOTYPE ITEM SHOP TIERING
+// ============================================================
+// Higher-stage cities carry the stronger canonical restorative as the world
+// expands. This is a prototype economy layer; exact prices/effects remain
+// subject to the final economy/stat balance pass.
+(function applyShopTiers(){
+    const advancedCities = new Set(['thermalis_city','winterhold_city','northreach_city','lakecrest_city','fairhaven_city']);
+    advancedCities.forEach(mapId => {
+        const map = maps[mapId];
+        (map?.npcs || []).filter(n => n.interaction === 'merchant' && n.shop).forEach(npc => {
+            if (!npc.shop.inventory.includes('greaterRestore')) npc.shop.inventory.push('greaterRestore');
+        });
+    });
+})();
