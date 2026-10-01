@@ -13,6 +13,7 @@ const gameState = {
     currentScene: "welcome",
     playerName: "",
     gender: null,
+    appearance: { hair: null, eye: null, outfit: "default" },
     starter: null,
     starterAvailable: false,
     starterData: null,
@@ -191,6 +192,10 @@ function showCharacterChoice() {
 
 function chooseGender(gender) {
     gameState.gender = gender;
+    const defaults = gender === "girl"
+        ? { hair: "brown", eye: "brown", outfit: "default" }
+        : { hair: "blond", eye: "amber", outfit: "default" };
+    gameState.appearance = { ...defaults };
     showNameEntry();
 }
 
@@ -198,8 +203,15 @@ function showNameEntry() {
     gameState.currentScene = "name-entry";
 
     sceneTitle.textContent = "What's Your Name?";
+    const previewGender = gameState.gender === "girl" ? "female" : "male";
     sceneText.innerHTML = `
-        <p>What should people call you in Kaleo?</p>
+        <div class="character-preview-card">
+            <img src="images/player/${previewGender}/down.png" class="character-preview-sprite" alt="Selected character preview">
+            <div>
+                <p>What should people call you in Kaleo?</p>
+                <p class="character-preview-note">This is the default ${gameState.gender === "girl" ? "female" : "male"} character. We'll add the full appearance customization options next.</p>
+            </div>
+        </div>
         <input id="player-name-input" class="name-input" maxlength="12" autocomplete="off" placeholder="Enter your name">
     `;
     optionsContainer.innerHTML = "";
@@ -227,6 +239,95 @@ function confirmPlayerName() {
     }
 
     gameState.playerName = name;
+    showCustomization();
+}
+
+function getCustomizationOptions() {
+    if (gameState.gender === "girl") {
+        return {
+            hair: [
+                ["brown", "Brown"], ["blonde", "Blonde"], ["black", "Black"],
+                ["red", "Red"], ["auburn", "Auburn"], ["pink", "Pink"]
+            ],
+            eye: [["brown", "Brown"], ["blue", "Blue"], ["green", "Green"], ["hazel", "Hazel"], ["grey", "Grey"]],
+            outfit: [["default", "Default"], ["casual", "Casual"], ["academy", "Academy"], ["explorer", "Explorer"], ["dress", "Dress"]]
+        };
+    }
+    return {
+        hair: [
+            ["blond", "Blond"], ["brown", "Brown"], ["black", "Black"],
+            ["red", "Red"], ["white", "White"], ["green", "Green"]
+        ],
+        eye: [["amber", "Amber"], ["blue", "Blue"], ["green", "Green"], ["brown", "Brown"], ["grey", "Grey"]],
+        outfit: [["default", "Default"], ["casual", "Casual"], ["academy", "Academy"], ["explorer", "Explorer"], ["jacket", "Jacket"]]
+    };
+}
+
+function appearanceSpritePath(direction = "down") {
+    const gender = gameState.gender === "girl" ? "female" : "male";
+    const a = gameState.appearance || {};
+    return `images/player/${gender}/${direction}_${a.hair}_${a.eye}_${a.outfit}.png`;
+}
+
+function renderCustomizationPreview() {
+    const preview = document.getElementById("customization-preview");
+    if (preview) preview.src = appearanceSpritePath("down");
+}
+
+function showCustomization() {
+    gameState.currentScene = "character-customization";
+    const options = getCustomizationOptions();
+    sceneTitle.textContent = "Customize Your Character";
+    sceneText.innerHTML = `
+        <div class="customization-layout">
+            <div class="customization-preview-card">
+                <img id="customization-preview" src="${appearanceSpritePath("down")}" alt="Character preview">
+                <h3>${gameState.playerName}</h3>
+                <p>${gameState.gender === "girl" ? "Female" : "Male"} Trainer</p>
+            </div>
+            <div class="customization-controls">
+                ${renderCustomizationGroup("Hair Colour", "hair", options.hair)}
+                ${renderCustomizationGroup("Eye Colour", "eye", options.eye)}
+                ${renderCustomizationGroup("Outfit", "outfit", options.outfit)}
+            </div>
+        </div>
+    `;
+    optionsContainer.innerHTML = "";
+    const confirm = document.createElement("button");
+    confirm.className = "option-button";
+    confirm.textContent = "Confirm Appearance";
+    confirm.addEventListener("click", confirmCustomization);
+    optionsContainer.appendChild(confirm);
+
+    sceneText.querySelectorAll(".customization-option").forEach(button => {
+        button.addEventListener("click", () => {
+            const key = button.dataset.customization;
+            const value = button.dataset.value;
+            gameState.appearance[key] = value;
+            sceneText.querySelectorAll(`.customization-option[data-customization="${key}"]`).forEach(b => b.classList.remove("selected"));
+            button.classList.add("selected");
+            renderCustomizationPreview();
+        });
+    });
+}
+
+function renderCustomizationGroup(title, key, values) {
+    return `
+        <div class="customization-group">
+            <h3>${title}</h3>
+            <div class="customization-options">
+                ${values.map(([value, label]) => `
+                    <button type="button" class="customization-option${gameState.appearance[key] === value ? " selected" : ""}" data-customization="${key}" data-value="${value}">
+                        <span>${label}</span>
+                    </button>
+                `).join("")}
+            </div>
+        </div>
+    `;
+}
+
+function confirmCustomization() {
+    refreshPlayerSprites();
     startOverworld();
 }
 
@@ -4532,10 +4633,35 @@ function getWorldHeight() {
 const player = {
     x: 4,
     y: 25,
-    width: 20,
-    height: 24,
-    speed: 4
+    width: 24,
+    height: 36,
+    speed: 4,
+    direction: "down",
+    walkFrame: 0,
+    walkTimer: 0
 };
+
+const playerSprites = {
+    male: {},
+    female: {}
+};
+
+function refreshPlayerSprites() {
+    const gender = gameState.gender === "girl" ? "female" : "male";
+    ["down", "up", "left", "right"].forEach(direction => {
+        const image = playerSprites[gender][direction] || new Image();
+        image.src = appearanceSpritePath(direction);
+        playerSprites[gender][direction] = image;
+    });
+}
+
+["male", "female"].forEach(gender => {
+    ["down", "up", "left", "right"].forEach(direction => {
+        const image = new Image();
+        image.src = `images/player/${gender}/${direction}.png`;
+        playerSprites[gender][direction] = image;
+    });
+});
 
 const camera = {
     x: 0,
@@ -4811,6 +4937,7 @@ document.addEventListener("keyup", event => {
 // ============================================================
 
 function startOverworld() {
+    refreshPlayerSprites();
     gameState.mode = "overworld";
     gameState.currentScene = "overworld";
     gameState.activeDialogue = null;
@@ -4958,7 +5085,23 @@ function updatePlayer(delta) {
         if (gameState.transitionCooldown > 0) return;
     }
 
-    if (dx === 0 && dy === 0) return;
+    if (dx === 0 && dy === 0) {
+        player.walkFrame = 0;
+        player.walkTimer = 0;
+        return;
+    }
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+        player.direction = dx < 0 ? "left" : "right";
+    } else if (dy !== 0) {
+        player.direction = dy < 0 ? "up" : "down";
+    }
+
+    player.walkTimer += delta * 16.67;
+    if (player.walkTimer >= 110) {
+        player.walkTimer = 0;
+        player.walkFrame = (player.walkFrame + 1) % 4;
+    }
 
     if (dx !== 0 && dy !== 0) {
         dx *= 0.7071;
@@ -7398,26 +7541,36 @@ function drawNpcs() {
 function drawPlayer() {
     const px = player.x * TILE_SIZE;
     const py = player.y * TILE_SIZE;
+    const gender = gameState.gender === "girl" ? "female" : "male";
+    const sprite = playerSprites[gender]?.[player.direction];
 
+    // Keep the shadow independent of the sprite artwork.
     ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
     ctx.beginPath();
-    ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
+    ctx.ellipse(px, py + 11, 10, 4, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = gameState.gender === "girl" ? "#b24f83" : "#3559a8";
-    ctx.fillRect(px - 9, py - 7, 18, 18);
+    if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+        const frameWidth = sprite.naturalWidth / 4;
+        const frameHeight = sprite.naturalHeight;
+        const drawWidth = 28;
+        const drawHeight = 42;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(
+            sprite,
+            player.walkFrame * frameWidth, 0, frameWidth, frameHeight,
+            px - drawWidth / 2, py - drawHeight + 8, drawWidth, drawHeight
+        );
+        return;
+    }
 
+    // Fallback while the sprite assets are loading.
+    ctx.fillStyle = gender === "female" ? "#b24f83" : "#3559a8";
+    ctx.fillRect(px - 9, py - 7, 18, 18);
     ctx.fillStyle = "#f0c6a4";
     ctx.beginPath();
     ctx.arc(px, py - 11, 8, 0, Math.PI * 2);
     ctx.fill();
-
-    ctx.fillStyle = "#4a3025";
-    ctx.fillRect(px - 7, py - 19, 14, 5);
-
-    ctx.fillStyle = "#222";
-    ctx.fillRect(px - 4, py - 12, 2, 2);
-    ctx.fillRect(px + 2, py - 12, 2, 2);
 }
 
 function showWorldMessage(message) {
@@ -7441,6 +7594,9 @@ function restartGame() {
     gameState.currentScene = "welcome";
     gameState.playerName = "";
     gameState.gender = null;
+    player.direction = "down";
+    player.walkFrame = 0;
+    player.walkTimer = 0;
     gameState.starter = null;
     gameState.starterAvailable = false;
     gameState.starterData = null;
