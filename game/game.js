@@ -290,8 +290,6 @@ function chooseStarter(name) {
     if (gameState.currentMap !== "research_center") return;
 
     gameState.starter = name;
-    // Receiving the starter counts as both an encounter and a capture for the Directory.
-    markEntheonCaptured(name);
 
     const speciesData = speciesBattleData[name];
     if (!speciesData) {
@@ -304,6 +302,7 @@ function chooseStarter(name) {
     const starterCreature = createCreature(name, speciesData.level);
     gameState.starterData = starterCreature;
     gameState.party = [starterCreature];
+    markEntheonCaptured(name);
 
     gameState.activePartyIndex = 0;
     gameState.selectedPartyIndex = 0;
@@ -4358,16 +4357,32 @@ function getGymBattleTeam(gym) {
     }));
 }
 
-const entheonDirectorySpecies = [{"id":1,"name":"Nimblet","affinity":"Wild","rarity":"Common"},{"id":2,"name":"Nymbril","affinity":"Wild / Gale","rarity":"Common"},{"id":3,"name":"Nymbrake","affinity":"Wild / Gale","rarity":"Uncommon"},{"id":4,"name":"Pipiri","affinity":"Tide","rarity":"Common"},{"id":5,"name":"Pirello","affinity":"Tide / Frost","rarity":"Common"},{"id":6,"name":"Piravelle","affinity":"Tide / Frost","rarity":"Uncommon"},{"id":7,"name":"Morrowe","affinity":"Umbral","rarity":"Common"},{"id":8,"name":"Morveth","affinity":"Umbral / Mystic","rarity":"Uncommon"},{"id":9,"name":"Morvayne","affinity":"Umbral / Mystic","rarity":"Rare"},{"id":10,"name":"Kivvi","affinity":"Radiant","rarity":"Common"},{"id":11,"name":"Kivara","affinity":"Radiant / Frost","rarity":"Common"},{"id":12,"name":"Kivarune","affinity":"Radiant / Frost","rarity":"Uncommon"},{"id":13,"name":"Brindlew","affinity":"Verdant","rarity":"Common"},{"id":14,"name":"Brindrel","affinity":"Verdant / Stone","rarity":"Common"},{"id":15,"name":"Brinderv","affinity":"Verdant / Stone","rarity":"Uncommon"},{"id":16,"name":"Sovel","affinity":"Gale","rarity":"Common"},{"id":17,"name":"Sovelle","affinity":"Gale / Radiant","rarity":"Common"},{"id":18,"name":"Sovaryn","affinity":"Gale / Radiant","rarity":"Uncommon"},{"id":19,"name":"Tarnit","affinity":"Stone","rarity":"Common"},{"id":20,"name":"Tarnelle","affinity":"Stone / Metal","rarity":"Common"},{"id":21,"name":"Tarnovar","affinity":"Stone / Metal","rarity":"Uncommon"},{"id":22,"name":"Quiblet","affinity":"Flame","rarity":"Common"},{"id":23,"name":"Quivane","affinity":"Flame / Volt","rarity":"Common"},{"id":24,"name":"Quivaryn","affinity":"Flame / Volt","rarity":"Uncommon"},{"id":25,"name":"Elnu","affinity":"Mystic","rarity":"Common"},{"id":26,"name":"Elvara","affinity":"Mystic / Radiant","rarity":"Common"},{"id":27,"name":"Elvarin","affinity":"Mystic / Radiant","rarity":"Rare"},{"id":28,"name":"Drakyn","affinity":"Dragon","rarity":"Rare"},{"id":29,"name":"Voltaryn","affinity":"Dragon / Volt","rarity":"Extremely Rare"},{"id":30,"name":"Drakoryn","affinity":"Dragon / Volt","rarity":"Extremely Rare"},{"id":31,"name":"Vessa","affinity":"Tide","rarity":"Common"},{"id":32,"name":"Vessari","affinity":"Tide / Dragon","rarity":"Rare"},{"id":33,"name":"Rookit","affinity":"Metal","rarity":"Common"},{"id":34,"name":"Rookane","affinity":"Metal / Gale","rarity":"Uncommon"},{"id":35,"name":"Meliu","affinity":"Verdant","rarity":"Common"},{"id":36,"name":"Meliora","affinity":"Verdant / Radiant","rarity":"Rare"},{"id":37,"name":"Dovik","affinity":"Stone","rarity":"Common"},{"id":38,"name":"Dovaryn","affinity":"Stone / Umbral","rarity":"Uncommon"},{"id":39,"name":"Pellin","affinity":"Frost","rarity":"Common"},{"id":40,"name":"Pellune","affinity":"Frost / Mystic","rarity":"Uncommon"},{"id":41,"name":"Arko","affinity":"Flame","rarity":"Common"},{"id":42,"name":"Arkelle","affinity":"Flame / Metal","rarity":"Uncommon"},{"id":43,"name":"Sairi","affinity":"Gale","rarity":"Common"},{"id":44,"name":"Sairune","affinity":"Gale / Mystic","rarity":"Uncommon"},{"id":45,"name":"Braska","affinity":"Flame / Stone","rarity":"Common"},{"id":46,"name":"Braskel","affinity":"Flame / Stone","rarity":"Rare"},{"id":47,"name":"Orrin","affinity":"Wild","rarity":"Common"},{"id":48,"name":"Orravel","affinity":"Wild / Umbral","rarity":"Uncommon"},{"id":49,"name":"Tivvi","affinity":"Volt","rarity":"Common"},{"id":50,"name":"Tivarra","affinity":"Volt / Radiant","rarity":"Rare"},{"id":51,"name":"Cairnix","affinity":"Stone","rarity":"Common"},{"id":52,"name":"Cairneth","affinity":"Stone / Mystic","rarity":"Rare"},{"id":53,"name":"Lumae","affinity":"Radiant","rarity":"Common"},{"id":54,"name":"Lumaryn","affinity":"Radiant / Mystic","rarity":"Rare"},{"id":55,"name":"Virel","affinity":"Verdant","rarity":"Common"},{"id":56,"name":"Virenne","affinity":"Verdant / Gale","rarity":"Uncommon"},{"id":57,"name":"Koroa","affinity":"Tide","rarity":"Common"},{"id":58,"name":"Korovan","affinity":"Tide / Stone","rarity":"Uncommon"},{"id":59,"name":"Esvin","affinity":"Umbral","rarity":"Common"},{"id":60,"name":"Esvar","affinity":"Umbral / Metal","rarity":"Rare"},{"id":61,"name":"Marnel","affinity":"Tide / Wild","rarity":"Common"},{"id":62,"name":"Marnyx","affinity":"Tide / Wild","rarity":"Rare"},{"id":63,"name":"Yori","affinity":"Dragon","rarity":"Rare"},{"id":64,"name":"Yorvale","affinity":"Dragon / Radiant","rarity":"Extremely Rare"},{"id":65,"name":"Thessa","affinity":"Mystic","rarity":"Common"},{"id":66,"name":"Thessane","affinity":"Mystic / Frost","rarity":"Rare"},{"id":67,"name":"Orli","affinity":"Wild","rarity":"Common"},{"id":68,"name":"Orlith","affinity":"Wild / Metal","rarity":"Uncommon"},{"id":69,"name":"Fenni","affinity":"Frost","rarity":"Common"},{"id":70,"name":"Fennovar","affinity":"Frost / Stone","rarity":"Rare"},{"id":71,"name":"Caelo","affinity":"Gale","rarity":"Common"},{"id":72,"name":"Caelune","affinity":"Gale / Tide","rarity":"Uncommon"},{"id":73,"name":"Rilsa","affinity":"Verdant / Tide","rarity":"Common"},{"id":74,"name":"Rilsaryn","affinity":"Verdant / Tide","rarity":"Rare"},{"id":75,"name":"Uvera","affinity":"Mystic","rarity":"Common"},{"id":76,"name":"Uveryn","affinity":"Mystic / Dragon","rarity":"Extremely Rare"},{"id":77,"name":"Veyli","affinity":"Wild","rarity":"Common"},{"id":78,"name":"Veylith","affinity":"Flame","rarity":"Uncommon"},{"id":79,"name":"Veyrune","affinity":"Tide","rarity":"Uncommon"},{"id":80,"name":"Veyvara","affinity":"Mystic","rarity":"Rare"},{"id":81,"name":"Mavren","affinity":"Umbral / Wild","rarity":"Uncommon"},{"id":82,"name":"Ossari","affinity":"Stone","rarity":"Common"},{"id":83,"name":"Keln","affinity":"Metal","rarity":"Common"},{"id":84,"name":"Veyro","affinity":"Gale / Volt","rarity":"Uncommon"},{"id":85,"name":"Sindra","affinity":"Flame / Umbral","rarity":"Rare"},{"id":86,"name":"Pavren","affinity":"Wild","rarity":"Common"},{"id":87,"name":"Ilyra","affinity":"Radiant","rarity":"Common"},{"id":88,"name":"Ruun","affinity":"Frost / Umbral","rarity":"Rare"},{"id":89,"name":"Talvi","affinity":"Frost","rarity":"Common"},{"id":90,"name":"Mirel","affinity":"Tide / Verdant","rarity":"Common"},{"id":91,"name":"Korri","affinity":"Metal / Wild","rarity":"Uncommon"},{"id":92,"name":"Avenn","affinity":"Gale","rarity":"Common"},{"id":93,"name":"Selka","affinity":"Tide","rarity":"Common"},{"id":94,"name":"Norrik","affinity":"Stone / Metal","rarity":"Uncommon"},{"id":95,"name":"Veysha","affinity":"Mystic / Umbral","rarity":"Rare"},{"id":96,"name":"Orven","affinity":"Verdant","rarity":"Common"},{"id":97,"name":"Auralith","affinity":"Radiant / Mystic","rarity":"Legendary"},{"id":98,"name":"Vaelora","affinity":"Radiant / Volt","rarity":"Legendary"},{"id":99,"name":"Nethryss","affinity":"Umbral / Dragon","rarity":"Legendary"},{"id":100,"name":"Orrytheon","affinity":"Mystic / Metal","rarity":"Legendary"},{"id":101,"name":"Kaelros","affinity":"Umbral / Flame","rarity":"Legendary"}];
-const ENTHeon_DIRECTORY_TOTAL = entheonDirectorySpecies.length;
+const entheonDirectorySpecies = [{"id": 1, "name": "Nimblet", "affinity": "Wild", "rarity": "Common"}, {"id": 2, "name": "Nymbril", "affinity": "Wild / Gale", "rarity": "Common"}, {"id": 3, "name": "Nymbrake", "affinity": "Wild / Gale", "rarity": "Uncommon"}, {"id": 4, "name": "Pipiri", "affinity": "Tide", "rarity": "Common"}, {"id": 5, "name": "Pirello", "affinity": "Tide / Frost", "rarity": "Common"}, {"id": 6, "name": "Piravelle", "affinity": "Tide / Frost", "rarity": "Uncommon"}, {"id": 7, "name": "Morrowe", "affinity": "Umbral", "rarity": "Common"}, {"id": 8, "name": "Morvane", "affinity": "Umbral / Mystic", "rarity": "Uncommon"}, {"id": 9, "name": "Morvayne", "affinity": "Umbral / Mystic", "rarity": "Rare"}, {"id": 10, "name": "Kivvi", "affinity": "Radiant", "rarity": "Common"}, {"id": 11, "name": "Kivara", "affinity": "Radiant / Frost", "rarity": "Common"}, {"id": 12, "name": "Kivarune", "affinity": "Radiant / Frost", "rarity": "Uncommon"}, {"id": 13, "name": "Brindlew", "affinity": "Verdant", "rarity": "Common"}, {"id": 14, "name": "Brindrel", "affinity": "Verdant / Stone", "rarity": "Common"}, {"id": 15, "name": "Brinderv", "affinity": "Verdant / Stone", "rarity": "Uncommon"}, {"id": 16, "name": "Sovel", "affinity": "Gale", "rarity": "Common"}, {"id": 17, "name": "Sovelle", "affinity": "Gale / Radiant", "rarity": "Common"}, {"id": 18, "name": "Sovaryn", "affinity": "Gale / Radiant", "rarity": "Uncommon"}, {"id": 19, "name": "Tarnit", "affinity": "Stone", "rarity": "Common"}, {"id": 20, "name": "Tarnelle", "affinity": "Stone / Metal", "rarity": "Common"}, {"id": 21, "name": "Tarnovar", "affinity": "Stone / Metal", "rarity": "Uncommon"}, {"id": 22, "name": "Quiblet", "affinity": "Flame", "rarity": "Common"}, {"id": 23, "name": "Quivane", "affinity": "Flame / Volt", "rarity": "Common"}, {"id": 24, "name": "Quivaryn", "affinity": "Flame / Volt", "rarity": "Uncommon"}, {"id": 25, "name": "Elnu", "affinity": "Mystic", "rarity": "Common"}, {"id": 26, "name": "Elvara", "affinity": "Mystic / Radiant", "rarity": "Common"}, {"id": 27, "name": "Elvarin", "affinity": "Mystic / Radiant", "rarity": "Rare"}, {"id": 28, "name": "Drakyn", "affinity": "Dragon", "rarity": "Rare"}, {"id": 29, "name": "Voltaryn", "affinity": "Dragon / Volt", "rarity": "Extremely Rare"}, {"id": 30, "name": "Drakoryn", "affinity": "Dragon / Volt", "rarity": "Extremely Rare"}, {"id": 31, "name": "Vessa", "affinity": "Tide", "rarity": "Common"}, {"id": 32, "name": "Vessari", "affinity": "Tide / Dragon", "rarity": "Rare"}, {"id": 33, "name": "Rookit", "affinity": "Metal", "rarity": "Common"}, {"id": 34, "name": "Rookane", "affinity": "Metal / Gale", "rarity": "Uncommon"}, {"id": 35, "name": "Meliu", "affinity": "Verdant", "rarity": "Common"}, {"id": 36, "name": "Meliora", "affinity": "Verdant / Radiant", "rarity": "Rare"}, {"id": 37, "name": "Dovik", "affinity": "Stone", "rarity": "Common"}, {"id": 38, "name": "Dovaryn", "affinity": "Stone / Umbral", "rarity": "Uncommon"}, {"id": 39, "name": "Pellin", "affinity": "Frost", "rarity": "Common"}, {"id": 40, "name": "Pellune", "affinity": "Frost / Mystic", "rarity": "Uncommon"}, {"id": 41, "name": "Arko", "affinity": "Flame", "rarity": "Common"}, {"id": 42, "name": "Arkelle", "affinity": "Flame / Metal", "rarity": "Uncommon"}, {"id": 43, "name": "Sairi", "affinity": "Gale", "rarity": "Common"}, {"id": 44, "name": "Sairune", "affinity": "Gale / Mystic", "rarity": "Uncommon"}, {"id": 45, "name": "Braska", "affinity": "Flame / Stone", "rarity": "Common"}, {"id": 46, "name": "Braskel", "affinity": "Flame / Stone", "rarity": "Rare"}, {"id": 47, "name": "Orrin", "affinity": "Wild", "rarity": "Common"}, {"id": 48, "name": "Orravel", "affinity": "Wild / Umbral", "rarity": "Uncommon"}, {"id": 49, "name": "Tivvi", "affinity": "Volt", "rarity": "Common"}, {"id": 50, "name": "Tivarra", "affinity": "Volt / Radiant", "rarity": "Rare"}, {"id": 51, "name": "Cairnix", "affinity": "Stone", "rarity": "Common"}, {"id": 52, "name": "Cairneth", "affinity": "Stone / Mystic", "rarity": "Rare"}, {"id": 53, "name": "Lumae", "affinity": "Radiant", "rarity": "Common"}, {"id": 54, "name": "Lumaryn", "affinity": "Radiant / Mystic", "rarity": "Rare"}, {"id": 55, "name": "Virel", "affinity": "Verdant", "rarity": "Common"}, {"id": 56, "name": "Virenne", "affinity": "Verdant / Gale", "rarity": "Uncommon"}, {"id": 57, "name": "Koroa", "affinity": "Tide", "rarity": "Common"}, {"id": 58, "name": "Korovan", "affinity": "Tide / Stone", "rarity": "Uncommon"}, {"id": 59, "name": "Esvin", "affinity": "Umbral", "rarity": "Common"}, {"id": 60, "name": "Esvar", "affinity": "Umbral / Metal", "rarity": "Rare"}, {"id": 61, "name": "Marnel", "affinity": "Tide / Wild", "rarity": "Common"}, {"id": 62, "name": "Marnyx", "affinity": "Tide / Wild", "rarity": "Rare"}, {"id": 63, "name": "Yori", "affinity": "Dragon", "rarity": "Rare"}, {"id": 64, "name": "Yorvale", "affinity": "Dragon / Radiant", "rarity": "Extremely Rare"}, {"id": 65, "name": "Thessa", "affinity": "Mystic", "rarity": "Common"}, {"id": 66, "name": "Thessane", "affinity": "Mystic / Frost", "rarity": "Rare"}, {"id": 67, "name": "Orli", "affinity": "Wild", "rarity": "Common"}, {"id": 68, "name": "Orlith", "affinity": "Wild / Metal", "rarity": "Uncommon"}, {"id": 69, "name": "Fenni", "affinity": "Frost", "rarity": "Common"}, {"id": 70, "name": "Fennovar", "affinity": "Frost / Stone", "rarity": "Rare"}, {"id": 71, "name": "Caelo", "affinity": "Gale", "rarity": "Common"}, {"id": 72, "name": "Caelune", "affinity": "Gale / Tide", "rarity": "Uncommon"}, {"id": 73, "name": "Rilsa", "affinity": "Verdant / Tide", "rarity": "Common"}, {"id": 74, "name": "Rilsaryn", "affinity": "Verdant / Tide", "rarity": "Rare"}, {"id": 75, "name": "Uvera", "affinity": "Mystic", "rarity": "Common"}, {"id": 76, "name": "Uveryn", "affinity": "Mystic / Dragon", "rarity": "Extremely Rare"}, {"id": 77, "name": "Veyli", "affinity": "Wild", "rarity": "Common"}, {"id": 78, "name": "Veylith", "affinity": "Flame", "rarity": "Uncommon"}, {"id": 79, "name": "Veyrune", "affinity": "Tide", "rarity": "Uncommon"}, {"id": 80, "name": "Veyvara", "affinity": "Mystic", "rarity": "Rare"}, {"id": 81, "name": "Mavren", "affinity": "Umbral / Wild", "rarity": "Uncommon"}, {"id": 82, "name": "Ossari", "affinity": "Stone", "rarity": "Common"}, {"id": 83, "name": "Keln", "affinity": "Metal", "rarity": "Common"}, {"id": 84, "name": "Veyro", "affinity": "Gale / Volt", "rarity": "Uncommon"}, {"id": 85, "name": "Sindra", "affinity": "Flame / Umbral", "rarity": "Rare"}, {"id": 86, "name": "Pavren", "affinity": "Wild", "rarity": "Common"}, {"id": 87, "name": "Ilyra", "affinity": "Radiant", "rarity": "Common"}, {"id": 88, "name": "Ruun", "affinity": "Frost / Umbral", "rarity": "Rare"}, {"id": 89, "name": "Talvi", "affinity": "Frost", "rarity": "Common"}, {"id": 90, "name": "Mirel", "affinity": "Tide / Verdant", "rarity": "Common"}, {"id": 91, "name": "Korri", "affinity": "Metal / Wild", "rarity": "Uncommon"}, {"id": 92, "name": "Avenn", "affinity": "Gale", "rarity": "Common"}, {"id": 93, "name": "Selka", "affinity": "Tide", "rarity": "Common"}, {"id": 94, "name": "Norrik", "affinity": "Stone / Metal", "rarity": "Uncommon"}, {"id": 95, "name": "Veysha", "affinity": "Mystic / Umbral", "rarity": "Rare"}, {"id": 96, "name": "Orven", "affinity": "Verdant", "rarity": "Common"}, {"id": 97, "name": "Auralith", "affinity": "Radiant / Mystic", "rarity": "Legendary"}, {"id": 98, "name": "Vaelora", "affinity": "Radiant / Volt", "rarity": "Legendary"}, {"id": 99, "name": "Nethryss", "affinity": "Umbral / Dragon", "rarity": "Legendary"}, {"id": 100, "name": "Orrytheon", "affinity": "Mystic / Metal", "rarity": "Legendary"}, {"id": 101, "name": "Morveth", "affinity": "Umbral / Mystic", "rarity": "Uncommon"}];
 
 function ensureDirectoryState() {
     if (!gameState.entheonDirectory) gameState.entheonDirectory = { seen: {}, captured: {} };
     gameState.entheonDirectory.seen ||= {};
     gameState.entheonDirectory.captured ||= {};
 }
-function markEntheonSeen(name) { ensureDirectoryState(); gameState.entheonDirectory.seen[name] = true; }
-function markEntheonCaptured(name) { ensureDirectoryState(); gameState.entheonDirectory.seen[name] = true; gameState.entheonDirectory.captured[name] = true; }
+function syncDirectoryFromParty() {
+    ensureDirectoryState();
+    (gameState.party || []).forEach(member => {
+        if (!member?.species) return;
+        gameState.entheonDirectory.seen[member.species] = true;
+        gameState.entheonDirectory.captured[member.species] = true;
+    });
+}
+function markEntheonSeen(name) {
+    if (!name) return;
+    ensureDirectoryState();
+    gameState.entheonDirectory.seen[name] = true;
+}
+function markEntheonCaptured(name) {
+    if (!name) return;
+    ensureDirectoryState();
+    gameState.entheonDirectory.seen[name] = true;
+    gameState.entheonDirectory.captured[name] = true;
+}
 function directoryPortrait(species, discovered) {
     const initials = species.name.slice(0,2).toUpperCase();
     if (!discovered) return '<div class="directory-portrait unknown"><span>?</span></div>';
@@ -4386,9 +4401,10 @@ function renderDirectoryDetail(species) {
 function renderDirectory() {
     if (!directoryList) return;
     ensureDirectoryState();
+    syncDirectoryFromParty();
     const seenCount = Object.values(gameState.entheonDirectory.seen).filter(Boolean).length;
     const capturedCount = Object.values(gameState.entheonDirectory.captured).filter(Boolean).length;
-    if (directorySummary) directorySummary.textContent = `Seen: ${seenCount}/${ENTHeon_DIRECTORY_TOTAL} · Captured: ${capturedCount}/${ENTHeon_DIRECTORY_TOTAL}`;
+    if (directorySummary) directorySummary.textContent = `Seen: ${seenCount}/${entheonDirectorySpecies.length} · Captured: ${capturedCount}/${entheonDirectorySpecies.length}`;
     directoryList.innerHTML = entheonDirectorySpecies.map(species => {
         const seen = !!gameState.entheonDirectory.seen[species.name];
         const captured = !!gameState.entheonDirectory.captured[species.name];
@@ -5179,6 +5195,8 @@ function createEvolutionPrompt(member) {
         const evolved = evolveCreature(member);
         closeEvolutionPrompt();
         if (evolved) {
+            markEntheonCaptured(member.species);
+            syncDirectoryFromParty();
             renderParty();
             renderPartyScreen();
             showWorldMessage(`${oldSpecies} evolved into ${member.species}!`);
@@ -6046,8 +6064,7 @@ function startTrainerBattle(npc) {
         return;
     }
 
-    playableTeam.forEach(entry => markEntheonSeen(entry.species));
-
+    markEntheonSeen(playableTeam[0].species);
     const first = createCreature(playableTeam[0].species, playableTeam[0].level);
     if (!first) {
         console.error("Could not create trainer's first creature:", playableTeam[0]);
@@ -6427,6 +6444,7 @@ function battleCapture(crystalId) {
             );
 
             gameState.party.push(captured);
+            syncDirectoryFromParty();
             gameState.selectedPartyIndex = gameState.party.length - 1;
             renderParty();
             renderBattle(`The resonance succeeded! ${wildName} was absorbed into the ${crystalName}.`);
@@ -7342,7 +7360,6 @@ function restartGame() {
     gameState.transitionCooldown = 0;
     gameState.encounterCooldown = 0;
     gameState.battle = null;
-    gameState.entheonDirectory = { seen: {}, captured: {} };
     gameState.evolutionPromptOpen = false;
 
     const evolutionOverlay = document.getElementById("evolution-prompt-overlay");
