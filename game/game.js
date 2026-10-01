@@ -5611,38 +5611,9 @@ if (menuCloseButton) {
 
 
 function renderParty() {
-    if (!partyPanel || !partyList) return;
-
-    if (!gameState.party || gameState.party.length === 0) {
-        partyPanel.classList.add("hidden");
-        partyList.innerHTML = "";
-        renderPartyScreen();
-        return;
-    }
-
-    partyPanel.classList.remove("hidden");
-    partyList.innerHTML = gameState.party.map((member, index) => {
-        const hp = Math.max(0, member.currentHp);
-        const maxHp = Math.max(1, member.maxHp);
-        const hpPercent = Math.max(0, Math.min(100, hp / maxHp * 100));
-
-        return `
-            <div class="party-member${index === gameState.activePartyIndex ? " active" : ""}${hp <= 0 ? " fainted" : ""}">
-                <div class="party-member-number">${index + 1}</div>
-                <div class="party-member-info">
-                    <div class="party-member-top">
-                        <span class="party-member-name">${member.species}</span>
-                        <span class="party-member-level">Lv. ${member.level}</span>
-                    </div>
-                    <div class="party-hp-track">
-                        <div class="party-hp-fill" style="width:${hpPercent}%"></div>
-                    </div>
-                    <div class="party-hp-text">${hp} / ${maxHp} HP</div>
-                    <div class="party-hp-text">XP ${member.xp || 0} / ${member.xpToNext || 0}</div>
-                </div>
-            </div>`;
-    }).join("");
-
+    // The old compact party HUD has been removed. Party information is now
+    // accessed through the in-game Party screen/menu, so there is no persistent
+    // party overlay covering the overworld.
     renderPartyScreen();
 }
 
