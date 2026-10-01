@@ -53,7 +53,8 @@ const gameState = {
     battle: null,
     trainerBattle: null,
     evolutionPromptOpen: false,
-    collectedItems: {}
+    collectedItems: {},
+    entheonDirectory: { seen: {}, captured: {} }
 };
 
 
@@ -96,6 +97,12 @@ const badgeScreen = document.getElementById("badge-screen");
 const badgeCloseButton = document.getElementById("badge-close-button");
 const badgeList = document.getElementById("badge-list");
 const badgeStatus = document.getElementById("badge-status");
+const directoryButton = document.getElementById("directory-button");
+const directoryScreen = document.getElementById("directory-screen");
+const directoryCloseButton = document.getElementById("directory-close-button");
+const directoryList = document.getElementById("directory-list");
+const directoryDetail = document.getElementById("directory-detail");
+const directorySummary = document.getElementById("directory-summary");
 const shopScreen = document.getElementById("shop-screen");
 const shopList = document.getElementById("shop-list");
 const shopVale = document.getElementById("shop-vale");
@@ -4349,6 +4356,147 @@ function getGymBattleTeam(gym) {
     }));
 }
 
+const entheonDirectorySpecies = [
+    { id: 1, name: 'Flame Burst', affinity: 'Special', rarity: '70' },
+    { id: 2, name: 'Nymbril', affinity: 'Wild / Gale', rarity: 'Common' },
+    { id: 3, name: 'Nymbrake', affinity: 'Wild / Gale', rarity: 'Uncommon' },
+    { id: 4, name: 'Vine Lash', affinity: 'Physical', rarity: '45' },
+    { id: 5, name: 'Flame Wheel', affinity: 'Physical', rarity: '60' },
+    { id: 6, name: 'Piravelle', affinity: 'Tide / Frost', rarity: 'Uncommon' },
+    { id: 7, name: 'Razor Leaf', affinity: 'Physical', rarity: '55' },
+    { id: 8, name: 'Morveth', affinity: 'Umbral / Mystic', rarity: 'Uncommon' },
+    { id: 9, name: 'Mind Pierce', affinity: 'Special', rarity: '80' },
+    { id: 10, name: 'Umbral Step', affinity: 'Status', rarity: '—' },
+    { id: 11, name: 'Kivara', affinity: 'Radiant / Frost', rarity: 'Common' },
+    { id: 12, name: 'Kivarune', affinity: 'Radiant / Frost', rarity: 'Uncommon' },
+    { id: 13, name: 'Growth', affinity: 'Status', rarity: '—' },
+    { id: 14, name: 'Brindrel', affinity: 'Verdant / Stone', rarity: 'Common' },
+    { id: 15, name: 'Dark Pulse', affinity: 'Special', rarity: '80' },
+    { id: 16, name: 'Regrowth', affinity: 'Status', rarity: '—' },
+    { id: 17, name: 'Dream Bind', affinity: 'Status', rarity: '—' },
+    { id: 18, name: 'Sovaryn', affinity: 'Gale / Radiant', rarity: 'Uncommon' },
+    { id: 19, name: 'Floral Guard', affinity: 'Status', rarity: '—' },
+    { id: 20, name: 'Scorching Veil', affinity: 'Status', rarity: '—' },
+    { id: 21, name: 'Psychic Field', affinity: 'Status', rarity: '—' },
+    { id: 22, name: 'Quiblet', affinity: 'Flame', rarity: 'Common' },
+    { id: 23, name: 'Soul Rend', affinity: 'Special', rarity: '90' },
+    { id: 24, name: 'Quivaryn', affinity: 'Flame / Volt', rarity: 'Uncommon' },
+    { id: 25, name: 'Night Slash', affinity: 'Physical', rarity: '70' },
+    { id: 26, name: 'Elvara', affinity: 'Mystic / Radiant', rarity: 'Common' },
+    { id: 27, name: 'Elvarin', affinity: 'Mystic / Radiant', rarity: 'Rare' },
+    { id: 28, name: 'Drakyn', affinity: 'Dragon', rarity: 'Rare' },
+    { id: 29, name: 'Draconic Guard', affinity: 'Status', rarity: '—' },
+    { id: 30, name: 'Soul Rend', affinity: 'Special', rarity: '90' },
+    { id: 31, name: 'Vessa', affinity: 'Tide', rarity: 'Common' },
+    { id: 32, name: 'Vessari', affinity: 'Tide / Dragon', rarity: 'Rare' },
+    { id: 33, name: 'Dragon Ascension', affinity: 'Special', rarity: '135' },
+    { id: 34, name: 'Rookane', affinity: 'Metal / Gale', rarity: 'Uncommon' },
+    { id: 35, name: 'Shadow Surge', affinity: 'Special', rarity: '100' },
+    { id: 36, name: 'Meliora', affinity: 'Verdant / Radiant', rarity: 'Rare' },
+    { id: 37, name: 'Dragon Ascension', affinity: 'Special', rarity: '135' },
+    { id: 38, name: 'Dovaryn', affinity: 'Stone / Umbral', rarity: 'Uncommon' },
+    { id: 39, name: 'Pellin', affinity: 'Frost', rarity: 'Common' },
+    { id: 40, name: 'Inferno', affinity: 'Special', rarity: '110' },
+    { id: 41, name: 'Arko', affinity: 'Flame', rarity: 'Common' },
+    { id: 42, name: 'Arkelle', affinity: 'Flame / Metal', rarity: 'Uncommon' },
+    { id: 43, name: 'Sairi', affinity: 'Gale', rarity: 'Common' },
+    { id: 44, name: 'Sairune', affinity: 'Gale / Mystic', rarity: 'Uncommon' },
+    { id: 45, name: 'Eclipse', affinity: 'Special', rarity: '130' },
+    { id: 46, name: 'Braskel', affinity: 'Flame / Stone', rarity: 'Rare' },
+    { id: 47, name: 'Orrin', affinity: 'Wild', rarity: 'Common' },
+    { id: 48, name: 'Orravel', affinity: 'Wild / Umbral', rarity: 'Uncommon' },
+    { id: 49, name: 'Tivvi', affinity: 'Volt', rarity: 'Common' },
+    { id: 50, name: 'Tivarra', affinity: 'Volt / Radiant', rarity: 'Rare' },
+    { id: 51, name: 'Cairnix', affinity: 'Stone', rarity: 'Common' },
+    { id: 52, name: 'Cairneth', affinity: 'Stone / Mystic', rarity: 'Rare' },
+    { id: 53, name: 'Lumae', affinity: 'Radiant', rarity: 'Common' },
+    { id: 54, name: 'Lumaryn', affinity: 'Radiant / Mystic', rarity: 'Rare' },
+    { id: 55, name: 'Virel', affinity: 'Verdant', rarity: 'Common' },
+    { id: 56, name: 'Virenne', affinity: 'Verdant / Gale', rarity: 'Uncommon' },
+    { id: 57, name: 'Koroa', affinity: 'Tide', rarity: 'Common' },
+    { id: 58, name: 'Korovan', affinity: 'Tide / Stone', rarity: 'Uncommon' },
+    { id: 59, name: 'Esvin', affinity: 'Umbral', rarity: 'Common' },
+    { id: 60, name: 'Esvar', affinity: 'Umbral / Metal', rarity: 'Rare' },
+    { id: 61, name: 'Marnel', affinity: 'Tide / Wild', rarity: 'Common' },
+    { id: 62, name: 'Marnyx', affinity: 'Tide / Wild', rarity: 'Rare' },
+    { id: 63, name: 'Yori', affinity: 'Dragon', rarity: 'Rare' },
+    { id: 64, name: 'Yorvale', affinity: 'Dragon / Radiant', rarity: 'Extremely Rare' },
+    { id: 65, name: 'Thessa', affinity: 'Mystic', rarity: 'Common' },
+    { id: 66, name: 'Thessane', affinity: 'Mystic / Frost', rarity: 'Rare' },
+    { id: 67, name: 'Orli', affinity: 'Wild', rarity: 'Common' },
+    { id: 68, name: 'Orlith', affinity: 'Wild / Metal', rarity: 'Uncommon' },
+    { id: 69, name: 'Fenni', affinity: 'Frost', rarity: 'Common' },
+    { id: 70, name: 'Fennovar', affinity: 'Frost / Stone', rarity: 'Rare' },
+    { id: 71, name: 'Caelo', affinity: 'Gale', rarity: 'Common' },
+    { id: 72, name: 'Caelune', affinity: 'Gale / Tide', rarity: 'Uncommon' },
+    { id: 73, name: 'Rilsa', affinity: 'Verdant / Tide', rarity: 'Common' },
+    { id: 74, name: 'Rilsaryn', affinity: 'Verdant / Tide', rarity: 'Rare' },
+    { id: 75, name: 'Uvera', affinity: 'Mystic', rarity: 'Common' },
+    { id: 76, name: 'Uveryn', affinity: 'Mystic / Dragon', rarity: 'Extremely Rare' },
+    { id: 77, name: 'Veyli', affinity: 'Wild', rarity: 'Common' },
+    { id: 78, name: 'Veylith', affinity: 'Flame', rarity: 'Uncommon' },
+    { id: 79, name: 'Veyrune', affinity: 'Tide', rarity: 'Uncommon' },
+    { id: 80, name: 'Veyvara', affinity: 'Mystic', rarity: 'Rare' },
+    { id: 81, name: 'Mavren', affinity: 'Umbral / Wild', rarity: 'Uncommon' },
+    { id: 82, name: 'Ossari', affinity: 'Stone', rarity: 'Common' },
+    { id: 83, name: 'Keln', affinity: 'Metal', rarity: 'Common' },
+    { id: 84, name: 'Veyro', affinity: 'Gale / Volt', rarity: 'Uncommon' },
+    { id: 85, name: 'Sindra', affinity: 'Flame / Umbral', rarity: 'Rare' },
+    { id: 86, name: 'Pavren', affinity: 'Wild', rarity: 'Common' },
+    { id: 87, name: 'Ilyra', affinity: 'Radiant', rarity: 'Common' },
+    { id: 88, name: 'Ruun', affinity: 'Frost / Umbral', rarity: 'Rare' },
+    { id: 89, name: 'Talvi', affinity: 'Frost', rarity: 'Common' },
+    { id: 90, name: 'Mirel', affinity: 'Tide / Verdant', rarity: 'Common' },
+    { id: 91, name: 'Korri', affinity: 'Metal / Wild', rarity: 'Uncommon' },
+    { id: 92, name: 'Avenn', affinity: 'Gale', rarity: 'Common' },
+    { id: 93, name: 'Selka', affinity: 'Tide', rarity: 'Common' },
+    { id: 94, name: 'Norrik', affinity: 'Stone / Metal', rarity: 'Uncommon' },
+    { id: 95, name: 'Veysha', affinity: 'Mystic / Umbral', rarity: 'Rare' },
+    { id: 96, name: 'Orven', affinity: 'Verdant', rarity: 'Common' },
+    { id: 97, name: 'Auralith', affinity: 'Radiant / Mystic', rarity: 'Legendary' },
+    { id: 98, name: 'Vaelora', affinity: 'Radiant / Volt', rarity: 'Legendary' },
+    { id: 99, name: 'Nethryss', affinity: 'Umbral / Dragon', rarity: 'Legendary' },
+    { id: 100, name: 'Orrytheon', affinity: 'Mystic / Metal', rarity: 'Legendary' },
+    { id: 101, name: 'Kaelros', affinity: 'Umbral / Flame', rarity: 'Legendary' },
+];
+
+function ensureDirectoryState() {
+    if (!gameState.entheonDirectory) gameState.entheonDirectory = { seen: {}, captured: {} };
+    gameState.entheonDirectory.seen ||= {};
+    gameState.entheonDirectory.captured ||= {};
+}
+function markEntheonSeen(name) { ensureDirectoryState(); gameState.entheonDirectory.seen[name] = true; }
+function markEntheonCaptured(name) { ensureDirectoryState(); gameState.entheonDirectory.seen[name] = true; gameState.entheonDirectory.captured[name] = true; }
+function directoryPortrait(species, discovered) {
+    const initials = species.name.slice(0,2).toUpperCase();
+    if (!discovered) return '<div class="directory-portrait unknown"><span>?</span></div>';
+    const affinity = species.affinity.split('/')[0].trim();
+    return `<div class="directory-portrait" data-affinity="${affinity}"><div class="directory-silhouette">${initials}</div><div class="directory-portrait-label">ENTHEON</div></div>`;
+}
+function renderDirectoryDetail(species) {
+    if (!directoryDetail || !species) return;
+    ensureDirectoryState();
+    const seen = !!gameState.entheonDirectory.seen[species.name];
+    const captured = !!gameState.entheonDirectory.captured[species.name];
+    if (!seen) { directoryDetail.innerHTML = `${directoryPortrait(species,false)}<div class="directory-detail-copy"><div class="directory-number">#${String(species.id).padStart(3,'0')}</div><h3>Unknown Entheon</h3><p>This Entheon has not yet been encountered.</p></div>`; return; }
+    const owned = gameState.party.find(c => c.name === species.name);
+    directoryDetail.innerHTML = `${directoryPortrait(species,true)}<div class="directory-detail-copy"><div class="directory-number">#${String(species.id).padStart(3,'0')}</div><h3>${species.name}</h3><div class="directory-tags"><span>${species.affinity}</span><span>${species.rarity}</span><span>${captured ? 'Captured' : 'Seen'}</span></div><p>${captured ? 'Registered as captured in your Entheon Directory.' : 'You have encountered this Entheon, but have not captured one yet.'}</p>${owned ? `<p class="directory-owned">Current party specimen: Lv. ${owned.level}</p>` : ''}</div>`;
+}
+function renderDirectory() {
+    if (!directoryList) return;
+    ensureDirectoryState();
+    const seenCount = Object.values(gameState.entheonDirectory.seen).filter(Boolean).length;
+    const capturedCount = Object.values(gameState.entheonDirectory.captured).filter(Boolean).length;
+    if (directorySummary) directorySummary.textContent = `Seen: ${seenCount}/101 · Captured: ${capturedCount}/101`;
+    directoryList.innerHTML = entheonDirectorySpecies.map(species => {
+        const seen = !!gameState.entheonDirectory.seen[species.name];
+        const captured = !!gameState.entheonDirectory.captured[species.name];
+        return `<button type="button" class="directory-entry ${seen ? 'seen' : ''} ${captured ? 'captured' : ''}" data-species="${species.name}"><span class="directory-entry-number">${String(species.id).padStart(3,'0')}</span><span class="directory-entry-portrait">${directoryPortrait(species,seen)}</span><span class="directory-entry-name">${seen ? species.name : '?????'}</span><span class="directory-entry-status">${captured ? '✓' : seen ? '◐' : '—'}</span></button>`;
+    }).join('');
+    directoryList.querySelectorAll('.directory-entry').forEach(btn => btn.addEventListener('click',()=>renderDirectoryDetail(entheonDirectorySpecies.find(x=>x.name===btn.dataset.species))));
+    renderDirectoryDetail(entheonDirectorySpecies.find(x=>gameState.entheonDirectory.seen[x.name]) || entheonDirectorySpecies[0]);
+}
+
 function renderBadges() {
     if (!badgeList) return;
     const earned = gameState.badges || [];
@@ -5387,6 +5535,13 @@ if (badgeCloseButton) {
     });
 }
 
+if (directoryButton) {
+    directoryButton.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); renderDirectory(); directoryScreen?.classList.remove("hidden"); overworldScreen?.classList.add("hidden"); });
+}
+if (directoryCloseButton) {
+    directoryCloseButton.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); directoryScreen?.classList.add("hidden"); overworldScreen?.classList.remove("hidden"); drawGame(); });
+}
+
 if (partyButton) {
     partyButton.addEventListener("click", (event) => {
         event.preventDefault();
@@ -5709,6 +5864,7 @@ function startWildEncounter() {
 
     const encounter = chooseWeightedEncounter(encounterPool);
     const wildSpecies = encounter.species;
+    markEntheonSeen(wildSpecies);
     const wildData = speciesBattleData[wildSpecies];
 
     if (!wildData) {
@@ -6359,6 +6515,7 @@ function battleCapture(crystalId) {
         if (!currentBattle || currentBattle.wild.name !== wildName) return;
 
         if (success) {
+            markEntheonCaptured(wildName);
             const captured = createCreature(
                 currentBattle.wild.name,
                 wildLevel,

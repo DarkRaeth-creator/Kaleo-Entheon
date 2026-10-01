@@ -44,6 +44,7 @@
                         <button id="party-button" class="ui-small-button" type="button">Party</button>
                         <button id="inventory-button" class="ui-small-button" type="button">Inventory</button>
                         <button id="badge-button" class="ui-small-button" type="button">Badges</button>
+                        <button id="directory-button" class="ui-small-button" type="button">Directory</button>
                         <button id="world-map-button" class="ui-small-button" type="button">Map</button></div>
 
                     <div id="world-message" class="world-message hidden"></div>
@@ -135,6 +136,18 @@
     </div>
     <div id="inventory-list" class="inventory-list"></div>
     <div id="inventory-target" class="inventory-target hidden"></div>
+</section>
+
+
+<section id="directory-screen" class="directory-screen hidden" aria-label="Entheon Directory">
+  <div class="directory-screen-header">
+    <div><h2>Entheon Directory</h2><p id="directory-summary">Seen: 0/101 · Captured: 0/101</p></div>
+    <button id="directory-close-button" class="ui-small-button" type="button">Close</button>
+  </div>
+  <div class="directory-body">
+    <div id="directory-list" class="directory-list"></div>
+    <aside id="directory-detail" class="directory-detail"></aside>
+  </div>
 </section>
 
 <section id="badge-screen" class="badge-screen hidden" aria-label="Gym Badges">
