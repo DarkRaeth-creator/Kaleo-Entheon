@@ -13,7 +13,7 @@ const gameState = {
     currentScene: "welcome",
     playerName: "",
     gender: null,
-    appearance: { hair: null, eye: null, outfit: "default" },
+    appearance: { hair: "blond", eyes: "amber", outfit: "default" },
     starter: null,
     starterAvailable: false,
     starterData: null,
@@ -55,7 +55,8 @@ const gameState = {
     trainerBattle: null,
     evolutionPromptOpen: false,
     collectedItems: {},
-    entheonDirectory: { seen: {}, captured: {} }
+    entheonDirectory: { seen: {}, captured: {} },
+    customizationReturnToOverworld: false
 };
 
 
@@ -111,9 +112,6 @@ const shopCloseButton = document.getElementById("shop-close-button");
 const worldMapScreen = document.getElementById("world-map-screen");
 const worldMapButton = document.getElementById("world-map-button");
 const worldMapCloseButton = document.getElementById("world-map-close-button");
-const menuButton = document.getElementById("menu-button");
-const gameMenu = document.getElementById("game-menu");
-const menuCloseButton = document.getElementById("menu-close-button");
 const worldMapLocation = document.getElementById("world-map-location");
 const worldMapCurrentName = document.getElementById("world-map-current-name");
 const worldMapCurrentRegion = document.getElementById("world-map-current-region");
@@ -121,6 +119,14 @@ const worldMapRouteName = document.getElementById("world-map-route-name");
 const worldMapRouteDirection = document.getElementById("world-map-route-direction");
 const worldMapConnections = document.getElementById("world-map-connections");
 const worldMapMarkers = document.getElementById("world-map-markers");
+const customizationScreen = document.getElementById("customization-screen");
+const customizationPreview = document.getElementById("customization-preview");
+const customizationName = document.getElementById("customization-name");
+const customizationGender = document.getElementById("customization-gender");
+const customizationSections = document.getElementById("customization-sections");
+const customizationConfirm = document.getElementById("customization-confirm");
+const customizationCancel = document.getElementById("customization-cancel");
+const appearanceButton = document.getElementById("appearance-button");
 function setCaptureStatus(text) {
     const battleArea =
         document.getElementById("battle-screen") ||
@@ -170,6 +176,333 @@ function showScene(title, text, options = []) {
     });
 }
 
+// ============================================================
+// PLAYER APPEARANCE + HIGH-RES SPRITE SYSTEM
+// ============================================================
+
+const PLAYER_SPRITE = {
+    frameWidth: 128,
+    frameHeight: 144,
+    columns: 5,
+    rows: 4,
+    drawWidth: 72,
+    drawHeight: 81,
+    paths: {
+        boy: "images/player/male/sheet.png",
+        girl: "images/player/female/sheet.png"
+    },
+    rowsByDirection: { down: 0, up: 1, left: 2, right: 3 }
+};
+
+const APPEARANCE_OPTIONS = {
+    boy: {
+        hair: [
+            ["blond", "Blond", "#e7b86b"], ["brown", "Brown", "#6d4a3b"],
+            ["black", "Black", "#252934"], ["red", "Red", "#b84742"], ["white", "White / Silver", "#d9dde5"]
+        ],
+        eyes: [
+            ["amber", "Amber", "#d9932d"], ["blue", "Blue", "#4c8ed9"],
+            ["green", "Green", "#63a85c"], ["brown", "Brown", "#85542f"], ["grey", "Grey", "#a6acb7"]
+        ],
+        outfit: [
+            ["default", "Default", "#20232a"], ["casual", "Casual", "#d9dde4"],
+            ["academy", "Academy", "#315a86"], ["explorer", "Explorer", "#3e6242"], ["jacket", "Jacket", "#9e3d3d"]
+        ]
+    },
+    girl: {
+        hair: [
+            ["brown", "Brown", "#6f4335"], ["blonde", "Blonde", "#e2b06d"],
+            ["black", "Black", "#282b32"], ["red", "Red", "#b84742"], ["auburn", "Auburn", "#8b4d36"]
+        ],
+        eyes: [
+            ["brown", "Brown", "#85542f"], ["blue", "Blue", "#4c8ed9"],
+            ["green", "Green", "#63a85c"], ["hazel", "Hazel", "#9a7b35"], ["grey", "Grey", "#a6acb7"]
+        ],
+        outfit: [
+            ["default", "Default", "#c94c4c"], ["casual", "Casual", "#5d8fd0"],
+            ["academy", "Academy", "#292d35"], ["explorer", "Explorer", "#486c48"], ["dress", "Dress", "#e98da6"]
+        ]
+    }
+};
+
+const playerSpriteImages = { boy: new Image(), girl: new Image() };
+Object.entries(playerSpriteImages).forEach(([gender, image]) => {
+    image.src = PLAYER_SPRITE.paths[gender];
+    image.onload = () => { drawGame(); renderCustomizationPreview(); };
+});
+
+const playerSpriteCache = new Map();
+const spriteSourceCanvas = document.createElement("canvas");
+spriteSourceCanvas.width = PLAYER_SPRITE.frameWidth;
+spriteSourceCanvas.height = PLAYER_SPRITE.frameHeight;
+const spriteSourceCtx = spriteSourceCanvas.getContext("2d", { willReadFrequently: true });
+
+function hexToRgb(hex) {
+    const value = hex.replace("#", "");
+    return {
+        r: parseInt(value.slice(0, 2), 16),
+        g: parseInt(value.slice(2, 4), 16),
+        b: parseInt(value.slice(4, 6), 16)
+    };
+}
+
+function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    if (d !== 0) {
+        if (max === r) h = ((g - b) / d) % 6;
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        h /= 6;
+        if (h < 0) h += 1;
+    }
+    const s = max === 0 ? 0 : d / max;
+    return [h, s, max];
+}
+
+function hsvToRgb(h, s, v) {
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+    const mod = i % 6;
+    const rgb = [
+        [v, t, p], [q, v, p], [p, v, t],
+        [p, q, v], [t, p, v], [v, p, q]
+    ][mod];
+    return rgb.map(channel => Math.round(channel * 255));
+}
+
+function appearancePalette(gender) {
+    return APPEARANCE_OPTIONS[gender] || APPEARANCE_OPTIONS.boy;
+}
+
+function getAppearanceTarget(gender, group, id) {
+    const option = appearancePalette(gender)[group]?.find(item => item[0] === id);
+    return option ? hexToRgb(option[2]) : null;
+}
+
+function shouldRecolorHair(gender, x, y, w, h, hsv) {
+    const [hue, sat] = hsv;
+    if (gender === "boy") {
+        // The source sprite is blond. Keep the face completely outside the mask;
+        // hair is the crown plus the side locks around the head.
+        const crown = y < h * 0.36;
+        const sideLocks = y < h * 0.58 && (x < w * 0.29 || x > w * 0.71);
+        return (crown || sideLocks) && sat > 0.20 && hue > 0.08 && hue < 0.18;
+    }
+    // Female hair is brown and extends below the hat on both sides and behind.
+    const sideLocks = y > h * 0.22 && y < h * 0.88 && (x < w * 0.34 || x > w * 0.66);
+    return sideLocks && sat > 0.24 && hue < 0.13;
+}
+
+function shouldRecolorOutfit(gender, x, y, w, h, hsv) {
+    const [, sat, value] = hsv;
+    const body = x > w * 0.29 && x < w * 0.71;
+    if (!body) return false;
+    if (gender === "girl") {
+        return y > h * 0.60 && y < h * 0.88 && sat > 0.22 && value < 0.78;
+    }
+    return y > h * 0.57 && y < h * 0.88 && (sat > 0.16 || value < 0.70);
+}
+
+function shouldRecolorEyes(gender, x, y, w, h, hsv, direction) {
+    const [, sat, value] = hsv;
+    if (direction === "up") return false;
+    const yBand = y > h * 0.39 && y < h * 0.58;
+    if (!yBand) return false;
+    if (direction === "left") {
+        if (x < w * 0.34 || x > w * 0.66) return false;
+    } else if (direction === "right") {
+        if (x < w * 0.34 || x > w * 0.66) return false;
+    } else if (x < w * 0.28 || x > w * 0.72) {
+        return false;
+    }
+    // Eyes and lashes are among the darkest pixels in the face region. This
+    // avoids painting the surrounding skin, which caused the earlier spill.
+    return value < 0.30 && sat > 0.05;
+}
+
+function tintPixel(r, g, b, target, preserveLight = true) {
+    const hsv = rgbToHsv(r, g, b);
+    const targetHsv = rgbToHsv(target.r, target.g, target.b);
+    const v = preserveLight ? Math.min(1, hsv[2] * (0.72 + targetHsv[2] * 0.50)) : targetHsv[2];
+    const s = Math.min(1, Math.max(0.22, targetHsv[1] * (0.78 + hsv[1] * 0.35)));
+    return hsvToRgb(targetHsv[0], s, v);
+}
+
+function getPlayerFrameCanvas(direction, frameIndex) {
+    const gender = gameState.gender === "girl" ? "girl" : "boy";
+    const appearance = gameState.appearance || { hair: gender === "girl" ? "brown" : "blond", eyes: gender === "girl" ? "brown" : "amber", outfit: "default" };
+    const key = `${gender}|${appearance.hair}|${appearance.eyes}|${appearance.outfit}|${direction}|${frameIndex}`;
+    if (playerSpriteCache.has(key)) return playerSpriteCache.get(key);
+
+    const image = playerSpriteImages[gender];
+    const canvas = document.createElement("canvas");
+    canvas.width = PLAYER_SPRITE.frameWidth;
+    canvas.height = PLAYER_SPRITE.frameHeight;
+    const render = canvas.getContext("2d", { willReadFrequently: true });
+    render.imageSmoothingEnabled = false;
+
+    if (!image.complete || !image.naturalWidth) return null;
+    const row = PLAYER_SPRITE.rowsByDirection[direction] ?? 0;
+    const frame = ((frameIndex % PLAYER_SPRITE.columns) + PLAYER_SPRITE.columns) % PLAYER_SPRITE.columns;
+    render.drawImage(
+        image,
+        frame * PLAYER_SPRITE.frameWidth,
+        row * PLAYER_SPRITE.frameHeight,
+        PLAYER_SPRITE.frameWidth,
+        PLAYER_SPRITE.frameHeight,
+        0, 0,
+        PLAYER_SPRITE.frameWidth,
+        PLAYER_SPRITE.frameHeight
+    );
+
+    const pixels = render.getImageData(0, 0, canvas.width, canvas.height);
+    const data = pixels.data;
+    const hairTarget = getAppearanceTarget(gender, "hair", appearance.hair);
+    const eyeTarget = getAppearanceTarget(gender, "eyes", appearance.eyes);
+    const outfitTarget = getAppearanceTarget(gender, "outfit", appearance.outfit);
+
+    if (hairTarget || eyeTarget || outfitTarget) {
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const i = (y * canvas.width + x) * 4;
+                if (data[i + 3] < 18) continue;
+                const r = data[i], g = data[i + 1], b = data[i + 2];
+                const hsv = rgbToHsv(r, g, b);
+                let rgb = null;
+                if (hairTarget && appearance.hair !== (gender === "girl" ? "brown" : "blond") && shouldRecolorHair(gender, x, y, canvas.width, canvas.height, hsv)) {
+                    rgb = tintPixel(r, g, b, hairTarget, true);
+                } else if (eyeTarget && appearance.eyes !== (gender === "girl" ? "brown" : "amber") && shouldRecolorEyes(gender, x, y, canvas.width, canvas.height, hsv, direction)) {
+                    rgb = tintPixel(r, g, b, eyeTarget, true);
+                } else if (outfitTarget && appearance.outfit !== "default" && shouldRecolorOutfit(gender, x, y, canvas.width, canvas.height, hsv)) {
+                    rgb = tintPixel(r, g, b, outfitTarget, true);
+                }
+                if (rgb) {
+                    data[i] = rgb[0]; data[i + 1] = rgb[1]; data[i + 2] = rgb[2];
+                }
+            }
+        }
+        render.putImageData(pixels, 0, 0);
+    }
+
+    playerSpriteCache.set(key, canvas);
+    return canvas;
+}
+
+function clearPlayerSpriteCache() {
+    playerSpriteCache.clear();
+}
+
+function renderCustomizationPreview() {
+    if (!customizationPreview) return;
+    const previewCtx = customizationPreview.getContext("2d");
+    previewCtx.clearRect(0, 0, customizationPreview.width, customizationPreview.height);
+    previewCtx.imageSmoothingEnabled = false;
+    const direction = "down";
+    const frame = Math.floor(performance.now() / 180) % 5;
+    const sprite = getPlayerFrameCanvas(direction, frame);
+    if (!sprite) return;
+    previewCtx.save();
+    previewCtx.translate(customizationPreview.width / 2, customizationPreview.height - 12);
+    previewCtx.drawImage(sprite, -PLAYER_SPRITE.drawWidth / 2, -PLAYER_SPRITE.drawHeight, PLAYER_SPRITE.drawWidth, PLAYER_SPRITE.drawHeight);
+    previewCtx.restore();
+}
+
+function makeCustomizationSection(title, group) {
+    const section = document.createElement("section");
+    section.className = "customization-section";
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    section.appendChild(heading);
+    const grid = document.createElement("div");
+    grid.className = "customization-options";
+    const gender = gameState.gender === "girl" ? "girl" : "boy";
+    appearancePalette(gender)[group].forEach(([id, label, color]) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "appearance-option" + (gameState.appearance[group] === id ? " selected" : "");
+        button.dataset.group = group;
+        button.dataset.value = id;
+        button.innerHTML = `<span class="appearance-swatch" style="background:${color}"></span><span>${label}</span>`;
+        button.addEventListener("click", () => {
+            gameState.appearance[group] = id;
+            clearPlayerSpriteCache();
+            buildCustomizationSections();
+            renderCustomizationPreview();
+        });
+        grid.appendChild(button);
+    });
+    section.appendChild(grid);
+    return section;
+}
+
+function buildCustomizationSections() {
+    if (!customizationSections) return;
+    customizationSections.innerHTML = "";
+    customizationSections.appendChild(makeCustomizationSection("Hair", "hair"));
+    customizationSections.appendChild(makeCustomizationSection("Eyes", "eyes"));
+    customizationSections.appendChild(makeCustomizationSection("Outfit", "outfit"));
+}
+
+function showCharacterCustomization(fromOverworld = false) {
+    gameState.currentScene = "customization";
+    gameState.customizationReturnToOverworld = fromOverworld;
+    const gender = gameState.gender === "girl" ? "girl" : "boy";
+    const defaults = gender === "girl"
+        ? { hair: "brown", eyes: "brown", outfit: "default" }
+        : { hair: "blond", eyes: "amber", outfit: "default" };
+    if (!gameState.appearance || !gameState.appearance.hair) gameState.appearance = { ...defaults };
+    customizationName.textContent = gameState.playerName || "Your Trainer";
+    customizationGender.textContent = gender === "girl" ? "Female Trainer" : "Male Trainer";
+    buildCustomizationSections();
+    renderCustomizationPreview();
+    if (fromOverworld) overworldScreen?.classList.add("hidden");
+    else introScreen?.classList.add("hidden");
+    customizationScreen?.classList.remove("hidden");
+    cancelAnimationFrame(customizationAnimation);
+    customizationAnimation = requestAnimationFrame(customizationPreviewLoop);
+}
+
+function confirmCustomization() {
+    cancelAnimationFrame(customizationAnimation);
+    customizationScreen?.classList.add("hidden");
+    clearPlayerSpriteCache();
+    if (gameState.customizationReturnToOverworld) {
+        gameState.mode = "overworld";
+        gameState.currentScene = "overworld";
+        overworldScreen?.classList.remove("hidden");
+        drawGame();
+        return;
+    }
+    startOverworld();
+}
+
+if (customizationConfirm) customizationConfirm.addEventListener("click", confirmCustomization);
+if (customizationCancel) customizationCancel.addEventListener("click", () => {
+    cancelAnimationFrame(customizationAnimation);
+    customizationScreen?.classList.add("hidden");
+    if (gameState.customizationReturnToOverworld) {
+        overworldScreen?.classList.remove("hidden");
+        gameState.mode = "overworld";
+        gameState.currentScene = "overworld";
+        drawGame();
+    } else {
+        introScreen?.classList.remove("hidden");
+        showNameEntry();
+    }
+});
+if (appearanceButton) appearanceButton.addEventListener("click", () => showCharacterCustomization(true));
+
+let customizationAnimation = null;
+function customizationPreviewLoop() {
+    if (!customizationScreen || customizationScreen.classList.contains("hidden")) return;
+    renderCustomizationPreview();
+    customizationAnimation = requestAnimationFrame(customizationPreviewLoop);
+}
+
 function showOpening() {
     showCharacterChoice();
 }
@@ -192,10 +525,10 @@ function showCharacterChoice() {
 
 function chooseGender(gender) {
     gameState.gender = gender;
-    const defaults = gender === "girl"
-        ? { hair: "brown", eye: "brown", outfit: "default" }
-        : { hair: "blond", eye: "amber", outfit: "default" };
-    gameState.appearance = { ...defaults };
+    gameState.appearance = gender === "girl"
+        ? { hair: "brown", eyes: "brown", outfit: "default" }
+        : { hair: "blond", eyes: "amber", outfit: "default" };
+    clearPlayerSpriteCache();
     showNameEntry();
 }
 
@@ -203,15 +536,8 @@ function showNameEntry() {
     gameState.currentScene = "name-entry";
 
     sceneTitle.textContent = "What's Your Name?";
-    const previewGender = gameState.gender === "girl" ? "female" : "male";
     sceneText.innerHTML = `
-        <div class="character-preview-card">
-            <img src="../images/player/${previewGender}/down.png" class="character-preview-sprite" alt="Selected character preview">
-            <div>
-                <p>What should people call you in Kaleo?</p>
-                <p class="character-preview-note">This is the default ${gameState.gender === "girl" ? "female" : "male"} character. We'll add the full appearance customization options next.</p>
-            </div>
-        </div>
+        <p>What should people call you in Kaleo?</p>
         <input id="player-name-input" class="name-input" maxlength="12" autocomplete="off" placeholder="Enter your name">
     `;
     optionsContainer.innerHTML = "";
@@ -239,96 +565,7 @@ function confirmPlayerName() {
     }
 
     gameState.playerName = name;
-    showCustomization();
-}
-
-function getCustomizationOptions() {
-    if (gameState.gender === "girl") {
-        return {
-            hair: [
-                ["brown", "Brown"], ["blonde", "Blonde"], ["black", "Black"],
-                ["red", "Red"], ["auburn", "Auburn"], ["pink", "Pink"]
-            ],
-            eye: [["brown", "Brown"], ["blue", "Blue"], ["green", "Green"], ["hazel", "Hazel"], ["grey", "Grey"]],
-            outfit: [["default", "Default"], ["casual", "Casual"], ["academy", "Academy"], ["explorer", "Explorer"], ["dress", "Dress"]]
-        };
-    }
-    return {
-        hair: [
-            ["blond", "Blond"], ["brown", "Brown"], ["black", "Black"],
-            ["red", "Red"], ["white", "White"], ["green", "Green"]
-        ],
-        eye: [["amber", "Amber"], ["blue", "Blue"], ["green", "Green"], ["brown", "Brown"], ["grey", "Grey"]],
-        outfit: [["default", "Default"], ["casual", "Casual"], ["academy", "Academy"], ["explorer", "Explorer"], ["jacket", "Jacket"]]
-    };
-}
-
-function appearanceSpritePath(direction = "down") {
-    const gender = gameState.gender === "girl" ? "female" : "male";
-    const a = gameState.appearance || {};
-    return `../images/player/${gender}/${direction}_${a.hair}_${a.eye}_${a.outfit}.png`;
-}
-
-function renderCustomizationPreview() {
-    const preview = document.getElementById("customization-preview");
-    if (preview) preview.src = appearanceSpritePath("down");
-}
-
-function showCustomization() {
-    gameState.currentScene = "character-customization";
-    const options = getCustomizationOptions();
-    sceneTitle.textContent = "Customize Your Character";
-    sceneText.innerHTML = `
-        <div class="customization-layout">
-            <div class="customization-preview-card">
-                <img id="customization-preview" src="${appearanceSpritePath("down")}" alt="Character preview">
-                <h3>${gameState.playerName}</h3>
-                <p>${gameState.gender === "girl" ? "Female" : "Male"} Trainer</p>
-            </div>
-            <div class="customization-controls">
-                ${renderCustomizationGroup("Hair Colour", "hair", options.hair)}
-                ${renderCustomizationGroup("Eye Colour", "eye", options.eye)}
-                ${renderCustomizationGroup("Outfit", "outfit", options.outfit)}
-            </div>
-        </div>
-    `;
-    optionsContainer.innerHTML = "";
-    const confirm = document.createElement("button");
-    confirm.className = "option-button";
-    confirm.textContent = "Confirm Appearance";
-    confirm.addEventListener("click", confirmCustomization);
-    optionsContainer.appendChild(confirm);
-
-    sceneText.querySelectorAll(".customization-option").forEach(button => {
-        button.addEventListener("click", () => {
-            const key = button.dataset.customization;
-            const value = button.dataset.value;
-            gameState.appearance[key] = value;
-            sceneText.querySelectorAll(`.customization-option[data-customization="${key}"]`).forEach(b => b.classList.remove("selected"));
-            button.classList.add("selected");
-            renderCustomizationPreview();
-        });
-    });
-}
-
-function renderCustomizationGroup(title, key, values) {
-    return `
-        <div class="customization-group">
-            <h3>${title}</h3>
-            <div class="customization-options">
-                ${values.map(([value, label]) => `
-                    <button type="button" class="customization-option${gameState.appearance[key] === value ? " selected" : ""}" data-customization="${key}" data-value="${value}">
-                        <span>${label}</span>
-                    </button>
-                `).join("")}
-            </div>
-        </div>
-    `;
-}
-
-function confirmCustomization() {
-    refreshPlayerSprites();
-    startOverworld();
+    showCharacterCustomization(false);
 }
 
 function showArrival() {
@@ -4461,90 +4698,31 @@ function getGymBattleTeam(gym) {
     }));
 }
 
-const entheonDirectorySpecies = [{"id": 1, "name": "Nimblet", "affinity": "Wild", "rarity": "Common"}, {"id": 2, "name": "Nymbril", "affinity": "Wild / Gale", "rarity": "Common"}, {"id": 3, "name": "Nymbrake", "affinity": "Wild / Gale", "rarity": "Uncommon"}, {"id": 4, "name": "Pipiri", "affinity": "Tide", "rarity": "Common"}, {"id": 5, "name": "Pirello", "affinity": "Tide / Frost", "rarity": "Common"}, {"id": 6, "name": "Piravelle", "affinity": "Tide / Frost", "rarity": "Uncommon"}, {"id": 7, "name": "Morrowe", "affinity": "Umbral", "rarity": "Common"}, {"id": 8, "name": "Morveth", "affinity": "Umbral / Mystic", "rarity": "Uncommon"}, {"id": 9, "name": "Morvayne", "affinity": "Umbral / Mystic", "rarity": "Rare"}, {"id": 10, "name": "Kivvi", "affinity": "Radiant", "rarity": "Common"}, {"id": 11, "name": "Kivara", "affinity": "Radiant / Frost", "rarity": "Common"}, {"id": 12, "name": "Kivarune", "affinity": "Radiant / Frost", "rarity": "Uncommon"}, {"id": 13, "name": "Brindlew", "affinity": "Verdant", "rarity": "Common"}, {"id": 14, "name": "Brindrel", "affinity": "Verdant / Stone", "rarity": "Common"}, {"id": 15, "name": "Brinderv", "affinity": "Verdant / Stone", "rarity": "Uncommon"}, {"id": 16, "name": "Sovel", "affinity": "Gale", "rarity": "Common"}, {"id": 17, "name": "Sovelle", "affinity": "Gale / Radiant", "rarity": "Common"}, {"id": 18, "name": "Sovaryn", "affinity": "Gale / Radiant", "rarity": "Uncommon"}, {"id": 19, "name": "Tarnit", "affinity": "Stone", "rarity": "Common"}, {"id": 20, "name": "Tarnelle", "affinity": "Stone / Metal", "rarity": "Common"}, {"id": 21, "name": "Tarnovar", "affinity": "Stone / Metal", "rarity": "Uncommon"}, {"id": 22, "name": "Quiblet", "affinity": "Flame", "rarity": "Common"}, {"id": 23, "name": "Quivane", "affinity": "Flame / Volt", "rarity": "Common"}, {"id": 24, "name": "Quivaryn", "affinity": "Flame / Volt", "rarity": "Uncommon"}, {"id": 25, "name": "Elnu", "affinity": "Mystic", "rarity": "Common"}, {"id": 26, "name": "Elvara", "affinity": "Mystic / Radiant", "rarity": "Common"}, {"id": 27, "name": "Elvarin", "affinity": "Mystic / Radiant", "rarity": "Rare"}, {"id": 28, "name": "Drakyn", "affinity": "Dragon", "rarity": "Rare"}, {"id": 29, "name": "Voltaryn", "affinity": "Dragon / Volt", "rarity": "Extremely Rare"}, {"id": 30, "name": "Drakoryn", "affinity": "Dragon / Volt", "rarity": "Extremely Rare"}, {"id": 31, "name": "Vessa", "affinity": "Tide", "rarity": "Common"}, {"id": 32, "name": "Vessari", "affinity": "Tide / Dragon", "rarity": "Rare"}, {"id": 33, "name": "Rookit", "affinity": "Metal", "rarity": "Common"}, {"id": 34, "name": "Rookane", "affinity": "Metal / Gale", "rarity": "Uncommon"}, {"id": 35, "name": "Meliu", "affinity": "Verdant", "rarity": "Common"}, {"id": 36, "name": "Meliora", "affinity": "Verdant / Radiant", "rarity": "Rare"}, {"id": 37, "name": "Dovik", "affinity": "Stone", "rarity": "Common"}, {"id": 38, "name": "Dovaryn", "affinity": "Stone / Umbral", "rarity": "Uncommon"}, {"id": 39, "name": "Pellin", "affinity": "Frost", "rarity": "Common"}, {"id": 40, "name": "Pellune", "affinity": "Frost / Mystic", "rarity": "Uncommon"}, {"id": 41, "name": "Arko", "affinity": "Flame", "rarity": "Common"}, {"id": 42, "name": "Arkelle", "affinity": "Flame / Metal", "rarity": "Uncommon"}, {"id": 43, "name": "Sairi", "affinity": "Gale", "rarity": "Common"}, {"id": 44, "name": "Sairune", "affinity": "Gale / Mystic", "rarity": "Uncommon"}, {"id": 45, "name": "Braska", "affinity": "Flame / Stone", "rarity": "Common"}, {"id": 46, "name": "Braskel", "affinity": "Flame / Stone", "rarity": "Rare"}, {"id": 47, "name": "Orrin", "affinity": "Wild", "rarity": "Common"}, {"id": 48, "name": "Orravel", "affinity": "Wild / Umbral", "rarity": "Uncommon"}, {"id": 49, "name": "Tivvi", "affinity": "Volt", "rarity": "Common"}, {"id": 50, "name": "Tivarra", "affinity": "Volt / Radiant", "rarity": "Rare"}, {"id": 51, "name": "Cairnix", "affinity": "Stone", "rarity": "Common"}, {"id": 52, "name": "Cairneth", "affinity": "Stone / Mystic", "rarity": "Rare"}, {"id": 53, "name": "Lumae", "affinity": "Radiant", "rarity": "Common"}, {"id": 54, "name": "Lumaryn", "affinity": "Radiant / Mystic", "rarity": "Rare"}, {"id": 55, "name": "Virel", "affinity": "Verdant", "rarity": "Common"}, {"id": 56, "name": "Virenne", "affinity": "Verdant / Gale", "rarity": "Uncommon"}, {"id": 57, "name": "Koroa", "affinity": "Tide", "rarity": "Common"}, {"id": 58, "name": "Korovan", "affinity": "Tide / Stone", "rarity": "Uncommon"}, {"id": 59, "name": "Esvin", "affinity": "Umbral", "rarity": "Common"}, {"id": 60, "name": "Esvar", "affinity": "Umbral / Metal", "rarity": "Rare"}, {"id": 61, "name": "Marnel", "affinity": "Tide / Wild", "rarity": "Common"}, {"id": 62, "name": "Marnyx", "affinity": "Tide / Wild", "rarity": "Rare"}, {"id": 63, "name": "Yori", "affinity": "Dragon", "rarity": "Rare"}, {"id": 64, "name": "Yorvale", "affinity": "Dragon / Radiant", "rarity": "Extremely Rare"}, {"id": 65, "name": "Thessa", "affinity": "Mystic", "rarity": "Common"}, {"id": 66, "name": "Thessane", "affinity": "Mystic / Frost", "rarity": "Rare"}, {"id": 67, "name": "Orli", "affinity": "Wild", "rarity": "Common"}, {"id": 68, "name": "Orlith", "affinity": "Wild / Metal", "rarity": "Uncommon"}, {"id": 69, "name": "Fenni", "affinity": "Frost", "rarity": "Common"}, {"id": 70, "name": "Fennovar", "affinity": "Frost / Stone", "rarity": "Rare"}, {"id": 71, "name": "Caelo", "affinity": "Gale", "rarity": "Common"}, {"id": 72, "name": "Caelune", "affinity": "Gale / Tide", "rarity": "Uncommon"}, {"id": 73, "name": "Rilsa", "affinity": "Verdant / Tide", "rarity": "Common"}, {"id": 74, "name": "Rilsaryn", "affinity": "Verdant / Tide", "rarity": "Rare"}, {"id": 75, "name": "Uvera", "affinity": "Mystic", "rarity": "Common"}, {"id": 76, "name": "Uveryn", "affinity": "Mystic / Dragon", "rarity": "Extremely Rare"}, {"id": 77, "name": "Veyli", "affinity": "Wild", "rarity": "Common"}, {"id": 78, "name": "Veylith", "affinity": "Flame", "rarity": "Uncommon"}, {"id": 79, "name": "Veyrune", "affinity": "Tide", "rarity": "Uncommon"}, {"id": 80, "name": "Veyvara", "affinity": "Mystic", "rarity": "Rare"}, {"id": 81, "name": "Mavren", "affinity": "Umbral / Wild", "rarity": "Uncommon"}, {"id": 82, "name": "Ossari", "affinity": "Stone", "rarity": "Common"}, {"id": 83, "name": "Keln", "affinity": "Metal", "rarity": "Common"}, {"id": 84, "name": "Veyro", "affinity": "Gale / Volt", "rarity": "Uncommon"}, {"id": 85, "name": "Sindra", "affinity": "Flame / Umbral", "rarity": "Rare"}, {"id": 86, "name": "Pavren", "affinity": "Wild", "rarity": "Common"}, {"id": 87, "name": "Ilyra", "affinity": "Radiant", "rarity": "Common"}, {"id": 88, "name": "Ruun", "affinity": "Frost / Umbral", "rarity": "Rare"}, {"id": 89, "name": "Talvi", "affinity": "Frost", "rarity": "Common"}, {"id": 90, "name": "Mirel", "affinity": "Tide / Verdant", "rarity": "Common"}, {"id": 91, "name": "Korri", "affinity": "Metal / Wild", "rarity": "Uncommon"}, {"id": 92, "name": "Avenn", "affinity": "Gale", "rarity": "Common"}, {"id": 93, "name": "Selka", "affinity": "Tide", "rarity": "Common"}, {"id": 94, "name": "Norrik", "affinity": "Stone / Metal", "rarity": "Uncommon"}, {"id": 95, "name": "Veysha", "affinity": "Mystic / Umbral", "rarity": "Rare"}, {"id": 96, "name": "Orven", "affinity": "Verdant", "rarity": "Common"}, {"id": 97, "name": "Auralith", "affinity": "Radiant / Mystic", "rarity": "Legendary"}, {"id": 98, "name": "Vaelora", "affinity": "Radiant / Volt", "rarity": "Legendary"}, {"id": 99, "name": "Nethryss", "affinity": "Umbral / Dragon", "rarity": "Legendary"}, {"id": 100, "name": "Orrytheon", "affinity": "Mystic / Metal", "rarity": "Legendary"}, {"id": 101, "name": "Kaelros", "affinity": "Umbral / Flame", "rarity": "Legendary"}];
+const entheonDirectorySpecies = [{"id": 1, "name": "Nimblet", "affinity": "Wild", "rarity": "Common"}, {"id": 2, "name": "Nymbril", "affinity": "Wild / Gale", "rarity": "Common"}, {"id": 3, "name": "Nymbrake", "affinity": "Wild / Gale", "rarity": "Uncommon"}, {"id": 4, "name": "Pipiri", "affinity": "Tide", "rarity": "Common"}, {"id": 5, "name": "Pirello", "affinity": "Tide / Frost", "rarity": "Common"}, {"id": 6, "name": "Piravelle", "affinity": "Tide / Frost", "rarity": "Uncommon"}, {"id": 7, "name": "Morrowe", "affinity": "Umbral", "rarity": "Common"}, {"id": 8, "name": "Morvane", "affinity": "Umbral / Mystic", "rarity": "Uncommon"}, {"id": 9, "name": "Morvayne", "affinity": "Umbral / Mystic", "rarity": "Rare"}, {"id": 10, "name": "Kivvi", "affinity": "Radiant", "rarity": "Common"}, {"id": 11, "name": "Kivara", "affinity": "Radiant / Frost", "rarity": "Common"}, {"id": 12, "name": "Kivarune", "affinity": "Radiant / Frost", "rarity": "Uncommon"}, {"id": 13, "name": "Brindlew", "affinity": "Verdant", "rarity": "Common"}, {"id": 14, "name": "Brindrel", "affinity": "Verdant / Stone", "rarity": "Common"}, {"id": 15, "name": "Brinderv", "affinity": "Verdant / Stone", "rarity": "Uncommon"}, {"id": 16, "name": "Sovel", "affinity": "Gale", "rarity": "Common"}, {"id": 17, "name": "Sovelle", "affinity": "Gale / Radiant", "rarity": "Common"}, {"id": 18, "name": "Sovaryn", "affinity": "Gale / Radiant", "rarity": "Uncommon"}, {"id": 19, "name": "Tarnit", "affinity": "Stone", "rarity": "Common"}, {"id": 20, "name": "Tarnelle", "affinity": "Stone / Metal", "rarity": "Common"}, {"id": 21, "name": "Tarnovar", "affinity": "Stone / Metal", "rarity": "Uncommon"}, {"id": 22, "name": "Quiblet", "affinity": "Flame", "rarity": "Common"}, {"id": 23, "name": "Quivane", "affinity": "Flame / Volt", "rarity": "Common"}, {"id": 24, "name": "Quivaryn", "affinity": "Flame / Volt", "rarity": "Uncommon"}, {"id": 25, "name": "Elnu", "affinity": "Mystic", "rarity": "Common"}, {"id": 26, "name": "Elvara", "affinity": "Mystic / Radiant", "rarity": "Common"}, {"id": 27, "name": "Elvarin", "affinity": "Mystic / Radiant", "rarity": "Rare"}, {"id": 28, "name": "Drakyn", "affinity": "Dragon", "rarity": "Rare"}, {"id": 29, "name": "Voltaryn", "affinity": "Dragon / Volt", "rarity": "Extremely Rare"}, {"id": 30, "name": "Drakoryn", "affinity": "Dragon / Volt", "rarity": "Extremely Rare"}, {"id": 31, "name": "Vessa", "affinity": "Tide", "rarity": "Common"}, {"id": 32, "name": "Vessari", "affinity": "Tide / Dragon", "rarity": "Rare"}, {"id": 33, "name": "Rookit", "affinity": "Metal", "rarity": "Common"}, {"id": 34, "name": "Rookane", "affinity": "Metal / Gale", "rarity": "Uncommon"}, {"id": 35, "name": "Meliu", "affinity": "Verdant", "rarity": "Common"}, {"id": 36, "name": "Meliora", "affinity": "Verdant / Radiant", "rarity": "Rare"}, {"id": 37, "name": "Dovik", "affinity": "Stone", "rarity": "Common"}, {"id": 38, "name": "Dovaryn", "affinity": "Stone / Umbral", "rarity": "Uncommon"}, {"id": 39, "name": "Pellin", "affinity": "Frost", "rarity": "Common"}, {"id": 40, "name": "Pellune", "affinity": "Frost / Mystic", "rarity": "Uncommon"}, {"id": 41, "name": "Arko", "affinity": "Flame", "rarity": "Common"}, {"id": 42, "name": "Arkelle", "affinity": "Flame / Metal", "rarity": "Uncommon"}, {"id": 43, "name": "Sairi", "affinity": "Gale", "rarity": "Common"}, {"id": 44, "name": "Sairune", "affinity": "Gale / Mystic", "rarity": "Uncommon"}, {"id": 45, "name": "Braska", "affinity": "Flame / Stone", "rarity": "Common"}, {"id": 46, "name": "Braskel", "affinity": "Flame / Stone", "rarity": "Rare"}, {"id": 47, "name": "Orrin", "affinity": "Wild", "rarity": "Common"}, {"id": 48, "name": "Orravel", "affinity": "Wild / Umbral", "rarity": "Uncommon"}, {"id": 49, "name": "Tivvi", "affinity": "Volt", "rarity": "Common"}, {"id": 50, "name": "Tivarra", "affinity": "Volt / Radiant", "rarity": "Rare"}, {"id": 51, "name": "Cairnix", "affinity": "Stone", "rarity": "Common"}, {"id": 52, "name": "Cairneth", "affinity": "Stone / Mystic", "rarity": "Rare"}, {"id": 53, "name": "Lumae", "affinity": "Radiant", "rarity": "Common"}, {"id": 54, "name": "Lumaryn", "affinity": "Radiant / Mystic", "rarity": "Rare"}, {"id": 55, "name": "Virel", "affinity": "Verdant", "rarity": "Common"}, {"id": 56, "name": "Virenne", "affinity": "Verdant / Gale", "rarity": "Uncommon"}, {"id": 57, "name": "Koroa", "affinity": "Tide", "rarity": "Common"}, {"id": 58, "name": "Korovan", "affinity": "Tide / Stone", "rarity": "Uncommon"}, {"id": 59, "name": "Esvin", "affinity": "Umbral", "rarity": "Common"}, {"id": 60, "name": "Esvar", "affinity": "Umbral / Metal", "rarity": "Rare"}, {"id": 61, "name": "Marnel", "affinity": "Tide / Wild", "rarity": "Common"}, {"id": 62, "name": "Marnyx", "affinity": "Tide / Wild", "rarity": "Rare"}, {"id": 63, "name": "Yori", "affinity": "Dragon", "rarity": "Rare"}, {"id": 64, "name": "Yorvale", "affinity": "Dragon / Radiant", "rarity": "Extremely Rare"}, {"id": 65, "name": "Thessa", "affinity": "Mystic", "rarity": "Common"}, {"id": 66, "name": "Thessane", "affinity": "Mystic / Frost", "rarity": "Rare"}, {"id": 67, "name": "Orli", "affinity": "Wild", "rarity": "Common"}, {"id": 68, "name": "Orlith", "affinity": "Wild / Metal", "rarity": "Uncommon"}, {"id": 69, "name": "Fenni", "affinity": "Frost", "rarity": "Common"}, {"id": 70, "name": "Fennovar", "affinity": "Frost / Stone", "rarity": "Rare"}, {"id": 71, "name": "Caelo", "affinity": "Gale", "rarity": "Common"}, {"id": 72, "name": "Caelune", "affinity": "Gale / Tide", "rarity": "Uncommon"}, {"id": 73, "name": "Rilsa", "affinity": "Verdant / Tide", "rarity": "Common"}, {"id": 74, "name": "Rilsaryn", "affinity": "Verdant / Tide", "rarity": "Rare"}, {"id": 75, "name": "Uvera", "affinity": "Mystic", "rarity": "Common"}, {"id": 76, "name": "Uveryn", "affinity": "Mystic / Dragon", "rarity": "Extremely Rare"}, {"id": 77, "name": "Veyli", "affinity": "Wild", "rarity": "Common"}, {"id": 78, "name": "Veylith", "affinity": "Flame", "rarity": "Uncommon"}, {"id": 79, "name": "Veyrune", "affinity": "Tide", "rarity": "Uncommon"}, {"id": 80, "name": "Veyvara", "affinity": "Mystic", "rarity": "Rare"}, {"id": 81, "name": "Mavren", "affinity": "Umbral / Wild", "rarity": "Uncommon"}, {"id": 82, "name": "Ossari", "affinity": "Stone", "rarity": "Common"}, {"id": 83, "name": "Keln", "affinity": "Metal", "rarity": "Common"}, {"id": 84, "name": "Veyro", "affinity": "Gale / Volt", "rarity": "Uncommon"}, {"id": 85, "name": "Sindra", "affinity": "Flame / Umbral", "rarity": "Rare"}, {"id": 86, "name": "Pavren", "affinity": "Wild", "rarity": "Common"}, {"id": 87, "name": "Ilyra", "affinity": "Radiant", "rarity": "Common"}, {"id": 88, "name": "Ruun", "affinity": "Frost / Umbral", "rarity": "Rare"}, {"id": 89, "name": "Talvi", "affinity": "Frost", "rarity": "Common"}, {"id": 90, "name": "Mirel", "affinity": "Tide / Verdant", "rarity": "Common"}, {"id": 91, "name": "Korri", "affinity": "Metal / Wild", "rarity": "Uncommon"}, {"id": 92, "name": "Avenn", "affinity": "Gale", "rarity": "Common"}, {"id": 93, "name": "Selka", "affinity": "Tide", "rarity": "Common"}, {"id": 94, "name": "Norrik", "affinity": "Stone / Metal", "rarity": "Uncommon"}, {"id": 95, "name": "Veysha", "affinity": "Mystic / Umbral", "rarity": "Rare"}, {"id": 96, "name": "Orven", "affinity": "Verdant", "rarity": "Common"}, {"id": 97, "name": "Auralith", "affinity": "Radiant / Mystic", "rarity": "Legendary"}, {"id": 98, "name": "Vaelora", "affinity": "Radiant / Volt", "rarity": "Legendary"}, {"id": 99, "name": "Nethryss", "affinity": "Umbral / Dragon", "rarity": "Legendary"}, {"id": 100, "name": "Orrytheon", "affinity": "Mystic / Metal", "rarity": "Legendary"}, {"id": 101, "name": "Morveth", "affinity": "Umbral / Mystic", "rarity": "Uncommon"}];
 
 function ensureDirectoryState() {
-    if (!gameState.entheonDirectory || typeof gameState.entheonDirectory !== "object") {
-        gameState.entheonDirectory = { seen: {}, captured: {} };
-    }
-    if (!gameState.entheonDirectory.seen || typeof gameState.entheonDirectory.seen !== "object") {
-        gameState.entheonDirectory.seen = {};
-    }
-    if (!gameState.entheonDirectory.captured || typeof gameState.entheonDirectory.captured !== "object") {
-        gameState.entheonDirectory.captured = {};
-    }
+    if (!gameState.entheonDirectory) gameState.entheonDirectory = { seen: {}, captured: {} };
+    gameState.entheonDirectory.seen ||= {};
+    gameState.entheonDirectory.captured ||= {};
 }
-
-// Canonical species names used by the Directory. Older prototype builds used
-// "Morvane" for entry #008; keep old test state compatible with the corrected
-// canonical name Morveth.
-function canonicalDirectorySpeciesName(name) {
-    if (!name) return null;
-    return name === "Morvane" ? "Morveth" : name;
-}
-
-function getDirectorySpecies(name) {
-    const canonicalName = canonicalDirectorySpeciesName(name);
-    return entheonDirectorySpecies.find(species => species.name === canonicalName) || null;
-}
-
-function reconcileDirectory() {
-    ensureDirectoryState();
-
-    // Migrate legacy #008 state from the old name.
-    if (gameState.entheonDirectory.seen.Morvane) {
-        gameState.entheonDirectory.seen.Morveth = true;
-        delete gameState.entheonDirectory.seen.Morvane;
-    }
-    if (gameState.entheonDirectory.captured.Morvane) {
-        gameState.entheonDirectory.captured.Morveth = true;
-        delete gameState.entheonDirectory.captured.Morvane;
-    }
-
-    // The player's party is authoritative proof that the current species has
-    // been captured. This is what makes evolution register automatically.
-    (gameState.party || []).forEach(member => {
-        const speciesName = canonicalDirectorySpeciesName(member?.species);
-        if (!speciesName || !getDirectorySpecies(speciesName)) return;
-        gameState.entheonDirectory.seen[speciesName] = true;
-        gameState.entheonDirectory.captured[speciesName] = true;
-    });
-
-    // Keep the state limited to canonical Directory entries.
-    const canonicalNames = new Set(entheonDirectorySpecies.map(species => species.name));
-    Object.keys(gameState.entheonDirectory.seen).forEach(name => {
-        if (!canonicalNames.has(name)) delete gameState.entheonDirectory.seen[name];
-    });
-    Object.keys(gameState.entheonDirectory.captured).forEach(name => {
-        if (!canonicalNames.has(name)) delete gameState.entheonDirectory.captured[name];
-    });
-}
-
-// Central Directory registration function.
-function registerEntheon(name, status = "seen") {
-    const species = getDirectorySpecies(name);
-    if (!species) {
-        console.warn("Directory registration ignored unknown species:", name);
-        return false;
-    }
-    ensureDirectoryState();
-    gameState.entheonDirectory.seen[species.name] = true;
-    if (status === "captured") {
-        gameState.entheonDirectory.captured[species.name] = true;
-    }
-    return true;
-}
-
 function syncDirectoryFromParty() {
-    reconcileDirectory();
+    ensureDirectoryState();
+    (gameState.party || []).forEach(member => {
+        if (!member?.species) return;
+        gameState.entheonDirectory.seen[member.species] = true;
+        gameState.entheonDirectory.captured[member.species] = true;
+    });
 }
-
 function markEntheonSeen(name) {
-    return registerEntheon(name, "seen");
+    if (!name) return;
+    ensureDirectoryState();
+    gameState.entheonDirectory.seen[name] = true;
 }
-
 function markEntheonCaptured(name) {
-    return registerEntheon(name, "captured");
+    if (!name) return;
+    ensureDirectoryState();
+    gameState.entheonDirectory.seen[name] = true;
+    gameState.entheonDirectory.captured[name] = true;
 }
 function directoryPortrait(species, discovered) {
     const initials = species.name.slice(0,2).toUpperCase();
@@ -4558,16 +4736,13 @@ function renderDirectoryDetail(species) {
     const seen = !!gameState.entheonDirectory.seen[species.name];
     const captured = !!gameState.entheonDirectory.captured[species.name];
     if (!seen) { directoryDetail.innerHTML = `${directoryPortrait(species,false)}<div class="directory-detail-copy"><div class="directory-number">#${String(species.id).padStart(3,'0')}</div><h3>Unknown Entheon</h3><p>This Entheon has not yet been encountered.</p></div>`; return; }
-    const owned = gameState.party.find(c => c.species === species.name);
+    const owned = gameState.party.find(c => c.name === species.name);
     directoryDetail.innerHTML = `${directoryPortrait(species,true)}<div class="directory-detail-copy"><div class="directory-number">#${String(species.id).padStart(3,'0')}</div><h3>${species.name}</h3><div class="directory-tags"><span>${species.affinity}</span><span>${species.rarity}</span><span>${captured ? 'Captured' : 'Seen'}</span></div><p>${captured ? 'Registered as captured in your Entheon Directory.' : 'You have encountered this Entheon, but have not captured one yet.'}</p>${owned ? `<p class="directory-owned">Current party specimen: Lv. ${owned.level}</p>` : ''}</div>`;
 }
 function renderDirectory() {
     if (!directoryList) return;
-
-    // Always reconcile ownership immediately before rendering. This means the
-    // Directory cannot show stale data after an evolution, even when it was
-    // opened from a different screen immediately after the evolution prompt.
-    reconcileDirectory();
+    ensureDirectoryState();
+    syncDirectoryFromParty();
     const seenCount = Object.values(gameState.entheonDirectory.seen).filter(Boolean).length;
     const capturedCount = Object.values(gameState.entheonDirectory.captured).filter(Boolean).length;
     if (directorySummary) directorySummary.textContent = `Seen: ${seenCount}/${entheonDirectorySpecies.length} · Captured: ${capturedCount}/${entheonDirectorySpecies.length}`;
@@ -4633,35 +4808,14 @@ function getWorldHeight() {
 const player = {
     x: 4,
     y: 25,
-    width: 24,
-    height: 36,
+    width: 20,
+    height: 24,
     speed: 4,
-    direction: "down",
-    walkFrame: 0,
-    walkTimer: 0
+    facing: "down",
+    moving: false,
+    walkClock: 0,
+    walkFrame: 0
 };
-
-const playerSprites = {
-    male: {},
-    female: {}
-};
-
-function refreshPlayerSprites() {
-    const gender = gameState.gender === "girl" ? "female" : "male";
-    ["down", "up", "left", "right"].forEach(direction => {
-        const image = playerSprites[gender][direction] || new Image();
-        image.src = appearanceSpritePath(direction);
-        playerSprites[gender][direction] = image;
-    });
-}
-
-["male", "female"].forEach(gender => {
-    ["down", "up", "left", "right"].forEach(direction => {
-        const image = new Image();
-        image.src = `../images/player/${gender}/${direction}.png`;
-        playerSprites[gender][direction] = image;
-    });
-});
 
 const camera = {
     x: 0,
@@ -4895,20 +5049,10 @@ document.addEventListener("keydown", event => {
         return;
     }
 
-    if (key === "escape" && gameState.mode === "overworld") {
+    if (key === "escape" && gameState.mode === "overworld" && worldMapScreen && !worldMapScreen.classList.contains("hidden")) {
         event.preventDefault();
-        if (gameMenu && !gameMenu.classList.contains("hidden")) {
-            closeGameMenu();
-            return;
-        }
-        if (partyScreen && !partyScreen.classList.contains("hidden") && !gameState.partyScreenForced) {
-            closePartyScreen();
-            return;
-        }
-        if (worldMapScreen && !worldMapScreen.classList.contains("hidden")) {
-            closeWorldMap();
-            return;
-        }
+        closeWorldMap();
+        return;
     }
 
     if (
@@ -4937,7 +5081,6 @@ document.addEventListener("keyup", event => {
 // ============================================================
 
 function startOverworld() {
-    refreshPlayerSprites();
     gameState.mode = "overworld";
     gameState.currentScene = "overworld";
     gameState.activeDialogue = null;
@@ -4950,8 +5093,6 @@ function startOverworld() {
 
     introScreen.classList.add("hidden");
     overworldScreen.classList.remove("hidden");
-    gameMenu?.classList.add("hidden");
-    partyScreen?.classList.add("hidden");
 
     showWorldMessage(
         `Welcome to Kaleo, ${gameState.playerName}. Visit the Entheon Research Center to begin your journey.`
@@ -5044,7 +5185,7 @@ function gameLoop(timestamp) {
     const delta = Math.min((timestamp - lastTime) / 16.67, 2);
     lastTime = timestamp;
 
-    if (!gameState.activeDialogue && !isOverworldOverlayOpen()) {
+    if (!gameState.activeDialogue) {
         updatePlayer(delta);
     }
 
@@ -5071,11 +5212,26 @@ function updatePlayer(delta) {
 
     let dx = 0;
     let dy = 0;
+    player.moving = false;
 
     if (keys["arrowup"] || keys["w"]) dy -= 1;
     if (keys["arrowdown"] || keys["s"]) dy += 1;
     if (keys["arrowleft"] || keys["a"]) dx -= 1;
     if (keys["arrowright"] || keys["d"]) dx += 1;
+
+    if (dx !== 0 || dy !== 0) {
+        player.moving = true;
+        if (Math.abs(dx) > Math.abs(dy)) player.facing = dx > 0 ? "right" : "left";
+        else player.facing = dy > 0 ? "down" : "up";
+        player.walkClock += delta * 16.67;
+        if (player.walkClock >= 115) {
+            player.walkClock = 0;
+            player.walkFrame = (player.walkFrame + 1) % 5;
+        }
+    } else {
+        player.walkFrame = 0;
+        player.walkClock = 0;
+    }
 
     // Check an already-positioned player as well. Boundary doors can place the
     // player directly on the doorway tile, so transitions must not depend on
@@ -5085,23 +5241,7 @@ function updatePlayer(delta) {
         if (gameState.transitionCooldown > 0) return;
     }
 
-    if (dx === 0 && dy === 0) {
-        player.walkFrame = 0;
-        player.walkTimer = 0;
-        return;
-    }
-
-    if (Math.abs(dx) > Math.abs(dy)) {
-        player.direction = dx < 0 ? "left" : "right";
-    } else if (dy !== 0) {
-        player.direction = dy < 0 ? "up" : "down";
-    }
-
-    player.walkTimer += delta * 16.67;
-    if (player.walkTimer >= 110) {
-        player.walkTimer = 0;
-        player.walkFrame = (player.walkFrame + 1) % 4;
-    }
+    if (dx === 0 && dy === 0) return;
 
     if (dx !== 0 && dy !== 0) {
         dx *= 0.7071;
@@ -5381,11 +5521,6 @@ function evolveCreature(member) {
     member.moves = getMoveSetForLevel(targetSpecies, member.level);
     member.pendingEvolution = null;
 
-    // The evolved species is now part of the player's collection and must be
-    // registered even when evolution was triggered by the rapid-evolution test.
-    registerEntheon(targetSpecies, "captured");
-    reconcileDirectory();
-
     gameState.starter = gameState.activePartyIndex >= 0 && gameState.party[gameState.activePartyIndex] === member
         ? targetSpecies
         : gameState.starter;
@@ -5623,7 +5758,6 @@ if (inventoryButton) {
     inventoryButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        closeGameMenu();
         openInventory(false);
     });
 }
@@ -5632,7 +5766,6 @@ if (worldMapButton) {
     worldMapButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        closeGameMenu();
         openWorldMap();
     });
 }
@@ -5665,9 +5798,9 @@ if (badgeButton) {
     badgeButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        closeGameMenu();
         renderBadges();
         badgeScreen?.classList.remove("hidden");
+        overworldScreen?.classList.add("hidden");
     });
 }
 
@@ -5676,33 +5809,22 @@ if (badgeCloseButton) {
         event.preventDefault();
         event.stopPropagation();
         badgeScreen?.classList.add("hidden");
+        overworldScreen?.classList.remove("hidden");
         drawGame();
     });
 }
 
 if (directoryButton) {
-    directoryButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        closeGameMenu();
-        renderDirectory();
-        directoryScreen?.classList.remove("hidden");
-    });
+    directoryButton.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); renderDirectory(); directoryScreen?.classList.remove("hidden"); overworldScreen?.classList.add("hidden"); });
 }
 if (directoryCloseButton) {
-    directoryCloseButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        directoryScreen?.classList.add("hidden");
-        drawGame();
-    });
+    directoryCloseButton.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); directoryScreen?.classList.add("hidden"); overworldScreen?.classList.remove("hidden"); drawGame(); });
 }
 
 if (partyButton) {
     partyButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        closeGameMenu();
         openPartyScreen(false, false);
     });
 }
@@ -5714,49 +5836,42 @@ if (partyCloseButton) {
         closePartyScreen();
     });
 }
-function isOverworldOverlayOpen() {
-    return !!(
-        gameMenu && !gameMenu.classList.contains("hidden") ||
-        partyScreen && !partyScreen.classList.contains("hidden") ||
-        worldMapScreen && !worldMapScreen.classList.contains("hidden")
-    );
-}
-
-function openGameMenu() {
-    if (gameState.mode !== "overworld" || !gameMenu) return;
-    gameMenu.classList.remove("hidden");
-    keys.w = keys.a = keys.s = keys.d = false;
-    keys.arrowup = keys.arrowdown = keys.arrowleft = keys.arrowright = false;
-}
-
-function closeGameMenu() {
-    if (!gameMenu) return;
-    gameMenu.classList.add("hidden");
-}
-
 battleUI.runButton.addEventListener("click", battleRun);
-
-if (menuButton) {
-    menuButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        openGameMenu();
-    });
-}
-
-if (menuCloseButton) {
-    menuCloseButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        closeGameMenu();
-    });
-}
 
 
 function renderParty() {
-    // The old compact party HUD has been removed. Party information is now
-    // accessed through the in-game Party screen/menu, so there is no persistent
-    // party overlay covering the overworld.
+    if (!partyPanel || !partyList) return;
+
+    if (!gameState.party || gameState.party.length === 0) {
+        partyPanel.classList.add("hidden");
+        partyList.innerHTML = "";
+        renderPartyScreen();
+        return;
+    }
+
+    partyPanel.classList.remove("hidden");
+    partyList.innerHTML = gameState.party.map((member, index) => {
+        const hp = Math.max(0, member.currentHp);
+        const maxHp = Math.max(1, member.maxHp);
+        const hpPercent = Math.max(0, Math.min(100, hp / maxHp * 100));
+
+        return `
+            <div class="party-member${index === gameState.activePartyIndex ? " active" : ""}${hp <= 0 ? " fainted" : ""}">
+                <div class="party-member-number">${index + 1}</div>
+                <div class="party-member-info">
+                    <div class="party-member-top">
+                        <span class="party-member-name">${member.species}</span>
+                        <span class="party-member-level">Lv. ${member.level}</span>
+                    </div>
+                    <div class="party-hp-track">
+                        <div class="party-hp-fill" style="width:${hpPercent}%"></div>
+                    </div>
+                    <div class="party-hp-text">${hp} / ${maxHp} HP</div>
+                    <div class="party-hp-text">XP ${member.xp || 0} / ${member.xpToNext || 0}</div>
+                </div>
+            </div>`;
+    }).join("");
+
     renderPartyScreen();
 }
 
@@ -7541,36 +7656,25 @@ function drawNpcs() {
 function drawPlayer() {
     const px = player.x * TILE_SIZE;
     const py = player.y * TILE_SIZE;
-    const gender = gameState.gender === "girl" ? "female" : "male";
-    const sprite = playerSprites[gender]?.[player.direction];
 
-    // Keep the shadow independent of the sprite artwork.
-    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
     ctx.beginPath();
-    ctx.ellipse(px, py + 11, 10, 4, 0, 0, Math.PI * 2);
+    ctx.ellipse(px, py + 9, 11, 4.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    if (sprite && sprite.complete && sprite.naturalWidth > 0) {
-        const frameWidth = sprite.naturalWidth / 4;
-        const frameHeight = sprite.naturalHeight;
-        const drawWidth = 28;
-        const drawHeight = 42;
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(
-            sprite,
-            player.walkFrame * frameWidth, 0, frameWidth, frameHeight,
-            px - drawWidth / 2, py - drawHeight + 8, drawWidth, drawHeight
-        );
-        return;
-    }
+    const sprite = getPlayerFrameCanvas(player.facing || "down", player.moving ? player.walkFrame : 0);
+    if (!sprite) return;
 
-    // Fallback while the sprite assets are loading.
-    ctx.fillStyle = gender === "female" ? "#b24f83" : "#3559a8";
-    ctx.fillRect(px - 9, py - 7, 18, 18);
-    ctx.fillStyle = "#f0c6a4";
-    ctx.beginPath();
-    ctx.arc(px, py - 11, 8, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(
+        sprite,
+        px - PLAYER_SPRITE.drawWidth / 2,
+        py + 8 - PLAYER_SPRITE.drawHeight,
+        PLAYER_SPRITE.drawWidth,
+        PLAYER_SPRITE.drawHeight
+    );
+    ctx.restore();
 }
 
 function showWorldMessage(message) {
@@ -7594,14 +7698,11 @@ function restartGame() {
     gameState.currentScene = "welcome";
     gameState.playerName = "";
     gameState.gender = null;
-    player.direction = "down";
-    player.walkFrame = 0;
-    player.walkTimer = 0;
+    gameState.appearance = { hair: "blond", eyes: "amber", outfit: "default" };
     gameState.starter = null;
     gameState.starterAvailable = false;
     gameState.starterData = null;
     gameState.party = [];
-    gameState.entheonDirectory = { seen: {}, captured: {} };
     gameState.activePartyIndex = 0;
     gameState.selectedPartyIndex = 0;
     gameState.captureDevices = 5;
@@ -7616,6 +7717,12 @@ function restartGame() {
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
+    gameState.customizationReturnToOverworld = false;
+    player.facing = "down";
+    player.moving = false;
+    player.walkClock = 0;
+    player.walkFrame = 0;
+    clearPlayerSpriteCache();
     gameState.transitionCooldown = 0;
     gameState.encounterCooldown = 0;
     gameState.battle = null;

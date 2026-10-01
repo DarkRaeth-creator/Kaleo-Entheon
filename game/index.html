@@ -32,51 +32,50 @@
                     <div id="options" class="options"></div>
                 </div>
 
+                <div id="customization-screen" class="hidden" aria-label="Character customization">
+                    <div class="customization-shell">
+                        <div class="customization-header">
+                            <div>
+                                <div class="customization-kicker">TRAINER CREATION</div>
+                                <h2>Customize Your Trainer</h2>
+                                <p>Build the look that will represent you throughout Kaleo.</p>
+                            </div>
+                            <div class="customization-identity">
+                                <strong id="customization-name">Your Trainer</strong>
+                                <span id="customization-gender">Trainer</span>
+                            </div>
+                        </div>
+                        <div class="customization-layout">
+                            <div class="customization-preview-panel">
+                                <div class="preview-stage">
+                                    <div class="preview-grid"></div>
+                                    <canvas id="customization-preview" width="260" height="300"></canvas>
+                                </div>
+                                <div class="preview-caption">Live pixel-art preview</div>
+                            </div>
+                            <div id="customization-sections" class="customization-controls"></div>
+                        </div>
+                        <div class="customization-footer">
+                            <button id="customization-cancel" class="ui-small-button" type="button">Back</button>
+                            <button id="customization-confirm" class="option-button customization-confirm" type="button">Confirm Appearance</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="overworld-screen" class="hidden">
                     <div id="game-container">
                         <canvas id="game-canvas" width="768" height="576"></canvas>
-
-                    <section id="party-screen" class="party-screen hidden" aria-label="Entheon Party Screen">
-                        <div class="party-screen-header">
-                            <div>
-                                <h2>Your Entheon Party</h2>
-                                <p>Your current team</p>
-                            </div>
-                            <button id="party-close-button" class="ui-small-button" type="button">Close</button>
-                        </div>
-                        <div class="party-screen-body">
-                            <div id="party-screen-list" class="party-screen-list"></div>
-                            <div id="party-detail" class="party-detail">
-                                <div class="party-detail-empty">Select an Entheon to view its details.</div>
-                            </div>
-                        </div>
-                    </section>
                     </div>
 
                     <div id="controls-help">
                         <span><strong>Move:</strong> WASD / Arrow Keys</span>
                         <span><strong>Interact:</strong> E / Enter / Space</span>
-                        <button id="menu-button" class="ui-small-button menu-trigger-button" type="button">Menu</button>
-                    </div>
-
-                    <div id="game-menu" class="game-menu hidden" aria-label="Game Menu">
-                        <div class="game-menu-card">
-                            <div class="game-menu-header">
-                                <div>
-                                    <h2>Menu</h2>
-                                    <p>Kaleo</p>
-                                </div>
-                                <button id="menu-close-button" class="ui-small-button" type="button">Close</button>
-                            </div>
-                            <div class="game-menu-options">
-                                <button id="party-button" class="game-menu-button" type="button">Party</button>
-                                <button id="inventory-button" class="game-menu-button" type="button">Inventory</button>
-                                <button id="badge-button" class="game-menu-button" type="button">Badges</button>
-                                <button id="directory-button" class="game-menu-button" type="button">Entheon Directory</button>
-                                <button id="world-map-button" class="game-menu-button" type="button">World Map</button>
-                            </div>
-                        </div>
-                    </div>
+                    
+                        <button id="party-button" class="ui-small-button" type="button">Party</button>
+                        <button id="inventory-button" class="ui-small-button" type="button">Inventory</button>
+                        <button id="badge-button" class="ui-small-button" type="button">Badges</button>
+                        <button id="directory-button" class="ui-small-button" type="button">Directory</button>
+                        <button id="world-map-button" class="ui-small-button" type="button">Map</button><button id="appearance-button" class="ui-small-button" type="button">Appearance</button></div>
 
                     <div id="world-message" class="world-message hidden"></div>
 
@@ -86,6 +85,14 @@
                         <div class="npc-dialogue-hint">Press E, Enter or Space to continue</div>
                     </div>
 
+                    <aside id="party-panel" class="party-panel hidden" aria-label="Entheon Party">
+                        <div class="party-panel-title">ENTHEON PARTY</div>
+                        <div id="party-list" class="party-list"></div>
+                    </aside>
+
+
+
+                    
                 </div>
 
 <section id="crystal-screen" class="crystal-screen hidden" aria-label="Capture Crystals">
@@ -164,7 +171,7 @@
 
 <section id="directory-screen" class="directory-screen hidden" aria-label="Entheon Directory">
   <div class="directory-screen-header">
-    <div><h2>Entheon Directory</h2><p id="directory-summary">Seen: 0/101 · Captured: 0/101</p></div>
+    <div><h2>Entheon Directory</h2><p id="directory-summary">Seen: 0/100 · Captured: 0/100</p></div>
     <button id="directory-close-button" class="ui-small-button" type="button">Close</button>
   </div>
   <div class="directory-body">
@@ -184,7 +191,21 @@
     <div id="badge-list" class="badge-list"></div>
 </section>
 
-
+<section id="party-screen" class="party-screen hidden" aria-label="Entheon Party Screen">
+                        <div class="party-screen-header">
+                            <div>
+                                <h2>Your Entheon Party</h2>
+                                <p>Your current team</p>
+                            </div>
+                            <button id="party-close-button" class="ui-small-button" type="button">Close</button>
+                        </div>
+                        <div class="party-screen-body">
+                            <div id="party-screen-list" class="party-screen-list"></div>
+                            <div id="party-detail" class="party-detail">
+                                <div class="party-detail-empty">Select an Entheon to view its details.</div>
+                            </div>
+                        </div>
+                    </section>
 
 <div id="battle-screen" class="battle-screen hidden">
                     <div class="battle-field">
@@ -237,6 +258,6 @@
     </div>
 
     <script src="world-data.js"></script>
-    <script src="game.js?v=20260929-full-world"></script>
+    <script src="game.js?v=20261001-high-res-player"></script>
 </body>
 </html>
