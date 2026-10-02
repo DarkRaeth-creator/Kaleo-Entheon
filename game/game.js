@@ -315,28 +315,69 @@ function getSheetMetrics(image) {
     const height = image?.naturalHeight || 0;
     if (!width || !height) return null;
 
-    // Production: 256×96 = four 64×96 frames.
-    // Prototype: 128×48 = four 32×48 frames.
-    // Also accept any clean four-frame horizontal sheet so future art can
-    // use a larger native resolution without another renderer rewrite.
-    if (width % 4 !== 0) return null;
-    return { width: width / 4, height };
+    // KALEO PRODUCTION STANDARD:
+    // 256×96 PNG = four 64×96 animation frames horizontally.
+    if (width === 256 && height === 96) {
+        return {
+            width: 64,
+            height: 96,
+            columns: 4,
+            rows: 1,
+            directionRows: { down: 0, left: 0, right: 0, up: 0 },
+            production: true
+        };
+    }
+
+    // Temporary compatibility with the original prototype assets.
+    // These are NOT a production target.
+    if (width === 128 && height === 48) {
+        return {
+            width: 32,
+            height: 48,
+            columns: 4,
+            rows: 1,
+            directionRows: { down: 0, left: 0, right: 0, up: 0 },
+            production: false
+        };
+    }
+
+    // Compatibility for other four-frame horizontal sheets while assets are
+    // being migrated. The production validator will still flag them.
+    if (width % 4 === 0 && height >= 32 && width / 4 >= 24) {
+        return {
+            width: width / 4,
+            height,
+            columns: 4,
+            rows: 1,
+            directionRows: { down: 0, left: 0, right: 0, up: 0 },
+            production: false
+        };
+    }
+
+    return null;
 }
 
-function drawPlayerSheet(image, frameIndex, x, y, width = 64, height = 96) {
+function getPlayerFrameCount(image) {
+    return getSheetMetrics(image)?.columns || 4;
+}
+
+function drawPlayerSheet(image, frameIndex, x, y, width, height, direction = "down") {
     const metrics = getSheetMetrics(image);
     if (!metrics) return false;
-    const sourceFrame = Math.min(3, Math.max(0, frameIndex));
+
+    const sourceFrame = Math.min(metrics.columns - 1, Math.max(0, frameIndex));
+    const row = metrics.directionRows?.[direction] ?? 0;
+
     ctx.drawImage(
         image,
         sourceFrame * metrics.width,
-        0,
+        row * metrics.height,
         metrics.width,
         metrics.height,
         Math.round(x),
         Math.round(y),
-        width,
-        height
+        Math.round(width),
+        Math.round(height)
     );
     return true;
 }
@@ -346,8 +387,8 @@ function makeSpritePreview(path, className = "") {
     wrapper.className = `cc-sprite-preview ${className}`.trim();
 
     const canvas = document.createElement("canvas");
-    canvas.width = 128;
-    canvas.height = 192;
+    canvas.width = className.includes("cc-large-sprite") ? 160 : 116;
+    canvas.height = className.includes("cc-large-sprite") ? 190 : 82;
     canvas.className = "cc-sprite-preview-canvas";
     canvas.setAttribute("aria-hidden", "true");
     wrapper.appendChild(canvas);
@@ -361,16 +402,30 @@ function makeSpritePreview(path, className = "") {
             c.imageSmoothingEnabled = false;
             const metrics = getSheetMetrics(image);
             if (metrics) {
-                const scale = Math.min(2, canvas.height / metrics.height);
+                const maxScale = className.includes("cc-large-sprite") ? 1.5 : 0.72;
+                const scale = Math.min(
+                    maxScale,
+                    canvas.height / metrics.height,
+                    canvas.width / metrics.width
+                );
                 const w = metrics.width * scale;
                 const h = metrics.height * scale;
-                c.drawImage(image, frame * metrics.width, 0, metrics.width, metrics.height,
-                    (canvas.width - w) / 2, canvas.height - h, w, h);
+                c.drawImage(
+                    image,
+                    frame * metrics.width,
+                    0,
+                    metrics.width,
+                    metrics.height,
+                    (canvas.width - w) / 2,
+                    canvas.height - h,
+                    w,
+                    h
+                );
             }
         };
         draw();
         const timer = setInterval(() => {
-            frame = (frame + 1) % 4;
+            frame = (frame + 1) % getPlayerFrameCount(image);
             draw();
         }, 130);
         playerPreviewTimers.set(wrapper, timer);
@@ -7718,21 +7773,23 @@ function drawPlayer() {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
 
-    // The feet/ground contact point is fixed at the player's world position.
-    // This keeps 96px production sprites visually grounded while retaining
-    // compatibility with the old 48px prototype sheets.
-    const targetWidth = 64;
-    const targetHeight = 96;
+    // Source artwork and world display size are deliberately separate.
+    // Production artwork is 64×96 per frame, but the current world uses
+    // 32px tiles, so the character is displayed at 48×72 to keep the
+    // intended RPG proportions rather than appearing several tiles tall.
+    const targetWidth = getCharacterConfig().worldFrame?.width || 48;
+    const targetHeight = getCharacterConfig().worldFrame?.height || 72;
+    const footOffset = getCharacterConfig().worldFrame?.footOffset ?? 4;
     const drawX = Math.round(px - targetWidth / 2);
-    const drawY = Math.round(py - targetHeight + 8);
+    const drawY = Math.round(py - targetHeight + footOffset);
 
     let rendered = false;
 
     if (asset.state === "ready" && asset.image) {
-        rendered = drawPlayerSheet(asset.image, frameIndex, drawX, drawY, targetWidth, targetHeight);
+        rendered = drawPlayerSheet(asset.image, frameIndex, drawX, drawY, targetWidth, targetHeight, player.direction);
     } else if (asset.state === "ready-layers" && asset.layers) {
         const layers = [asset.layers.base, asset.layers.outfit, asset.layers.hair, asset.layers.eyes].filter(Boolean);
-        rendered = layers.every(image => drawPlayerSheet(image, frameIndex, drawX, drawY, targetWidth, targetHeight));
+        rendered = layers.every(image => drawPlayerSheet(image, frameIndex, drawX, drawY, targetWidth, targetHeight, player.direction));
     }
 
     // A deliberately clear development fallback. It should only be visible
