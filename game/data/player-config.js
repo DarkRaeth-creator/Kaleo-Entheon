@@ -15,6 +15,9 @@
 window.KALEO_PLAYER_CONFIG = {
     assetRoot: "../images/player",
     productionFrame: { width: 64, height: 96 },
+    // World display is independent from source artwork resolution.
+    // The current 32px tile world displays the 64×96 source frame at 48×72.
+    worldFrame: { width: 48, height: 72, footOffset: 4 },
     directions: ["down", "left", "right", "up"],
 
     male: {
