@@ -118,6 +118,8 @@ const shopVale = document.getElementById("shop-vale");
 const shopCloseButton = document.getElementById("shop-close-button");
 const worldMapScreen = document.getElementById("world-map-screen");
 const worldMapButton = document.getElementById("world-map-button");
+const appearanceButton = document.getElementById("appearance-button");
+const saveGameButton = document.getElementById("save-game-button");
 const worldMapCloseButton = document.getElementById("world-map-close-button");
 const worldMapLocation = document.getElementById("world-map-location");
 const worldMapCurrentName = document.getElementById("world-map-current-name");
@@ -189,6 +191,12 @@ function getCharacterConfig() {
 
 const playerAssetCache = new Map();
 const playerPreviewTimers = new WeakMap();
+
+// Persistent player save data. Only stable gameplay state is serialized;
+// transient battle/UI state is intentionally excluded.
+const KALEO_SAVE_KEY = "kaleo_world_of_entheon_save_v1";
+let appearanceEditing = false;
+let appearanceReturnContext = null;
 
 function getPlayerVisualSelection() {
     const gender = gameState.gender === "girl" ? "female" : "male";
@@ -633,6 +641,24 @@ function confirmCharacterCreation() {
 
     gameState.playerName = name.slice(0, 12);
     gameState.currentScene = "character-complete";
+
+    if (appearanceEditing && appearanceReturnContext) {
+        const context = appearanceReturnContext;
+        appearanceEditing = false;
+        appearanceReturnContext = null;
+        characterCreationScreen?.classList.add("hidden");
+        overworldScreen?.classList.remove("hidden");
+        gameState.mode = "overworld";
+        gameState.currentScene = "overworld";
+        loadMap(context.mapId, context.x, context.y);
+        player.direction = context.direction || "down";
+        player.frame = context.frame || 0;
+        closeGameMenu();
+        drawGame();
+        saveGame(false);
+        return;
+    }
+
     characterCreationScreen?.classList.add("hidden");
     startOverworld();
 }
@@ -5145,6 +5171,177 @@ function closeWorldMap() {
 }
 
 // ============================================================
+// SAVE / LOAD
+// ============================================================
+
+function getSaveSnapshot() {
+    return {
+        version: 1,
+        savedAt: new Date().toISOString(),
+        gameState: {
+            playerName: gameState.playerName,
+            gender: gameState.gender,
+            playerCustomization: { ...gameState.playerCustomization },
+            starter: gameState.starter,
+            starterAvailable: gameState.starterAvailable,
+            starterData: gameState.starterData,
+            party: gameState.party,
+            activePartyIndex: gameState.activePartyIndex,
+            selectedPartyIndex: gameState.selectedPartyIndex,
+            captureDevices: gameState.captureDevices,
+            vale: gameState.vale,
+            badges: gameState.badges,
+            crystals: gameState.crystals,
+            items: gameState.items,
+            collectedItems: gameState.collectedItems,
+            entheonDirectory: gameState.entheonDirectory,
+            currentMap: gameState.currentMap,
+            ferryReturnMap: gameState.ferryReturnMap,
+            ferryReturnX: gameState.ferryReturnX,
+            ferryReturnY: gameState.ferryReturnY
+        },
+        player: {
+            x: player.x,
+            y: player.y,
+            direction: player.direction,
+            frame: player.frame
+        }
+    };
+}
+
+function hasSavedGame() {
+    try {
+        return Boolean(localStorage.getItem(KALEO_SAVE_KEY));
+    } catch (error) {
+        console.warn("Kaleo save check unavailable:", error);
+        return false;
+    }
+}
+
+function saveGame(showMessage = true) {
+    if (gameState.mode !== "overworld") return false;
+
+    try {
+        localStorage.setItem(KALEO_SAVE_KEY, JSON.stringify(getSaveSnapshot()));
+        if (showMessage) {
+            closeGameMenu();
+            showWorldMessage("Game saved. Your progress is safe.");
+        }
+        return true;
+    } catch (error) {
+        console.error("Unable to save Kaleo:", error);
+        if (showMessage) showWorldMessage("The game could not be saved in this browser.");
+        return false;
+    }
+}
+
+function clearSavedGame() {
+    try {
+        localStorage.removeItem(KALEO_SAVE_KEY);
+    } catch (error) {
+        console.warn("Unable to clear Kaleo save:", error);
+    }
+}
+
+function loadSavedGame() {
+    let raw;
+    try {
+        raw = localStorage.getItem(KALEO_SAVE_KEY);
+    } catch (error) {
+        console.warn("Kaleo save unavailable:", error);
+        return false;
+    }
+
+    if (!raw) return false;
+
+    try {
+        const snapshot = JSON.parse(raw);
+        if (!snapshot || snapshot.version !== 1 || !snapshot.gameState || !snapshot.player) return false;
+
+        const saved = snapshot.gameState;
+        gameState.playerName = saved.playerName || "";
+        gameState.gender = saved.gender || "boy";
+        gameState.playerCustomization = {
+            hair: saved.playerCustomization?.hair || (gameState.gender === "girl" ? "brown" : "blond"),
+            eyes: saved.playerCustomization?.eyes || (gameState.gender === "girl" ? "brown" : "amber"),
+            outfit: saved.playerCustomization?.outfit || "default"
+        };
+        gameState.starter = saved.starter || null;
+        gameState.starterAvailable = Boolean(saved.starterAvailable);
+        gameState.starterData = saved.starterData || null;
+        gameState.party = Array.isArray(saved.party) ? saved.party : [];
+        gameState.activePartyIndex = Number.isInteger(saved.activePartyIndex) ? saved.activePartyIndex : 0;
+        gameState.selectedPartyIndex = Number.isInteger(saved.selectedPartyIndex) ? saved.selectedPartyIndex : 0;
+        gameState.captureDevices = Number.isFinite(saved.captureDevices) ? saved.captureDevices : 5;
+        gameState.vale = Number.isFinite(saved.vale) ? saved.vale : 1500;
+        gameState.badges = Array.isArray(saved.badges) ? saved.badges : [];
+        gameState.crystals = saved.crystals || gameState.crystals;
+        gameState.items = saved.items || gameState.items;
+        gameState.collectedItems = saved.collectedItems || {};
+        gameState.entheonDirectory = saved.entheonDirectory || { seen: {}, captured: {} };
+        gameState.ferryReturnMap = saved.ferryReturnMap || null;
+        gameState.ferryReturnX = saved.ferryReturnX ?? null;
+        gameState.ferryReturnY = saved.ferryReturnY ?? null;
+        gameState.battle = null;
+        gameState.trainerBattle = null;
+        gameState.activeDialogue = null;
+        gameState.dialogueIndex = 0;
+        gameState.evolutionPromptOpen = false;
+        gameState.mode = "overworld";
+        gameState.currentScene = "overworld";
+
+        Object.values(maps).forEach(map => {
+            (map.npcs || []).forEach(npc => {
+                if (npc.type === "starter") npc.chosen = Boolean(gameState.starter);
+            });
+        });
+
+        const mapId = maps[saved.currentMap] ? saved.currentMap : "town";
+        loadMap(mapId, snapshot.player.x, snapshot.player.y);
+        player.direction = snapshot.player.direction || "down";
+        player.frame = Number.isInteger(snapshot.player.frame) ? snapshot.player.frame : 0;
+        player.moving = false;
+
+        introScreen.classList.add("hidden");
+        characterCreationScreen?.classList.add("hidden");
+        overworldScreen.classList.remove("hidden");
+        gameMenu?.classList.add("hidden");
+        renderBadges();
+        renderParty();
+        drawGame();
+        showWorldMessage(`Welcome back, ${gameState.playerName || "Trainer"}.`);
+
+        cancelAnimationFrame(animationFrame);
+        lastTime = performance.now();
+        animationFrame = requestAnimationFrame(gameLoop);
+        return true;
+    } catch (error) {
+        console.error("Unable to load Kaleo save:", error);
+        return false;
+    }
+}
+
+function openAppearanceEditor() {
+    if (gameState.mode !== "overworld") return;
+
+    appearanceEditing = true;
+    appearanceReturnContext = {
+        mapId: gameState.currentMap,
+        x: player.x,
+        y: player.y,
+        direction: player.direction,
+        frame: player.frame
+    };
+
+    closeGameMenu();
+    overworldScreen.classList.add("hidden");
+    characterCreationScreen.classList.remove("hidden");
+    gameState.mode = "appearance";
+    gameState.currentScene = "appearance";
+    renderCharacterCreation();
+}
+
+// ============================================================
 // OVERWORLD MENU
 // ============================================================
 
@@ -5172,6 +5369,22 @@ if (menuCloseButton) {
         event.preventDefault();
         event.stopPropagation();
         closeGameMenu();
+    });
+}
+
+if (saveGameButton) {
+    saveGameButton.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        saveGame(true);
+    });
+}
+
+if (appearanceButton) {
+    appearanceButton.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openAppearanceEditor();
     });
 }
 
@@ -7977,24 +8190,90 @@ function restartGame() {
     showWelcome();
 }
 
+function resetGame() {
+    gameState.mode = "intro";
+    gameState.currentScene = "welcome";
+    gameState.playerName = "";
+    gameState.gender = null;
+    gameState.playerCustomization = { hair: "blond", eyes: "amber", outfit: "default" };
+    gameState.starter = null;
+    gameState.starterAvailable = false;
+    gameState.starterData = null;
+    gameState.party = [];
+    gameState.activePartyIndex = 0;
+    gameState.selectedPartyIndex = 0;
+    gameState.captureDevices = 5;
+    gameState.vale = 1500;
+    gameState.badges = [];
+    gameState.crystals = { capture: { id: "capture", name: "Capture Crystal", grade: "Capture", quantity: 5 } };
+    gameState.items = {
+        basicRestore: { id: "basicRestore", name: "Basic Restore", description: "A field restorative for minor injuries. (Prototype: restores 25 HP.)", quantity: 3, kind: "heal", amount: 25 },
+        revitalizingElixir: { id: "revitalizingElixir", name: "Revitalizing Elixir", description: "A specialized restorative for an exhausted Entheon. (Prototype: revives at 50% HP.)", quantity: 1, kind: "revive", amount: 0.5 },
+        greaterRestore: { id: "greaterRestore", name: "Greater Restore", description: "A stronger restorative for more serious injuries. (Prototype: restores 60 HP.)", quantity: 0, kind: "heal", amount: 60 }
+    };
+    gameState.collectedItems = {};
+    gameState.entheonDirectory = { seen: {}, captured: {} };
+    gameState.currentMap = "town";
+    gameState.ferryReturnMap = null;
+    gameState.ferryReturnX = null;
+    gameState.ferryReturnY = null;
+    gameState.battle = null;
+    gameState.trainerBattle = null;
+    gameState.activeDialogue = null;
+    gameState.dialogueIndex = 0;
+    gameState.evolutionPromptOpen = false;
+
+    Object.values(maps).forEach(map => {
+        (map.npcs || []).forEach(npc => {
+            if (npc.type === "starter") npc.chosen = false;
+        });
+    });
+
+    player.x = 4;
+    player.y = 25;
+    player.direction = "down";
+    player.frame = 0;
+    player.frameClock = 0;
+    player.moving = false;
+    currentMap = maps.town;
+    clearSavedGame();
+}
+
 function showWelcome() {
     gameState.mode = "intro";
     gameState.currentScene = "welcome";
     characterCreationScreen?.classList.add("hidden");
+    overworldScreen?.classList.add("hidden");
     introScreen.classList.remove("hidden");
+
+    const options = [];
+
+    if (hasSavedGame()) {
+        options.push({
+            text: "Continue Adventure",
+            action: () => {
+                if (!loadSavedGame()) showCharacterChoice();
+            }
+        });
+    }
+
+    options.push({
+        text: hasSavedGame() ? "New Game" : "Begin your journey",
+        action: () => {
+            clearSavedGame();
+            resetGame();
+            showCharacterCreation();
+        }
+    });
 
     showScene(
         "Welcome to Kaleo",
         `
         <p>Your journey is about to begin.</p>
         <p>The world of Kaleo awaits.</p>
+        ${hasSavedGame() ? "<p class=\"save-notice\">A saved adventure was found in this browser.</p>" : ""}
         `,
-        [
-            {
-                text: "Begin your journey",
-                action: showCharacterChoice
-            }
-        ]
+        options
     );
 }
 
