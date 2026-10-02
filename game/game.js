@@ -13,7 +13,11 @@ const gameState = {
     currentScene: "welcome",
     playerName: "",
     gender: null,
-    appearance: { hair: "blond", eyes: "amber", outfit: "default" },
+    playerCustomization: {
+        hair: "blond",
+        eyes: "amber",
+        outfit: "default"
+    },
     starter: null,
     starterAvailable: false,
     starterData: null,
@@ -55,8 +59,7 @@ const gameState = {
     trainerBattle: null,
     evolutionPromptOpen: false,
     collectedItems: {},
-    entheonDirectory: { seen: {}, captured: {} },
-    customizationReturnToOverworld: false
+    entheonDirectory: { seen: {}, captured: {} }
 };
 
 
@@ -67,6 +70,7 @@ const gameState = {
 const sceneTitle = document.getElementById("scene-title");
 const sceneText = document.getElementById("scene-text");
 const optionsContainer = document.getElementById("options");
+const characterCreationScreen = document.getElementById("character-creation-screen");
 
 const introScreen = document.getElementById("intro-screen");
 const overworldScreen = document.getElementById("overworld-screen");
@@ -119,14 +123,6 @@ const worldMapRouteName = document.getElementById("world-map-route-name");
 const worldMapRouteDirection = document.getElementById("world-map-route-direction");
 const worldMapConnections = document.getElementById("world-map-connections");
 const worldMapMarkers = document.getElementById("world-map-markers");
-const customizationScreen = document.getElementById("customization-screen");
-const customizationPreview = document.getElementById("customization-preview");
-const customizationName = document.getElementById("customization-name");
-const customizationGender = document.getElementById("customization-gender");
-const customizationSections = document.getElementById("customization-sections");
-const customizationConfirm = document.getElementById("customization-confirm");
-const customizationCancel = document.getElementById("customization-cancel");
-const appearanceButton = document.getElementById("appearance-button");
 function setCaptureStatus(text) {
     const battleArea =
         document.getElementById("battle-screen") ||
@@ -176,359 +172,416 @@ function showScene(title, text, options = []) {
     });
 }
 
-// ============================================================
-// PLAYER APPEARANCE + HIGH-RES SPRITE SYSTEM
-// ============================================================
-
-const PLAYER_SPRITE = {
-    frameWidth: 128,
-    frameHeight: 144,
-    columns: 5,
-    rows: 4,
-    drawWidth: 72,
-    drawHeight: 81,
-    paths: {
-        boy: "images/player/male/sheet.png",
-        girl: "images/player/female/sheet.png"
-    },
-    rowsByDirection: { down: 0, up: 1, left: 2, right: 3 }
-};
-
-const APPEARANCE_OPTIONS = {
-    boy: {
-        hair: [
-            ["blond", "Blond", "#e7b86b"], ["brown", "Brown", "#6d4a3b"],
-            ["black", "Black", "#252934"], ["red", "Red", "#b84742"], ["white", "White / Silver", "#d9dde5"]
-        ],
-        eyes: [
-            ["amber", "Amber", "#d9932d"], ["blue", "Blue", "#4c8ed9"],
-            ["green", "Green", "#63a85c"], ["brown", "Brown", "#85542f"], ["grey", "Grey", "#a6acb7"]
-        ],
-        outfit: [
-            ["default", "Default", "#20232a"], ["casual", "Casual", "#d9dde4"],
-            ["academy", "Academy", "#315a86"], ["explorer", "Explorer", "#3e6242"], ["jacket", "Jacket", "#9e3d3d"]
-        ]
-    },
-    girl: {
-        hair: [
-            ["brown", "Brown", "#6f4335"], ["blonde", "Blonde", "#e2b06d"],
-            ["black", "Black", "#282b32"], ["red", "Red", "#b84742"], ["auburn", "Auburn", "#8b4d36"]
-        ],
-        eyes: [
-            ["brown", "Brown", "#85542f"], ["blue", "Blue", "#4c8ed9"],
-            ["green", "Green", "#63a85c"], ["hazel", "Hazel", "#9a7b35"], ["grey", "Grey", "#a6acb7"]
-        ],
-        outfit: [
-            ["default", "Default", "#c94c4c"], ["casual", "Casual", "#5d8fd0"],
-            ["academy", "Academy", "#292d35"], ["explorer", "Explorer", "#486c48"], ["dress", "Dress", "#e98da6"]
-        ]
-    }
-};
-
-const playerSpriteImages = { boy: new Image(), girl: new Image() };
-Object.entries(playerSpriteImages).forEach(([gender, image]) => {
-    image.src = PLAYER_SPRITE.paths[gender];
-    image.onload = () => { drawGame(); renderCustomizationPreview(); };
-});
-
-const playerSpriteCache = new Map();
-const spriteSourceCanvas = document.createElement("canvas");
-spriteSourceCanvas.width = PLAYER_SPRITE.frameWidth;
-spriteSourceCanvas.height = PLAYER_SPRITE.frameHeight;
-const spriteSourceCtx = spriteSourceCanvas.getContext("2d", { willReadFrequently: true });
-
-function hexToRgb(hex) {
-    const value = hex.replace("#", "");
-    return {
-        r: parseInt(value.slice(0, 2), 16),
-        g: parseInt(value.slice(2, 4), 16),
-        b: parseInt(value.slice(4, 6), 16)
-    };
-}
-
-function rgbToHsv(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    const d = max - min;
-    let h = 0;
-    if (d !== 0) {
-        if (max === r) h = ((g - b) / d) % 6;
-        else if (max === g) h = (b - r) / d + 2;
-        else h = (r - g) / d + 4;
-        h /= 6;
-        if (h < 0) h += 1;
-    }
-    const s = max === 0 ? 0 : d / max;
-    return [h, s, max];
-}
-
-function hsvToRgb(h, s, v) {
-    const i = Math.floor(h * 6);
-    const f = h * 6 - i;
-    const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
-    const mod = i % 6;
-    const rgb = [
-        [v, t, p], [q, v, p], [p, v, t],
-        [p, q, v], [t, p, v], [v, p, q]
-    ][mod];
-    return rgb.map(channel => Math.round(channel * 255));
-}
-
-function appearancePalette(gender) {
-    return APPEARANCE_OPTIONS[gender] || APPEARANCE_OPTIONS.boy;
-}
-
-function getAppearanceTarget(gender, group, id) {
-    const option = appearancePalette(gender)[group]?.find(item => item[0] === id);
-    return option ? hexToRgb(option[2]) : null;
-}
-
-function shouldRecolorHair(gender, x, y, w, h, hsv) {
-    const [hue, sat] = hsv;
-    if (gender === "boy") {
-        // The source sprite is blond. Keep the face completely outside the mask;
-        // hair is the crown plus the side locks around the head.
-        const crown = y < h * 0.36;
-        const sideLocks = y < h * 0.58 && (x < w * 0.29 || x > w * 0.71);
-        return (crown || sideLocks) && sat > 0.20 && hue > 0.08 && hue < 0.18;
-    }
-    // Female hair is brown and extends below the hat on both sides and behind.
-    const sideLocks = y > h * 0.22 && y < h * 0.88 && (x < w * 0.34 || x > w * 0.66);
-    return sideLocks && sat > 0.24 && hue < 0.13;
-}
-
-function shouldRecolorOutfit(gender, x, y, w, h, hsv) {
-    const [, sat, value] = hsv;
-    const body = x > w * 0.29 && x < w * 0.71;
-    if (!body) return false;
-    if (gender === "girl") {
-        return y > h * 0.60 && y < h * 0.88 && sat > 0.22 && value < 0.78;
-    }
-    return y > h * 0.57 && y < h * 0.88 && (sat > 0.16 || value < 0.70);
-}
-
-function shouldRecolorEyes(gender, x, y, w, h, hsv, direction) {
-    const [, sat, value] = hsv;
-    if (direction === "up") return false;
-    const yBand = y > h * 0.39 && y < h * 0.58;
-    if (!yBand) return false;
-    if (direction === "left") {
-        if (x < w * 0.34 || x > w * 0.66) return false;
-    } else if (direction === "right") {
-        if (x < w * 0.34 || x > w * 0.66) return false;
-    } else if (x < w * 0.28 || x > w * 0.72) {
-        return false;
-    }
-    // Eyes and lashes are among the darkest pixels in the face region. This
-    // avoids painting the surrounding skin, which caused the earlier spill.
-    return value < 0.30 && sat > 0.05;
-}
-
-function tintPixel(r, g, b, target, preserveLight = true) {
-    const hsv = rgbToHsv(r, g, b);
-    const targetHsv = rgbToHsv(target.r, target.g, target.b);
-    const v = preserveLight ? Math.min(1, hsv[2] * (0.72 + targetHsv[2] * 0.50)) : targetHsv[2];
-    const s = Math.min(1, Math.max(0.22, targetHsv[1] * (0.78 + hsv[1] * 0.35)));
-    return hsvToRgb(targetHsv[0], s, v);
-}
-
-function getPlayerFrameCanvas(direction, frameIndex) {
-    const gender = gameState.gender === "girl" ? "girl" : "boy";
-    const appearance = gameState.appearance || { hair: gender === "girl" ? "brown" : "blond", eyes: gender === "girl" ? "brown" : "amber", outfit: "default" };
-    const key = `${gender}|${appearance.hair}|${appearance.eyes}|${appearance.outfit}|${direction}|${frameIndex}`;
-    if (playerSpriteCache.has(key)) return playerSpriteCache.get(key);
-
-    const image = playerSpriteImages[gender];
-    const canvas = document.createElement("canvas");
-    canvas.width = PLAYER_SPRITE.frameWidth;
-    canvas.height = PLAYER_SPRITE.frameHeight;
-    const render = canvas.getContext("2d", { willReadFrequently: true });
-    render.imageSmoothingEnabled = false;
-
-    if (!image.complete || !image.naturalWidth) return null;
-    const row = PLAYER_SPRITE.rowsByDirection[direction] ?? 0;
-    const frame = ((frameIndex % PLAYER_SPRITE.columns) + PLAYER_SPRITE.columns) % PLAYER_SPRITE.columns;
-    render.drawImage(
-        image,
-        frame * PLAYER_SPRITE.frameWidth,
-        row * PLAYER_SPRITE.frameHeight,
-        PLAYER_SPRITE.frameWidth,
-        PLAYER_SPRITE.frameHeight,
-        0, 0,
-        PLAYER_SPRITE.frameWidth,
-        PLAYER_SPRITE.frameHeight
-    );
-
-    const pixels = render.getImageData(0, 0, canvas.width, canvas.height);
-    const data = pixels.data;
-    const hairTarget = getAppearanceTarget(gender, "hair", appearance.hair);
-    const eyeTarget = getAppearanceTarget(gender, "eyes", appearance.eyes);
-    const outfitTarget = getAppearanceTarget(gender, "outfit", appearance.outfit);
-
-    if (hairTarget || eyeTarget || outfitTarget) {
-        for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-                const i = (y * canvas.width + x) * 4;
-                if (data[i + 3] < 18) continue;
-                const r = data[i], g = data[i + 1], b = data[i + 2];
-                const hsv = rgbToHsv(r, g, b);
-                let rgb = null;
-                if (hairTarget && appearance.hair !== (gender === "girl" ? "brown" : "blond") && shouldRecolorHair(gender, x, y, canvas.width, canvas.height, hsv)) {
-                    rgb = tintPixel(r, g, b, hairTarget, true);
-                } else if (eyeTarget && appearance.eyes !== (gender === "girl" ? "brown" : "amber") && shouldRecolorEyes(gender, x, y, canvas.width, canvas.height, hsv, direction)) {
-                    rgb = tintPixel(r, g, b, eyeTarget, true);
-                } else if (outfitTarget && appearance.outfit !== "default" && shouldRecolorOutfit(gender, x, y, canvas.width, canvas.height, hsv)) {
-                    rgb = tintPixel(r, g, b, outfitTarget, true);
-                }
-                if (rgb) {
-                    data[i] = rgb[0]; data[i + 1] = rgb[1]; data[i + 2] = rgb[2];
-                }
-            }
-        }
-        render.putImageData(pixels, 0, 0);
-    }
-
-    playerSpriteCache.set(key, canvas);
-    return canvas;
-}
-
-function clearPlayerSpriteCache() {
-    playerSpriteCache.clear();
-}
-
-function renderCustomizationPreview() {
-    if (!customizationPreview) return;
-    const previewCtx = customizationPreview.getContext("2d");
-    previewCtx.clearRect(0, 0, customizationPreview.width, customizationPreview.height);
-    previewCtx.imageSmoothingEnabled = false;
-    const direction = "down";
-    const frame = Math.floor(performance.now() / 180) % 5;
-    const sprite = getPlayerFrameCanvas(direction, frame);
-    if (!sprite) return;
-    previewCtx.save();
-    previewCtx.translate(customizationPreview.width / 2, customizationPreview.height - 12);
-    previewCtx.drawImage(sprite, -PLAYER_SPRITE.drawWidth / 2, -PLAYER_SPRITE.drawHeight, PLAYER_SPRITE.drawWidth, PLAYER_SPRITE.drawHeight);
-    previewCtx.restore();
-}
-
-function makeCustomizationSection(title, group) {
-    const section = document.createElement("section");
-    section.className = "customization-section";
-    const heading = document.createElement("h3");
-    heading.textContent = title;
-    section.appendChild(heading);
-    const grid = document.createElement("div");
-    grid.className = "customization-options";
-    const gender = gameState.gender === "girl" ? "girl" : "boy";
-    appearancePalette(gender)[group].forEach(([id, label, color]) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "appearance-option" + (gameState.appearance[group] === id ? " selected" : "");
-        button.dataset.group = group;
-        button.dataset.value = id;
-        button.innerHTML = `<span class="appearance-swatch" style="background:${color}"></span><span>${label}</span>`;
-        button.addEventListener("click", () => {
-            gameState.appearance[group] = id;
-            clearPlayerSpriteCache();
-            buildCustomizationSections();
-            renderCustomizationPreview();
-        });
-        grid.appendChild(button);
-    });
-    section.appendChild(grid);
-    return section;
-}
-
-function buildCustomizationSections() {
-    if (!customizationSections) return;
-    customizationSections.innerHTML = "";
-    customizationSections.appendChild(makeCustomizationSection("Hair", "hair"));
-    customizationSections.appendChild(makeCustomizationSection("Eyes", "eyes"));
-    customizationSections.appendChild(makeCustomizationSection("Outfit", "outfit"));
-}
-
-function showCharacterCustomization(fromOverworld = false) {
-    gameState.currentScene = "customization";
-    gameState.customizationReturnToOverworld = fromOverworld;
-    const gender = gameState.gender === "girl" ? "girl" : "boy";
-    const defaults = gender === "girl"
-        ? { hair: "brown", eyes: "brown", outfit: "default" }
-        : { hair: "blond", eyes: "amber", outfit: "default" };
-    if (!gameState.appearance || !gameState.appearance.hair) gameState.appearance = { ...defaults };
-    customizationName.textContent = gameState.playerName || "Your Trainer";
-    customizationGender.textContent = gender === "girl" ? "Female Trainer" : "Male Trainer";
-    buildCustomizationSections();
-    renderCustomizationPreview();
-    if (fromOverworld) overworldScreen?.classList.add("hidden");
-    else introScreen?.classList.add("hidden");
-    customizationScreen?.classList.remove("hidden");
-    cancelAnimationFrame(customizationAnimation);
-    customizationAnimation = requestAnimationFrame(customizationPreviewLoop);
-}
-
-function confirmCustomization() {
-    cancelAnimationFrame(customizationAnimation);
-    customizationScreen?.classList.add("hidden");
-    clearPlayerSpriteCache();
-    if (gameState.customizationReturnToOverworld) {
-        gameState.mode = "overworld";
-        gameState.currentScene = "overworld";
-        overworldScreen?.classList.remove("hidden");
-        drawGame();
-        return;
-    }
-    startOverworld();
-}
-
-if (customizationConfirm) customizationConfirm.addEventListener("click", confirmCustomization);
-if (customizationCancel) customizationCancel.addEventListener("click", () => {
-    cancelAnimationFrame(customizationAnimation);
-    customizationScreen?.classList.add("hidden");
-    if (gameState.customizationReturnToOverworld) {
-        overworldScreen?.classList.remove("hidden");
-        gameState.mode = "overworld";
-        gameState.currentScene = "overworld";
-        drawGame();
-    } else {
-        introScreen?.classList.remove("hidden");
-        showNameEntry();
-    }
-});
-if (appearanceButton) appearanceButton.addEventListener("click", () => showCharacterCustomization(true));
-
-let customizationAnimation = null;
-function customizationPreviewLoop() {
-    if (!customizationScreen || customizationScreen.classList.contains("hidden")) return;
-    renderCustomizationPreview();
-    customizationAnimation = requestAnimationFrame(customizationPreviewLoop);
-}
-
 function showOpening() {
     showCharacterChoice();
 }
 
 function showCharacterChoice() {
-    gameState.currentScene = "character-choice";
-
-    showScene(
-        "Choose Your Character",
-        `
-        <p>Before your journey begins, decide who you will be in Kaleo.</p>
-        <p>Your choice changes your trainer's appearance in the overworld.</p>
-        `,
-        [
-            { text: "Boy", action: () => chooseGender("boy") },
-            { text: "Girl", action: () => chooseGender("girl") }
-        ]
-    );
+    showCharacterCreation();
 }
+
+function getCharacterConfig() {
+    return window.KALEO_PLAYER_CONFIG;
+}
+
+const playerAssetCache = new Map();
+const playerPreviewTimers = new WeakMap();
+
+function getPlayerVisualSelection() {
+    const gender = gameState.gender === "girl" ? "female" : "male";
+    const config = getCharacterConfig();
+    const data = config[gender];
+    const defaults = data.default || {};
+    const choice = gameState.playerCustomization || {};
+    return {
+        gender,
+        hair: choice.hair || defaults.hair,
+        eyes: choice.eyes || defaults.eyes,
+        outfit: choice.outfit || defaults.outfit
+    };
+}
+
+function playerAssetKey(direction = "down") {
+    const c = getPlayerVisualSelection();
+    return `${c.gender}|${direction}|${c.hair}|${c.eyes}|${c.outfit}`;
+}
+
+function imageCandidates(paths) {
+    return [...new Set(paths.filter(Boolean))];
+}
+
+function combinedPlayerCandidates(direction, c) {
+    const root = getCharacterConfig().assetRoot;
+    const g = c.gender;
+    return imageCandidates([
+        `${root}/${g}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`,
+        `${root}/${g}/${c.hair}_${c.eyes}_${c.outfit}_${direction}.png`,
+        `${root}/${g}/${direction}_${c.hair}_${c.outfit}.png`,
+        `${root}/${g}/${c.hair}_${c.outfit}_${direction}.png`,
+        `${root}/${g}/${direction}_${c.outfit}_${c.hair}.png`,
+        `${root}/${g}/${c.outfit}_${direction}_${c.hair}.png`,
+        `${root}/${g}/${direction}_${c.outfit}.png`,
+        `${root}/${g}/${c.outfit}_${direction}.png`,
+        `${root}/${g}/${direction}.png`,
+        `${root}/${g}/${c.outfit}.png`
+    ]);
+}
+
+function layeredPlayerCandidates(direction, c) {
+    const root = getCharacterConfig().assetRoot;
+    const g = c.gender;
+    const layer = (folder, id) => imageCandidates([
+        `${root}/${g}/${folder}/${id}_${direction}.png`,
+        `${root}/${g}/${folder}/${direction}_${id}.png`,
+        `${root}/${g}/${folder}/${id}.png`
+    ]);
+    return {
+        base: imageCandidates([
+            `${root}/${g}/base/${direction}.png`,
+            `${root}/${g}/base_${direction}.png`,
+            `${root}/${g}/base.png`
+        ]),
+        hair: layer("hair", c.hair),
+        eyes: layer("eyes", c.eyes),
+        outfit: layer("outfits", c.outfit)
+    };
+}
+
+function loadImageCandidates(paths) {
+    return new Promise(resolve => {
+        const candidates = [...paths];
+        const tryNext = () => {
+            if (!candidates.length) {
+                resolve(null);
+                return;
+            }
+            const src = candidates.shift();
+            const image = new Image();
+            image.decoding = "async";
+            image.onload = () => {
+                if (image.naturalWidth >= 4 && image.naturalHeight >= 4) resolve(image);
+                else tryNext();
+            };
+            image.onerror = tryNext;
+            image.src = src;
+        };
+        tryNext();
+    });
+}
+
+function getPlayerAsset(direction = "down") {
+    const key = playerAssetKey(direction);
+    if (playerAssetCache.has(key)) return playerAssetCache.get(key);
+
+    const pending = {
+        state: "loading",
+        image: null,
+        layers: null,
+        promise: null
+    };
+    playerAssetCache.set(key, pending);
+
+    const c = getPlayerVisualSelection();
+    pending.promise = (async () => {
+        const combined = await loadImageCandidates(combinedPlayerCandidates(direction, c));
+        if (combined) {
+            pending.state = "ready";
+            pending.image = combined;
+            return pending;
+        }
+
+        const layerCandidates = layeredPlayerCandidates(direction, c);
+        const [base, hair, eyes, outfit] = await Promise.all([
+            loadImageCandidates(layerCandidates.base),
+            loadImageCandidates(layerCandidates.hair),
+            loadImageCandidates(layerCandidates.eyes),
+            loadImageCandidates(layerCandidates.outfit)
+        ]);
+
+        if (base && hair && outfit) {
+            pending.state = "ready-layers";
+            pending.layers = { base, hair, eyes, outfit };
+        } else {
+            pending.state = "missing";
+        }
+        return pending;
+    })();
+
+    return pending;
+}
+
+function getSheetMetrics(image) {
+    const width = image?.naturalWidth || 0;
+    const height = image?.naturalHeight || 0;
+    if (!width || !height) return null;
+
+    // Production: 256×96 = four 64×96 frames.
+    // Prototype: 128×48 = four 32×48 frames.
+    // Also accept any clean four-frame horizontal sheet so future art can
+    // use a larger native resolution without another renderer rewrite.
+    if (width % 4 !== 0) return null;
+    return { width: width / 4, height };
+}
+
+function drawPlayerSheet(image, frameIndex, x, y, width = 64, height = 96) {
+    const metrics = getSheetMetrics(image);
+    if (!metrics) return false;
+    const sourceFrame = Math.min(3, Math.max(0, frameIndex));
+    ctx.drawImage(
+        image,
+        sourceFrame * metrics.width,
+        0,
+        metrics.width,
+        metrics.height,
+        Math.round(x),
+        Math.round(y),
+        width,
+        height
+    );
+    return true;
+}
+
+function makeSpritePreview(path, className = "") {
+    const wrapper = document.createElement("div");
+    wrapper.className = `cc-sprite-preview ${className}`.trim();
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 192;
+    canvas.className = "cc-sprite-preview-canvas";
+    canvas.setAttribute("aria-hidden", "true");
+    wrapper.appendChild(canvas);
+
+    const renderImage = image => {
+        if (!image) return;
+        let frame = 0;
+        const draw = () => {
+            const c = canvas.getContext("2d");
+            c.clearRect(0, 0, canvas.width, canvas.height);
+            c.imageSmoothingEnabled = false;
+            const metrics = getSheetMetrics(image);
+            if (metrics) {
+                const scale = Math.min(2, canvas.height / metrics.height);
+                const w = metrics.width * scale;
+                const h = metrics.height * scale;
+                c.drawImage(image, frame * metrics.width, 0, metrics.width, metrics.height,
+                    (canvas.width - w) / 2, canvas.height - h, w, h);
+            }
+        };
+        draw();
+        const timer = setInterval(() => {
+            frame = (frame + 1) % 4;
+            draw();
+        }, 130);
+        playerPreviewTimers.set(wrapper, timer);
+    };
+
+    if (Array.isArray(path)) {
+        loadImageCandidates(path).then(renderImage);
+    } else {
+        const image = new Image();
+        image.decoding = "async";
+        image.onload = () => renderImage(image);
+        image.src = path;
+    }
+    return wrapper;
+}
+
+function playerAssetPath(direction = "down") {
+    const c = getPlayerVisualSelection();
+    // This path remains the primary production convention and is also useful
+    // for the preview UI. Runtime loading below supports alternate layouts.
+    return `${getCharacterConfig().assetRoot}/${c.gender}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`;
+}
+
+function characterPreviewAsset(category, value) {
+    const c = getPlayerVisualSelection();
+    const next = { ...c, [category]: value };
+    return `${getCharacterConfig().assetRoot}/${c.gender}/down_${next.hair}_${next.eyes}_${next.outfit}.png`;
+}
+
+function renderCharacterCreation() {
+    if (!characterCreationScreen) return;
+
+    const config = getCharacterConfig();
+    const gender = gameState.gender === "girl" ? "female" : "male";
+    const data = config[gender];
+    const current = gameState.playerCustomization;
+
+    characterCreationScreen.innerHTML = `
+        <div class="cc-shell">
+            <div class="cc-header">
+                <div>
+                    <div class="cc-kicker">KALEO · WORLD OF ENTHEON</div>
+                    <h1>Character Creation</h1>
+                    <p>Choose the Trainer who will accompany you through Kaleo.</p>
+                </div>
+                <div class="cc-header-badge"><strong>01</strong><span>APPEARANCE</span></div>
+            </div>
+
+            <div class="cc-body">
+                <aside class="cc-steps">
+                    <div class="cc-step-item active"><b>1</b><span>Appearance<small>Customise your look</small></span></div>
+                    <div class="cc-step-item"><b>2</b><span>Name<small>Choose your name</small></span></div>
+                    <div class="cc-step-item"><b>3</b><span>Begin<small>Start your adventure</small></span></div>
+                </aside>
+
+                <section class="cc-preview-panel">
+                    <div class="cc-panel-title">Preview</div>
+                    <div class="cc-preview-stage"><div id="cc-large-preview"></div></div>
+                    <div class="cc-preview-caption">
+                        <strong>${gender === "female" ? "Female" : "Male"} Trainer</strong>
+                        <span>4-direction · 4-frame walking animation</span>
+                    </div>
+                </section>
+
+                <section class="cc-options-panel">
+                    <div class="cc-gender-toggle">
+                        <button type="button" data-gender="boy" class="${gender === "male" ? "selected" : ""}">♂&nbsp; Male</button>
+                        <button type="button" data-gender="girl" class="${gender === "female" ? "selected" : ""}">♀&nbsp; Female</button>
+                    </div>
+
+                    <div class="cc-option-section">
+                        <div class="cc-section-heading"><span>Hair Colour</span><small>Choose your hair</small></div>
+                        <div class="cc-option-grid" id="cc-hair-options"></div>
+                    </div>
+
+                    <div class="cc-option-section">
+                        <div class="cc-section-heading"><span>Eye Colour</span><small>Choose your eyes</small></div>
+                        <div class="cc-option-grid" id="cc-eye-options"></div>
+                    </div>
+
+                    <div class="cc-option-section">
+                        <div class="cc-section-heading"><span>Outfit</span><small>Choose your style</small></div>
+                        <div class="cc-option-grid" id="cc-outfit-options"></div>
+                    </div>
+
+                    <div class="cc-name-row">
+                        <label for="cc-name">Character Name</label>
+                        <div class="cc-name-input-wrap">
+                            <input id="cc-name" maxlength="12" autocomplete="off" value="${escapeHtml(gameState.playerName)}" placeholder="Enter your name">
+                            <button type="button" id="cc-random-name" title="Randomize name">✦</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="cc-footer">
+                <span><i>◆</i> Your appearance will be used throughout the overworld.</span>
+                <button type="button" class="cc-continue" id="cc-continue">Continue <b>›</b></button>
+            </div>
+        </div>
+    `;
+
+    characterCreationScreen.querySelectorAll("[data-gender]").forEach(button => {
+        button.addEventListener("click", () => {
+            const nextGender = button.dataset.gender;
+            gameState.gender = nextGender;
+            gameState.playerCustomization = nextGender === "girl"
+                ? { hair: "brown", eyes: "brown", outfit: "default" }
+                : { hair: "blond", eyes: "amber", outfit: "default" };
+            renderCharacterCreation();
+        });
+    });
+
+    const addOption = (containerId, category, item, previewPath) => {
+        const container = characterCreationScreen.querySelector(containerId);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `cc-option ${current[category] === item.id ? "selected" : ""}`;
+        button.appendChild(makeSpritePreview(previewPath));
+        const label = document.createElement("span");
+        label.textContent = item.label;
+        button.appendChild(label);
+        button.addEventListener("click", () => {
+            gameState.playerCustomization[category] = item.id;
+            renderCharacterCreation();
+        });
+        container.appendChild(button);
+    };
+
+    data.hair.forEach(item => {
+        const previewSelection = { gender, hair: item.id, eyes: current.eyes, outfit: current.outfit };
+        const path = combinedPlayerCandidates("down", previewSelection);
+        addOption("#cc-hair-options", "hair", item, path);
+    });
+
+    data.eyes.forEach(item => {
+        const previewSelection = { gender, hair: current.hair, eyes: item.id, outfit: current.outfit };
+        const path = combinedPlayerCandidates("down", previewSelection);
+        addOption("#cc-eye-options", "eyes", item, path);
+    });
+
+    data.outfits.forEach(item => {
+        const previewSelection = { gender, hair: current.hair, eyes: current.eyes, outfit: item.id };
+        const path = combinedPlayerCandidates("down", previewSelection);
+        addOption("#cc-outfit-options", "outfit", item, path);
+    });
+
+    characterCreationScreen.querySelector("#cc-large-preview").appendChild(
+        makeSpritePreview(combinedPlayerCandidates("down", getPlayerVisualSelection()), "cc-large-sprite")
+    );
+
+    const nameInput = characterCreationScreen.querySelector("#cc-name");
+    nameInput.addEventListener("input", () => {
+        gameState.playerName = nameInput.value.trim().slice(0, 12);
+    });
+    nameInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") confirmCharacterCreation();
+    });
+
+    characterCreationScreen.querySelector("#cc-random-name").addEventListener("click", () => {
+        const names = ["Kael", "Aren", "Lio", "Mira", "Nia", "Rin", "Kaleo"];
+        nameInput.value = names[Math.floor(Math.random() * names.length)];
+        gameState.playerName = nameInput.value;
+    });
+
+    characterCreationScreen.querySelector("#cc-continue").addEventListener("click", confirmCharacterCreation);
+}
+
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[char]));
+}
+
+function showCharacterCreation() {
+    if (!characterCreationScreen) {
+        chooseGender("boy");
+        return;
+    }
+
+    gameState.mode = "intro";
+    gameState.currentScene = "character-creation";
+
+    if (!gameState.gender) gameState.gender = "boy";
+    if (!gameState.playerCustomization) {
+        gameState.playerCustomization = { hair: "blond", eyes: "amber", outfit: "default" };
+    }
+
+    introScreen.classList.add("hidden");
+    characterCreationScreen.classList.remove("hidden");
+    renderCharacterCreation();
+}
+
+function confirmCharacterCreation() {
+    const input = document.getElementById("cc-name");
+    const name = input?.value.trim() || "";
+
+    if (!name) {
+        input?.focus();
+        return;
+    }
+
+    gameState.playerName = name.slice(0, 12);
+    gameState.currentScene = "character-complete";
+    characterCreationScreen?.classList.add("hidden");
+    startOverworld();
+}
+
 
 function chooseGender(gender) {
     gameState.gender = gender;
-    gameState.appearance = gender === "girl"
-        ? { hair: "brown", eyes: "brown", outfit: "default" }
-        : { hair: "blond", eyes: "amber", outfit: "default" };
-    clearPlayerSpriteCache();
     showNameEntry();
 }
 
@@ -565,7 +618,7 @@ function confirmPlayerName() {
     }
 
     gameState.playerName = name;
-    showCharacterCustomization(false);
+    startOverworld();
 }
 
 function showArrival() {
@@ -4811,10 +4864,10 @@ const player = {
     width: 20,
     height: 24,
     speed: 4,
-    facing: "down",
-    moving: false,
-    walkClock: 0,
-    walkFrame: 0
+    direction: "down",
+    frame: 0,
+    frameClock: 0,
+    moving: false
 };
 
 const camera = {
@@ -5212,26 +5265,11 @@ function updatePlayer(delta) {
 
     let dx = 0;
     let dy = 0;
-    player.moving = false;
 
     if (keys["arrowup"] || keys["w"]) dy -= 1;
     if (keys["arrowdown"] || keys["s"]) dy += 1;
     if (keys["arrowleft"] || keys["a"]) dx -= 1;
     if (keys["arrowright"] || keys["d"]) dx += 1;
-
-    if (dx !== 0 || dy !== 0) {
-        player.moving = true;
-        if (Math.abs(dx) > Math.abs(dy)) player.facing = dx > 0 ? "right" : "left";
-        else player.facing = dy > 0 ? "down" : "up";
-        player.walkClock += delta * 16.67;
-        if (player.walkClock >= 115) {
-            player.walkClock = 0;
-            player.walkFrame = (player.walkFrame + 1) % 5;
-        }
-    } else {
-        player.walkFrame = 0;
-        player.walkClock = 0;
-    }
 
     // Check an already-positioned player as well. Boundary doors can place the
     // player directly on the doorway tile, so transitions must not depend on
@@ -5241,7 +5279,19 @@ function updatePlayer(delta) {
         if (gameState.transitionCooldown > 0) return;
     }
 
-    if (dx === 0 && dy === 0) return;
+    if (dx === 0 && dy === 0) {
+        player.moving = false;
+        player.frame = 0;
+        player.frameClock = 0;
+        return;
+    }
+
+    player.moving = true;
+    if (Math.abs(dx) >= Math.abs(dy)) {
+        player.direction = dx < 0 ? "left" : "right";
+    } else {
+        player.direction = dy < 0 ? "up" : "down";
+    }
 
     if (dx !== 0 && dy !== 0) {
         dx *= 0.7071;
@@ -5261,6 +5311,12 @@ function updatePlayer(delta) {
 
     if (canMoveTo(player.x, newY)) {
         player.y = newY;
+    }
+
+    player.frameClock += delta * 16.67;
+    if (player.frameClock >= 120) {
+        player.frame = (player.frame + 1) % 4;
+        player.frameClock = 0;
     }
 
     // Boundary exits need to be reachable at the edge of the map.
@@ -7656,24 +7712,73 @@ function drawNpcs() {
 function drawPlayer() {
     const px = player.x * TILE_SIZE;
     const py = player.y * TILE_SIZE;
-
-    ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
-    ctx.beginPath();
-    ctx.ellipse(px, py + 9, 11, 4.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    const sprite = getPlayerFrameCanvas(player.facing || "down", player.moving ? player.walkFrame : 0);
-    if (!sprite) return;
+    const asset = getPlayerAsset(player.direction);
+    const frameIndex = player.moving ? player.frame : 0;
 
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(
-        sprite,
-        px - PLAYER_SPRITE.drawWidth / 2,
-        py + 8 - PLAYER_SPRITE.drawHeight,
-        PLAYER_SPRITE.drawWidth,
-        PLAYER_SPRITE.drawHeight
-    );
+
+    // The feet/ground contact point is fixed at the player's world position.
+    // This keeps 96px production sprites visually grounded while retaining
+    // compatibility with the old 48px prototype sheets.
+    const targetWidth = 64;
+    const targetHeight = 96;
+    const drawX = Math.round(px - targetWidth / 2);
+    const drawY = Math.round(py - targetHeight + 8);
+
+    let rendered = false;
+
+    if (asset.state === "ready" && asset.image) {
+        rendered = drawPlayerSheet(asset.image, frameIndex, drawX, drawY, targetWidth, targetHeight);
+    } else if (asset.state === "ready-layers" && asset.layers) {
+        const layers = [asset.layers.base, asset.layers.outfit, asset.layers.hair, asset.layers.eyes].filter(Boolean);
+        rendered = layers.every(image => drawPlayerSheet(image, frameIndex, drawX, drawY, targetWidth, targetHeight));
+    }
+
+    // A deliberately clear development fallback. It should only be visible
+    // while production artwork is missing or has an invalid sheet layout.
+    // This is preferable to silently rendering only the ground shadow.
+    if (!rendered) {
+        ctx.globalAlpha = asset.state === "missing" ? 0.9 : 0.72;
+
+        // body / jacket
+        ctx.fillStyle = gameState.gender === "girl" ? "#9a4164" : "#283c5c";
+        ctx.fillRect(px - 13, py - 43, 26, 31);
+
+        // legs
+        ctx.fillStyle = "#1b2029";
+        ctx.fillRect(px - 11, py - 13, 9, 13);
+        ctx.fillRect(px + 2, py - 13, 9, 13);
+
+        // head
+        ctx.fillStyle = "#f0c6a4";
+        ctx.beginPath();
+        ctx.arc(px, py - 53, 11, 0, Math.PI * 2);
+        ctx.fill();
+
+        // hair
+        const hairColours = {
+            blond: "#e5bb72", brown: "#76503c", black: "#20252d",
+            red: "#a9473f", white: "#d9dce1", blonde: "#e5bb72", auburn: "#8f503d"
+        };
+        ctx.fillStyle = hairColours[getPlayerVisualSelection().hair] || "#76503c";
+        ctx.beginPath();
+        ctx.arc(px, py - 58, 11, Math.PI, Math.PI * 2);
+        ctx.fill();
+
+        // eyes
+        ctx.fillStyle = "#1b1b1b";
+        ctx.fillRect(px - 5, py - 53, 2, 2);
+        ctx.fillRect(px + 3, py - 53, 2, 2);
+
+        // feet
+        ctx.fillStyle = "#d7d9dd";
+        ctx.fillRect(px - 12, py - 2, 10, 4);
+        ctx.fillRect(px + 2, py - 2, 10, 4);
+
+        ctx.globalAlpha = 1;
+    }
+
     ctx.restore();
 }
 
@@ -7698,7 +7803,15 @@ function restartGame() {
     gameState.currentScene = "welcome";
     gameState.playerName = "";
     gameState.gender = null;
-    gameState.appearance = { hair: "blond", eyes: "amber", outfit: "default" };
+    gameState.playerCustomization = {
+        hair: "blond",
+        eyes: "amber",
+        outfit: "default"
+    };
+    player.direction = "down";
+    player.frame = 0;
+    player.frameClock = 0;
+    player.moving = false;
     gameState.starter = null;
     gameState.starterAvailable = false;
     gameState.starterData = null;
@@ -7717,12 +7830,6 @@ function restartGame() {
     gameState.activeDialogue = null;
     gameState.dialogueIndex = 0;
     gameState.currentMap = "town";
-    gameState.customizationReturnToOverworld = false;
-    player.facing = "down";
-    player.moving = false;
-    player.walkClock = 0;
-    player.walkFrame = 0;
-    clearPlayerSpriteCache();
     gameState.transitionCooldown = 0;
     gameState.encounterCooldown = 0;
     gameState.battle = null;
@@ -7754,6 +7861,8 @@ function restartGame() {
 function showWelcome() {
     gameState.mode = "intro";
     gameState.currentScene = "welcome";
+    characterCreationScreen?.classList.add("hidden");
+    introScreen.classList.remove("hidden");
 
     showScene(
         "Welcome to Kaleo",
