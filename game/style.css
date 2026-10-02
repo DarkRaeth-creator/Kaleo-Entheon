@@ -117,6 +117,7 @@ body {
 }
 
 #game-container {
+    position: relative;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -1474,4 +1475,76 @@ body {
     aspect-ratio: 16 / 9;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+}
+
+
+/* ============================================================
+   KALEO MENU / OVERLAY RESTORATION
+   ============================================================ */
+.menu-trigger-button {
+    min-width: 88px;
+    margin-left: auto;
+}
+
+.game-menu {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 950;
+    width: min(520px, calc(100% - 36px));
+}
+
+.game-menu-card {
+    background: rgba(24, 24, 32, .98);
+    border: 3px solid #555565;
+    border-radius: 12px;
+    box-shadow: 0 18px 55px rgba(0,0,0,.65);
+    padding: 20px;
+}
+
+.game-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #41414f;
+}
+
+.game-menu-header h2 { margin: 0; font-size: 24px; }
+.game-menu-header p { margin: 4px 0 0; color: #bdbdc8; font-size: 13px; }
+
+.game-menu-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.game-menu-button {
+    min-height: 58px;
+    padding: 12px 16px;
+    border: 2px solid #555565;
+    border-radius: 9px;
+    background: #30303d;
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+}
+
+.game-menu-button:hover {
+    background: #393947;
+    border-color: #a6c8ff;
+}
+
+.game-menu.hidden { display: none !important; }
+
+/* The detailed party view is the party UI. The old compact party panel is legacy. */
+#party-panel { display: none !important; }
+
+@media (max-width: 650px) {
+    .game-menu-options { grid-template-columns: 1fr; }
 }

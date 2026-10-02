@@ -85,6 +85,9 @@ const npcDialogueText = document.getElementById("npc-dialogue-text");
 const battleScreen = document.getElementById("battle-screen");
 
 const partyPanel = document.getElementById("party-panel");
+const menuButton = document.getElementById("menu-button");
+const gameMenu = document.getElementById("game-menu");
+const menuCloseButton = document.getElementById("menu-close-button");
 const partyList = document.getElementById("party-list");
 const partyButton = document.getElementById("party-button");
 const partyScreen = document.getElementById("party-screen");
@@ -5142,6 +5145,37 @@ function closeWorldMap() {
 }
 
 // ============================================================
+// OVERWORLD MENU
+// ============================================================
+
+function openGameMenu() {
+    if (gameState.mode !== "overworld" || !gameMenu) return;
+    gameMenu.classList.remove("hidden");
+    Object.keys(keys || {}).forEach(key => { keys[key] = false; });
+}
+
+function closeGameMenu() {
+    if (gameMenu) gameMenu.classList.add("hidden");
+}
+
+if (menuButton) {
+    menuButton.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (gameMenu?.classList.contains("hidden")) openGameMenu();
+        else closeGameMenu();
+    });
+}
+
+if (menuCloseButton) {
+    menuCloseButton.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeGameMenu();
+    });
+}
+
+// ============================================================
 // INPUT
 // ============================================================
 
@@ -5163,9 +5197,21 @@ document.addEventListener("keydown", event => {
         return;
     }
 
-    if (key === "escape" && gameState.mode === "overworld" && worldMapScreen && !worldMapScreen.classList.contains("hidden")) {
-        event.preventDefault();
-        closeWorldMap();
+    if (key === "escape" && gameState.mode === "overworld") {
+        if (gameMenu && !gameMenu.classList.contains("hidden")) {
+            event.preventDefault();
+            closeGameMenu();
+            return;
+        }
+        if (worldMapScreen && !worldMapScreen.classList.contains("hidden")) {
+            event.preventDefault();
+            closeWorldMap();
+            return;
+        }
+    }
+
+    if (gameState.mode === "overworld" && gameMenu && !gameMenu.classList.contains("hidden")) {
+        if (!["tab", "shift", "control", "alt"].includes(key)) event.preventDefault();
         return;
     }
 
@@ -5195,6 +5241,7 @@ document.addEventListener("keyup", event => {
 // ============================================================
 
 function startOverworld() {
+    closeGameMenu();
     gameState.mode = "overworld";
     gameState.currentScene = "overworld";
     gameState.activeDialogue = null;
@@ -5875,6 +5922,7 @@ if (inventoryButton) {
     inventoryButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        closeGameMenu();
         openInventory(false);
     });
 }
@@ -5883,6 +5931,7 @@ if (worldMapButton) {
     worldMapButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        closeGameMenu();
         openWorldMap();
     });
 }
@@ -5915,6 +5964,7 @@ if (badgeButton) {
     badgeButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        closeGameMenu();
         renderBadges();
         badgeScreen?.classList.remove("hidden");
         overworldScreen?.classList.add("hidden");
@@ -5932,7 +5982,7 @@ if (badgeCloseButton) {
 }
 
 if (directoryButton) {
-    directoryButton.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); renderDirectory(); directoryScreen?.classList.remove("hidden"); overworldScreen?.classList.add("hidden"); });
+    directoryButton.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); closeGameMenu(); renderDirectory(); directoryScreen?.classList.remove("hidden"); overworldScreen?.classList.add("hidden"); });
 }
 if (directoryCloseButton) {
     directoryCloseButton.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); directoryScreen?.classList.add("hidden"); overworldScreen?.classList.remove("hidden"); drawGame(); });
@@ -5942,6 +5992,7 @@ if (partyButton) {
     partyButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        closeGameMenu();
         openPartyScreen(false, false);
     });
 }
@@ -5966,7 +6017,7 @@ function renderParty() {
         return;
     }
 
-    partyPanel.classList.remove("hidden");
+    partyPanel.classList.add("hidden");
     partyList.innerHTML = gameState.party.map((member, index) => {
         const hp = Math.max(0, member.currentHp);
         const maxHp = Math.max(1, member.maxHp);

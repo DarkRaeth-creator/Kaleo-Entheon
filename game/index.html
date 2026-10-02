@@ -67,17 +67,48 @@
                 <div id="overworld-screen" class="hidden">
                     <div id="game-container">
                         <canvas id="game-canvas" width="1280" height="720"></canvas>
+
+                        <section id="party-screen" class="party-screen hidden" aria-label="Entheon Party Screen">
+                            <div class="party-screen-header">
+                                <div>
+                                    <h2>Your Entheon Party</h2>
+                                    <p>Your current team</p>
+                                </div>
+                                <button id="party-close-button" class="ui-small-button" type="button">Close</button>
+                            </div>
+                            <div class="party-screen-body">
+                                <div id="party-screen-list" class="party-screen-list"></div>
+                                <div id="party-detail" class="party-detail">
+                                    <div class="party-detail-empty">Select an Entheon to view its details.</div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
 
                     <div id="controls-help">
                         <span><strong>Move:</strong> WASD / Arrow Keys</span>
                         <span><strong>Interact:</strong> E / Enter / Space</span>
-                    
-                        <button id="party-button" class="ui-small-button" type="button">Party</button>
-                        <button id="inventory-button" class="ui-small-button" type="button">Inventory</button>
-                        <button id="badge-button" class="ui-small-button" type="button">Badges</button>
-                        <button id="directory-button" class="ui-small-button" type="button">Directory</button>
-                        <button id="world-map-button" class="ui-small-button" type="button">Map</button><button id="appearance-button" class="ui-small-button" type="button">Appearance</button></div>
+                        <button id="menu-button" class="ui-small-button menu-trigger-button" type="button">Menu</button>
+                    </div>
+
+                    <div id="game-menu" class="game-menu hidden" aria-label="Game Menu">
+                        <div class="game-menu-card">
+                            <div class="game-menu-header">
+                                <div>
+                                    <h2>Menu</h2>
+                                    <p>Kaleo</p>
+                                </div>
+                                <button id="menu-close-button" class="ui-small-button" type="button">Close</button>
+                            </div>
+                            <div class="game-menu-options">
+                                <button id="party-button" class="game-menu-button" type="button">Party</button>
+                                <button id="inventory-button" class="game-menu-button" type="button">Inventory</button>
+                                <button id="badge-button" class="game-menu-button" type="button">Badges</button>
+                                <button id="directory-button" class="game-menu-button" type="button">Entheon Directory</button>
+                                <button id="world-map-button" class="game-menu-button" type="button">World Map</button>
+                            </div>
+                        </div>
+                    </div>
 
                     <div id="world-message" class="world-message hidden"></div>
 
@@ -91,10 +122,6 @@
                         <div class="party-panel-title">ENTHEON PARTY</div>
                         <div id="party-list" class="party-list"></div>
                     </aside>
-
-
-
-                    
                 </div>
 
 <section id="crystal-screen" class="crystal-screen hidden" aria-label="Capture Crystals">
