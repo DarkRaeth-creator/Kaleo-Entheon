@@ -217,45 +217,44 @@ function playerAssetKey(direction = "down") {
     return `${c.gender}|${direction}|${c.hair}|${c.eyes}|${c.outfit}`;
 }
 
+// Production player artwork is deliberately loaded as a single, complete
+// 256×96 sheet.  We do NOT fall back to old naming conventions or layered
+// prototype assets: doing that can silently mix an old sprite with a new one
+// (which is exactly what caused the hair/outfit bleed and wrong UP sprite).
+const PLAYER_ASSET_VERSION = "20261002-sprite-production-v2";
+
 function imageCandidates(paths) {
     return [...new Set(paths.filter(Boolean))];
 }
 
-function combinedPlayerCandidates(direction, c) {
-    const root = getCharacterConfig().assetRoot;
-    const g = c.gender;
+function getPlayerAssetRoots() {
+    const configured = String(getCharacterConfig()?.assetRoot || "images/player").replace(/\/$/, "");
+    // GitHub Pages is case-sensitive.  Keep the configured path first, then
+    // support the two folder-capitalisation variants used during migration.
     return imageCandidates([
-        `${root}/${g}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`,
-        `${root}/${g}/${c.hair}_${c.eyes}_${c.outfit}_${direction}.png`,
-        `${root}/${g}/${direction}_${c.hair}_${c.outfit}.png`,
-        `${root}/${g}/${c.hair}_${c.outfit}_${direction}.png`,
-        `${root}/${g}/${direction}_${c.outfit}_${c.hair}.png`,
-        `${root}/${g}/${c.outfit}_${direction}_${c.hair}.png`,
-        `${root}/${g}/${direction}_${c.outfit}.png`,
-        `${root}/${g}/${c.outfit}_${direction}.png`,
-        `${root}/${g}/${direction}.png`,
-        `${root}/${g}/${c.outfit}.png`
+        configured,
+        "images/player",
+        "images/Player",
+        "Images/player",
+        "Images/Player"
     ]);
 }
 
-function layeredPlayerCandidates(direction, c) {
-    const root = getCharacterConfig().assetRoot;
-    const g = c.gender;
-    const layer = (folder, id) => imageCandidates([
-        `${root}/${g}/${folder}/${id}_${direction}.png`,
-        `${root}/${g}/${folder}/${direction}_${id}.png`,
-        `${root}/${g}/${folder}/${id}.png`
-    ]);
-    return {
-        base: imageCandidates([
-            `${root}/${g}/base/${direction}.png`,
-            `${root}/${g}/base_${direction}.png`,
-            `${root}/${g}/base.png`
-        ]),
-        hair: layer("hair", c.hair),
-        eyes: layer("eyes", c.eyes),
-        outfit: layer("outfits", c.outfit)
-    };
+function combinedPlayerCandidates(direction, c) {
+    // There are exactly 125 combinations per gender and four directional
+    // sheets per combination.  The production filename is: 
+    // direction_hair_eyes_outfit.png
+    return imageCandidates(
+        getPlayerAssetRoots().map(root =>
+            `${root}/${c.gender}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`
+        )
+    );
+}
+
+function addAssetVersion(src) {
+    if (!src) return src;
+    const separator = src.includes("?") ? "&" : "?";
+    return `${src}${separator}v=${PLAYER_ASSET_VERSION}`;
 }
 
 function loadImageCandidates(paths) {
@@ -266,14 +265,28 @@ function loadImageCandidates(paths) {
                 resolve(null);
                 return;
             }
-            const src = candidates.shift();
+
+            const rawSrc = candidates.shift();
+            const src = addAssetVersion(rawSrc);
             const image = new Image();
             image.decoding = "async";
             image.onload = () => {
-                if (image.naturalWidth >= 4 && image.naturalHeight >= 4) resolve(image);
-                else tryNext();
+                // Production player sheets must be exactly 256×96.  Reject
+                // old 128×48/other prototype files instead of displaying them.
+                if (image.naturalWidth === 256 && image.naturalHeight === 96) {
+                    image.dataset.kaleoAssetSource = rawSrc;
+                    resolve(image);
+                } else {
+                    console.warn(
+                        `Rejected non-production player sheet (${image.naturalWidth}×${image.naturalHeight}):`,
+                        rawSrc
+                    );
+                    tryNext();
+                }
             };
-            image.onerror = tryNext;
+            image.onerror = () => {
+                tryNext();
+            };
             image.src = src;
         };
         tryNext();
@@ -293,30 +306,23 @@ function getPlayerAsset(direction = "down") {
     playerAssetCache.set(key, pending);
 
     const c = getPlayerVisualSelection();
-    pending.promise = (async () => {
-        const combined = await loadImageCandidates(combinedPlayerCandidates(direction, c));
-        if (combined) {
+    const candidates = combinedPlayerCandidates(direction, c);
+
+    pending.promise = loadImageCandidates(candidates).then(image => {
+        if (image) {
             pending.state = "ready";
-            pending.image = combined;
-            return pending;
-        }
-
-        const layerCandidates = layeredPlayerCandidates(direction, c);
-        const [base, hair, eyes, outfit] = await Promise.all([
-            loadImageCandidates(layerCandidates.base),
-            loadImageCandidates(layerCandidates.hair),
-            loadImageCandidates(layerCandidates.eyes),
-            loadImageCandidates(layerCandidates.outfit)
-        ]);
-
-        if (base && hair && outfit) {
-            pending.state = "ready-layers";
-            pending.layers = { base, hair, eyes, outfit };
+            pending.image = image;
         } else {
             pending.state = "missing";
+            console.error(
+                "Kaleo production player sprite missing:",
+                `${c.gender}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`,
+                "Checked roots:",
+                getPlayerAssetRoots()
+            );
         }
         return pending;
-    })();
+    });
 
     return pending;
 }
@@ -336,32 +342,6 @@ function getSheetMetrics(image) {
             rows: 1,
             directionRows: { down: 0, left: 0, right: 0, up: 0 },
             production: true
-        };
-    }
-
-    // Temporary compatibility with the original prototype assets.
-    // These are NOT a production target.
-    if (width === 128 && height === 48) {
-        return {
-            width: 32,
-            height: 48,
-            columns: 4,
-            rows: 1,
-            directionRows: { down: 0, left: 0, right: 0, up: 0 },
-            production: false
-        };
-    }
-
-    // Compatibility for other four-frame horizontal sheets while assets are
-    // being migrated. The production validator will still flag them.
-    if (width % 4 === 0 && height >= 32 && width / 4 >= 24) {
-        return {
-            width: width / 4,
-            height,
-            columns: 4,
-            rows: 1,
-            directionRows: { down: 0, left: 0, right: 0, up: 0 },
-            production: false
         };
     }
 
@@ -5634,10 +5614,15 @@ function updatePlayer(delta) {
         player.y = newY;
     }
 
+    // Four-frame production walk cycle.  Use an accumulator rather than
+    // resetting the clock so animation speed stays stable across frame-rate
+    // fluctuations.  The same frame index is used by the selected 256×96
+    // sheet, so movement and animation remain synchronised.
     player.frameClock += delta * 16.67;
-    if (player.frameClock >= 120) {
+    const WALK_FRAME_MS = 110;
+    while (player.frameClock >= WALK_FRAME_MS) {
         player.frame = (player.frame + 1) % 4;
-        player.frameClock = 0;
+        player.frameClock -= WALK_FRAME_MS;
     }
 
     // Boundary exits need to be reachable at the edge of the map.
@@ -8061,10 +8046,15 @@ function drawPlayer() {
     let rendered = false;
 
     if (asset.state === "ready" && asset.image) {
-        rendered = drawPlayerSheet(asset.image, frameIndex, drawX, drawY, targetWidth, targetHeight, player.direction);
-    } else if (asset.state === "ready-layers" && asset.layers) {
-        const layers = [asset.layers.base, asset.layers.outfit, asset.layers.hair, asset.layers.eyes].filter(Boolean);
-        rendered = layers.every(image => drawPlayerSheet(image, frameIndex, drawX, drawY, targetWidth, targetHeight, player.direction));
+        rendered = drawPlayerSheet(
+            asset.image,
+            frameIndex,
+            drawX,
+            drawY,
+            targetWidth,
+            targetHeight,
+            player.direction
+        );
     }
 
     // A deliberately clear development fallback. It should only be visible
