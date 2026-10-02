@@ -783,7 +783,13 @@ function chooseStarter(name) {
 // MAP DATA
 // ============================================================
 
-const TILE_SIZE = 32;
+// KALEO HIGH-POLISH WORLD SCALE
+// The world grid is intentionally larger than the original 32px prototype.
+// This gives future 48px pixel-art tiles enough room for layered detail while
+// keeping the existing map coordinates, collision logic and encounter data.
+const TILE_SIZE = 48;
+const TILE_BASE_SIZE = 32;
+const TILE_ART_SCALE = TILE_SIZE / TILE_BASE_SIZE;
 
 const TILE = {
     GRASS: ".",
@@ -7556,6 +7562,9 @@ function drawMap() {
 }
 
 function drawTile(tile, x, y) {
+    const S = TILE_ART_SCALE;
+    const q = value => value * S;
+
     if (tile === TILE.VOID) {
         ctx.fillStyle = "#0f1017";
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -7567,8 +7576,8 @@ function drawTile(tile, x, y) {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         ctx.fillStyle = "#79b969";
-        ctx.fillRect(x + 7, y + 8, 3, 3);
-        ctx.fillRect(x + 22, y + 19, 3, 3);
+        ctx.fillRect(x + q(7), y + q(8), q(3), q(3));
+        ctx.fillRect(x + q(22), y + q(19), q(3), q(3));
     }
 
     else if (tile === TILE.TALL_GRASS) {
@@ -7576,12 +7585,12 @@ function drawTile(tile, x, y) {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         ctx.strokeStyle = "#2f7030";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = Math.max(1, q(2));
         for (let i = 0; i < 5; i++) {
-            const bx = x + 5 + i * 5;
+            const bx = x + q(5 + i * 5);
             ctx.beginPath();
-            ctx.moveTo(bx, y + 25);
-            ctx.lineTo(bx + 2, y + 10);
+            ctx.moveTo(bx, y + q(25));
+            ctx.lineTo(bx + q(2), y + q(10));
             ctx.stroke();
         }
     }
@@ -7591,58 +7600,58 @@ function drawTile(tile, x, y) {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         ctx.fillStyle = "#d7bf8d";
-        ctx.fillRect(x + 5, y + 6, 3, 3);
-        ctx.fillRect(x + 20, y + 20, 3, 3);
+        ctx.fillRect(x + q(5), y + q(6), q(3), q(3));
+        ctx.fillRect(x + q(20), y + q(20), q(3), q(3));
     }
 
     else if (tile === TILE.FLOOR) {
         ctx.fillStyle = "#d9d5c8";
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
         ctx.fillStyle = "#c9c4b5";
-        ctx.fillRect(x, y + 30, TILE_SIZE, 2);
-        ctx.fillRect(x + 30, y, 2, TILE_SIZE);
+        ctx.fillRect(x, y + q(30), TILE_SIZE, q(2));
+        ctx.fillRect(x + q(30), y, q(2), TILE_SIZE);
     }
 
     else if (tile === TILE.SHELF) {
         ctx.fillStyle = "#5b4635";
-        ctx.fillRect(x + 3, y + 3, 26, 26);
+        ctx.fillRect(x + q(3), y + q(3), q(26), q(26));
         ctx.fillStyle = "#9b7952";
-        ctx.fillRect(x + 6, y + 7, 20, 4);
-        ctx.fillRect(x + 6, y + 15, 20, 4);
-        ctx.fillRect(x + 6, y + 23, 20, 3);
+        ctx.fillRect(x + q(6), y + q(7), q(20), q(4));
+        ctx.fillRect(x + q(6), y + q(15), q(20), q(4));
+        ctx.fillRect(x + q(6), y + q(23), q(20), q(3));
         ctx.fillStyle = "#d8c28d";
-        ctx.fillRect(x + 8, y + 5, 4, 3);
-        ctx.fillRect(x + 17, y + 13, 4, 3);
+        ctx.fillRect(x + q(8), y + q(5), q(4), q(3));
+        ctx.fillRect(x + q(17), y + q(13), q(4), q(3));
     }
 
     else if (tile === TILE.LAB) {
         ctx.fillStyle = "#394958";
-        ctx.fillRect(x + 2, y + 4, 28, 24);
+        ctx.fillRect(x + q(2), y + q(4), q(28), q(24));
         ctx.fillStyle = "#78a5b6";
-        ctx.fillRect(x + 5, y + 7, 22, 5);
+        ctx.fillRect(x + q(5), y + q(7), q(22), q(5));
         ctx.fillStyle = "#26313b";
-        ctx.fillRect(x + 5, y + 16, 22, 9);
+        ctx.fillRect(x + q(5), y + q(16), q(22), q(9));
         ctx.fillStyle = "#77d4bd";
-        ctx.fillRect(x + 9, y + 18, 4, 4);
-        ctx.fillRect(x + 18, y + 18, 4, 4);
+        ctx.fillRect(x + q(9), y + q(18), q(4), q(4));
+        ctx.fillRect(x + q(18), y + q(18), q(4), q(4));
     }
 
     else if (tile === TILE.DISPLAY) {
         ctx.fillStyle = "#4b6170";
-        ctx.fillRect(x + 3, y + 5, 26, 22);
+        ctx.fillRect(x + q(3), y + q(5), q(26), q(22));
         ctx.fillStyle = "#a9d9df";
-        ctx.fillRect(x + 6, y + 8, 20, 12);
+        ctx.fillRect(x + q(6), y + q(8), q(20), q(12));
         ctx.fillStyle = "#6a91a1";
-        ctx.fillRect(x + 10, y + 22, 12, 3);
+        ctx.fillRect(x + q(10), y + q(22), q(12), q(3));
     }
 
     else if (tile === TILE.PLANT) {
         ctx.fillStyle = "#7c5639";
-        ctx.fillRect(x + 12, y + 19, 8, 9);
+        ctx.fillRect(x + q(12), y + q(19), q(8), q(9));
         ctx.fillStyle = "#4c9a5a";
         ctx.beginPath();
-        ctx.arc(x + 11, y + 14, 7, 0, Math.PI * 2);
-        ctx.arc(x + 20, y + 12, 7, 0, Math.PI * 2);
+        ctx.arc(x + q(11), y + q(14), q(7), 0, Math.PI * 2);
+        ctx.arc(x + q(20), y + q(12), q(7), 0, Math.PI * 2);
         ctx.fill();
     }
 
@@ -7652,11 +7661,11 @@ function drawTile(tile, x, y) {
 
         ctx.fillStyle = "#276332";
         ctx.beginPath();
-        ctx.arc(x + 16, y + 13, 13, 0, Math.PI * 2);
+        ctx.arc(x + q(16), y + q(13), q(13), 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = "#795333";
-        ctx.fillRect(x + 13, y + 20, 6, 12);
+        ctx.fillRect(x + q(13), y + q(20), q(6), q(12));
     }
 
     else if (tile === TILE.WATER) {
@@ -7664,13 +7673,13 @@ function drawTile(tile, x, y) {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         ctx.strokeStyle = "#75b4dc";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = Math.max(1, q(2));
 
         ctx.beginPath();
-        ctx.moveTo(x + 5, y + 12);
-        ctx.lineTo(x + 13, y + 12);
-        ctx.moveTo(x + 18, y + 22);
-        ctx.lineTo(x + 27, y + 22);
+        ctx.moveTo(x + q(5), y + q(12));
+        ctx.lineTo(x + q(13), y + q(12));
+        ctx.moveTo(x + q(18), y + q(22));
+        ctx.lineTo(x + q(27), y + q(22));
         ctx.stroke();
     }
 
@@ -7679,7 +7688,8 @@ function drawTile(tile, x, y) {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         ctx.strokeStyle = "#696771";
-        ctx.strokeRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+        ctx.lineWidth = Math.max(1, q(1));
+        ctx.strokeRect(x + q(2), y + q(2), TILE_SIZE - q(4), TILE_SIZE - q(4));
     }
 
     else if (tile === TILE.DOOR) {
@@ -7687,11 +7697,11 @@ function drawTile(tile, x, y) {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         ctx.fillStyle = "#b9824e";
-        ctx.fillRect(x + 5, y + 4, TILE_SIZE - 10, TILE_SIZE - 4);
+        ctx.fillRect(x + q(5), y + q(4), TILE_SIZE - q(10), TILE_SIZE - q(4));
 
         ctx.fillStyle = "#e0bd68";
         ctx.beginPath();
-        ctx.arc(x + 22, y + 18, 2, 0, Math.PI * 2);
+        ctx.arc(x + q(22), y + q(18), q(2), 0, Math.PI * 2);
         ctx.fill();
     }
 }
@@ -7703,24 +7713,24 @@ function drawNpcs() {
 
         ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
         ctx.beginPath();
-        ctx.ellipse(px, py + 9, 9, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(px, py + 9 * TILE_ART_SCALE, 9 * TILE_ART_SCALE, 4 * TILE_ART_SCALE, 0, 0, Math.PI * 2);
         ctx.fill();
 
         if (npc.type === "item" || npc.interaction === "item") {
             ctx.fillStyle = "rgba(0, 0, 0, 0.20)";
             ctx.beginPath();
-            ctx.ellipse(px, py + 7, 8, 3, 0, 0, Math.PI * 2);
+            ctx.ellipse(px, py + 7 * TILE_ART_SCALE, 8 * TILE_ART_SCALE, 3 * TILE_ART_SCALE, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.fillStyle = npc.color || '#d5b35f';
             ctx.beginPath();
-            ctx.moveTo(px, py - 12);
-            ctx.lineTo(px + 9, py);
-            ctx.lineTo(px, py + 12);
-            ctx.lineTo(px - 9, py);
+            ctx.moveTo(px, py - 12 * TILE_ART_SCALE);
+            ctx.lineTo(px + 9 * TILE_ART_SCALE, py);
+            ctx.lineTo(px, py + 12 * TILE_ART_SCALE);
+            ctx.lineTo(px - 9 * TILE_ART_SCALE, py);
             ctx.closePath();
             ctx.fill();
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 13px Arial';
+            ctx.font = `bold ${Math.round(13 * TILE_ART_SCALE)}px Arial`;
             ctx.textAlign = 'center';
             ctx.fillText(npc.icon || '✦', px, py + 4);
             return;
@@ -7729,10 +7739,10 @@ function drawNpcs() {
         if (npc.type === "starter") {
             ctx.fillStyle = npc.color;
             ctx.beginPath();
-            ctx.arc(px, py - 4, 12, 0, Math.PI * 2);
+            ctx.arc(px, py - 4 * TILE_ART_SCALE, 12 * TILE_ART_SCALE, 0, Math.PI * 2);
             ctx.fill();
             ctx.fillStyle = "#222";
-            ctx.fillRect(px - 5, py - 7, 3, 3);
+            ctx.fillRect(px - 5 * TILE_ART_SCALE, py - 7 * TILE_ART_SCALE, 3 * TILE_ART_SCALE, 3 * TILE_ART_SCALE);
             ctx.fillRect(px + 2, py - 7, 3, 3);
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 10px Arial";
@@ -7742,25 +7752,25 @@ function drawNpcs() {
         }
 
         ctx.fillStyle = npc.color;
-        ctx.fillRect(px - 9, py - 7, 18, 18);
+        ctx.fillRect(px - 9 * TILE_ART_SCALE, py - 7, 18, 18);
 
         ctx.fillStyle = "#f0c6a4";
         ctx.beginPath();
-        ctx.arc(px, py - 11, 8, 0, Math.PI * 2);
+        ctx.arc(px, py - 11 * TILE_ART_SCALE, 8 * TILE_ART_SCALE, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = "#3c2a24";
-        ctx.fillRect(px - 7, py - 19, 14, 5);
+        ctx.fillRect(px - 7, py - 19 * TILE_ART_SCALE, 14 * TILE_ART_SCALE, 5 * TILE_ART_SCALE);
 
         ctx.fillStyle = "#222";
-        ctx.fillRect(px - 4, py - 12, 2, 2);
-        ctx.fillRect(px + 2, py - 12, 2, 2);
+        ctx.fillRect(px - 4, py - 12 * TILE_ART_SCALE, 2, 2);
+        ctx.fillRect(px + 2, py - 12 * TILE_ART_SCALE, 2, 2);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 12px Arial";
         ctx.textAlign = "center";
         const marker = npc.interaction === "merchant" ? "$" : npc.interaction === "trainer" ? "!" : "!";
-        ctx.fillText(marker, px, py - 25);
+        ctx.fillText(marker, px, py - 25 * TILE_ART_SCALE);
     });
 }
 
@@ -7774,9 +7784,10 @@ function drawPlayer() {
     ctx.imageSmoothingEnabled = false;
 
     // Source artwork and world display size are deliberately separate.
-    // Production artwork is 64×96 per frame, but the current world uses
-    // 32px tiles, so the character is displayed at 48×72 to keep the
-    // intended RPG proportions rather than appearing several tiles tall.
+    // Production artwork is 64×96 per frame. The high-polish world uses
+    // 48px tiles, while the trainer remains 48×72 in-world (1.5 tiles tall).
+    // This increases environmental pixel density without making the trainer
+    // physically larger on screen.
     const targetWidth = getCharacterConfig().worldFrame?.width || 48;
     const targetHeight = getCharacterConfig().worldFrame?.height || 72;
     const footOffset = getCharacterConfig().worldFrame?.footOffset ?? 4;

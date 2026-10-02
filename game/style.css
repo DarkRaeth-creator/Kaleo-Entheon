@@ -133,10 +133,10 @@ body {
     width: min(
         960px,
         calc(100vw - 100px),
-        calc((100vh - 190px) * 1.333333)
+        calc((100vh - 190px) * 1.777778)
     );
     height: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     max-width: 100%;
     max-height: calc(100vh - 190px);
     image-rendering: pixelated;
@@ -1133,7 +1133,7 @@ body {
 }
 
 #game-canvas {
-    width: min(1100px, calc(100vw - 90px), calc((100vh - 175px) * 1.333333));
+    width: min(1180px, calc(100vw - 90px), calc((100vh - 175px) * 1.777778));
     max-height: calc(100vh - 175px);
 }
 
@@ -1460,6 +1460,18 @@ body {
 /* High-resolution player sprites are deliberately never smoothed. */
 .player-sprite,
 [data-player-sprite] {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+
+/* ============================================================
+   KALEO HIGH-POLISH WORLD SCALE
+   ============================================================ */
+#game-canvas {
+    width: min(1180px, calc(100vw - 90px), calc((100vh - 175px) * 1.777778));
+    height: auto;
+    aspect-ratio: 16 / 9;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
 }
