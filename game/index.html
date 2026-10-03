@@ -24,6 +24,8 @@
             </header>
 
             <main class="game-screen">
+
+                <section id="character-creation-screen" class="character-creation-screen hidden" aria-label="Character Creation"></section>
                 <div id="intro-screen">
                     <div class="dialogue">
                         <h2 id="scene-title"></h2>
@@ -141,7 +143,7 @@
 
 <section id="directory-screen" class="directory-screen hidden" aria-label="Entheon Directory">
   <div class="directory-screen-header">
-    <div><h2>Entheon Directory</h2><p id="directory-summary">Seen: 0/100 · Captured: 0/100</p></div>
+    <div><h2>Entheon Directory</h2><p id="directory-summary">Seen: 0/101 · Captured: 0/101</p></div>
     <button id="directory-close-button" class="ui-small-button" type="button">Close</button>
   </div>
   <div class="directory-body">
@@ -227,7 +229,52 @@
         </div>
     </div>
 
+
+    <script>
+        window.KALEO_PLAYER_CONFIG = {
+            assetRoot: "images/Player",
+            worldFrame: {
+                width: 48,
+                height: 72,
+                footOffset: 4
+            },
+
+            male: {
+                default: {
+                    hair: "blond",
+                    eyes: "amber",
+                    outfit: "academy"
+                },
+                hair: [
+                    { id: "blond", label: "Blond (Default)" }
+                ],
+                eyes: [
+                    { id: "amber", label: "Amber (Default)" }
+                ],
+                outfits: [
+                    { id: "academy", label: "Academy" }
+                ]
+            },
+
+            female: {
+                default: {
+                    hair: "brown",
+                    eyes: "brown",
+                    outfit: "academy"
+                },
+                hair: [
+                    { id: "brown", label: "Brown (Default)" }
+                ],
+                eyes: [
+                    { id: "brown", label: "Brown (Default)" }
+                ],
+                outfits: [
+                    { id: "academy", label: "Academy" }
+                ]
+            }
+        };
+    </script>
     <script src="world-data.js"></script>
-    <script src="game.js?v=20261003-fixed-default-player-v1"></script>
+    <script src="game.js?v=20261003-player-production-fix"></script>
 </body>
 </html>

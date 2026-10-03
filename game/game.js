@@ -16,7 +16,7 @@ const gameState = {
     playerCustomization: {
         hair: "blond",
         eyes: "amber",
-        outfit: "default"
+        outfit: "academy"
     },
     starter: null,
     starterAvailable: false,
@@ -186,7 +186,22 @@ function showCharacterChoice() {
 }
 
 function getCharacterConfig() {
-    return window.KALEO_PLAYER_CONFIG;
+    return window.KALEO_PLAYER_CONFIG || {
+        assetRoot: "images/Player",
+        worldFrame: { width: 48, height: 72, footOffset: 4 },
+        male: {
+            default: { hair: "blond", eyes: "amber", outfit: "academy" },
+            hair: [{ id: "blond", label: "Blond (Default)" }],
+            eyes: [{ id: "amber", label: "Amber (Default)" }],
+            outfits: [{ id: "academy", label: "Academy" }]
+        },
+        female: {
+            default: { hair: "brown", eyes: "brown", outfit: "academy" },
+            hair: [{ id: "brown", label: "Brown (Default)" }],
+            eyes: [{ id: "brown", label: "Brown (Default)" }],
+            outfits: [{ id: "academy", label: "Academy" }]
+        }
+    };
 }
 
 const playerAssetCache = new Map();
@@ -201,14 +216,21 @@ let appearanceReturnContext = null;
 function getPlayerVisualSelection() {
     const gender = gameState.gender === "girl" ? "female" : "male";
     const config = getCharacterConfig();
-    const data = config[gender];
+    const data = config[gender] || config.male;
     const defaults = data.default || {};
+
     const choice = gameState.playerCustomization || {};
+
+    const validChoice = (list, value, fallback) =>
+        Array.isArray(list) && list.some(item => item.id === value)
+            ? value
+            : fallback;
+
     return {
         gender,
-        hair: choice.hair || defaults.hair,
-        eyes: choice.eyes || defaults.eyes,
-        outfit: choice.outfit || defaults.outfit
+        hair: validChoice(data.hair, choice.hair, defaults.hair),
+        eyes: validChoice(data.eyes, choice.eyes, defaults.eyes),
+        outfit: validChoice(data.outfits, choice.outfit, defaults.outfit)
     };
 }
 
@@ -221,7 +243,7 @@ function playerAssetKey(direction = "down") {
 // 256×96 sheet.  We do NOT fall back to old naming conventions or layered
 // prototype assets: doing that can silently mix an old sprite with a new one
 // (which is exactly what caused the hair/outfit bleed and wrong UP sprite).
-const PLAYER_ASSET_VERSION = "20261002-sprite-production-v2";
+const PLAYER_ASSET_VERSION = "20261003-male-academy-single-production-v1";
 
 function imageCandidates(paths) {
     return [...new Set(paths.filter(Boolean))];
@@ -241,12 +263,15 @@ function getPlayerAssetRoots() {
 }
 
 function combinedPlayerCandidates(direction, c) {
-    // There are exactly 125 combinations per gender and four directional
-    // sheets per combination.  The production filename is: 
-    // direction_hair_eyes_outfit.png
+    // CURRENT PRODUCTION SET:
+    // One approved character per gender, Academy outfit, default colours.
+    // Each direction is a complete 256×96 sheet containing four 64×96 frames.
+    // Do not fall back to any of the old layered/combination naming schemes.
+    const fileName = `${c.gender}_academy_default_${direction}.png`;
+
     return imageCandidates(
         getPlayerAssetRoots().map(root =>
-            `${root}/${c.gender}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`
+            `${root}/${c.gender}/${fileName}`
         )
     );
 }
@@ -435,15 +460,15 @@ function makeSpritePreview(path, className = "") {
 
 function playerAssetPath(direction = "down") {
     const c = getPlayerVisualSelection();
-    // This path remains the primary production convention and is also useful
-    // for the preview UI. Runtime loading below supports alternate layouts.
-    return `${getCharacterConfig().assetRoot}/${c.gender}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`;
+    const fileName = `${c.gender}_academy_default_${direction}.png`;
+    return `${getCharacterConfig().assetRoot}/${c.gender}/${fileName}`;
 }
 
 function characterPreviewAsset(category, value) {
     const c = getPlayerVisualSelection();
     const next = { ...c, [category]: value };
-    return `${getCharacterConfig().assetRoot}/${c.gender}/down_${next.hair}_${next.eyes}_${next.outfit}.png`;
+    const fileName = `${next.gender}_academy_default_down.png`;
+    return `${getCharacterConfig().assetRoot}/${next.gender}/${fileName}`;
 }
 
 function renderCharacterCreation() {
@@ -451,8 +476,8 @@ function renderCharacterCreation() {
 
     const config = getCharacterConfig();
     const gender = gameState.gender === "girl" ? "female" : "male";
-    const data = config[gender];
-    const current = gameState.playerCustomization;
+    const data = config[gender] || config.male;
+    const current = getPlayerVisualSelection();
 
     characterCreationScreen.innerHTML = `
         <div class="cc-shell">
@@ -524,8 +549,8 @@ function renderCharacterCreation() {
             const nextGender = button.dataset.gender;
             gameState.gender = nextGender;
             gameState.playerCustomization = nextGender === "girl"
-                ? { hair: "brown", eyes: "brown", outfit: "default" }
-                : { hair: "blond", eyes: "amber", outfit: "default" };
+                ? { hair: "brown", eyes: "brown", outfit: "academy" }
+                : { hair: "blond", eyes: "amber", outfit: "academy" };
             renderCharacterCreation();
         });
     });
@@ -602,7 +627,7 @@ function showCharacterCreation() {
 
     if (!gameState.gender) gameState.gender = "boy";
     if (!gameState.playerCustomization) {
-        gameState.playerCustomization = { hair: "blond", eyes: "amber", outfit: "default" };
+        gameState.playerCustomization = { hair: "blond", eyes: "amber", outfit: "academy" };
     }
 
     introScreen.classList.add("hidden");
@@ -5244,7 +5269,7 @@ function loadSavedGame() {
         gameState.playerCustomization = {
             hair: saved.playerCustomization?.hair || (gameState.gender === "girl" ? "brown" : "blond"),
             eyes: saved.playerCustomization?.eyes || (gameState.gender === "girl" ? "brown" : "amber"),
-            outfit: saved.playerCustomization?.outfit || "default"
+            outfit: saved.playerCustomization?.outfit || "academy"
         };
         gameState.starter = saved.starter || null;
         gameState.starterAvailable = Boolean(saved.starterAvailable);
@@ -8128,7 +8153,7 @@ function restartGame() {
     gameState.playerCustomization = {
         hair: "blond",
         eyes: "amber",
-        outfit: "default"
+        outfit: "academy"
     };
     player.direction = "down";
     player.frame = 0;
