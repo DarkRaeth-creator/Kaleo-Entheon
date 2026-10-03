@@ -248,7 +248,7 @@ function playerAssetKey(direction = "down") {
 // 256×96 sheet.  We do NOT fall back to old naming conventions or layered
 // prototype assets: doing that can silently mix an old sprite with a new one
 // (which is exactly what caused the hair/outfit bleed and wrong UP sprite).
-const PLAYER_ASSET_VERSION = "20261003-sprite-single-default-v1";
+const PLAYER_ASSET_VERSION = "20261003-male-walk-animation-v1";
 
 function imageCandidates(paths) {
     return [...new Set(paths.filter(Boolean))];
@@ -8061,7 +8061,16 @@ function drawPlayer() {
     const px = player.x * TILE_SIZE;
     const py = player.y * TILE_SIZE;
     const asset = getPlayerAsset(player.direction);
-    const frameIndex = player.moving ? player.frame : 0;
+
+    // The production sheets contain four distinct walking poses horizontally.
+    // Drive the displayed frame directly from elapsed browser time while the
+    // player is moving. This makes the animation independent of movement
+    // collision/update timing and guarantees that LEFT and RIGHT animate in
+    // exactly the same way as UP and DOWN.
+    const WALK_FRAME_MS = 110;
+    const frameIndex = player.moving
+        ? Math.floor(performance.now() / WALK_FRAME_MS) % 4
+        : 0;
 
     ctx.save();
     ctx.imageSmoothingEnabled = false;
