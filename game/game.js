@@ -185,8 +185,35 @@ function showCharacterChoice() {
     showCharacterCreation();
 }
 
+// ============================================================
+// PLAYER ART CONFIGURATION — CURRENT SIMPLIFIED PRODUCTION SET
+// ============================================================
+// There is currently one approved appearance per gender. The four
+// directional 256×96 sheets are the complete production assets.
+// Keeping this configuration inside game.js avoids a missing external
+// config file breaking character creation.
+const KALEO_PLAYER_CONFIG = {
+    assetRoot: "images/Player",
+    worldFrame: { width: 48, height: 72, footOffset: 4 },
+    male: {
+        default: { hair: "blond", eyes: "amber", outfit: "default" },
+        hair: [{ id: "blond", label: "Blond" }],
+        eyes: [{ id: "amber", label: "Amber" }],
+        outfits: [{ id: "default", label: "Academy" }]
+    },
+    female: {
+        default: { hair: "brown", eyes: "brown", outfit: "default" },
+        hair: [{ id: "brown", label: "Brown" }],
+        eyes: [{ id: "brown", label: "Brown" }],
+        outfits: [{ id: "default", label: "Academy" }]
+    }
+};
+
+// Expose the config for any existing code that reads it from window.
+window.KALEO_PLAYER_CONFIG = KALEO_PLAYER_CONFIG;
+
 function getCharacterConfig() {
-    return window.KALEO_PLAYER_CONFIG;
+    return KALEO_PLAYER_CONFIG;
 }
 
 const playerAssetCache = new Map();
