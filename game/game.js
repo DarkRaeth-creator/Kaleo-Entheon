@@ -186,30 +186,26 @@ function showCharacterChoice() {
 }
 
 // ============================================================
-// PLAYER ART CONFIGURATION — CURRENT SIMPLIFIED PRODUCTION SET
+// PLAYER CHARACTER CONFIGURATION
 // ============================================================
-// There is currently one approved appearance per gender. The four
-// directional 256×96 sheets are the complete production assets.
-// Keeping this configuration inside game.js avoids a missing external
-// config file breaking character creation.
+// For the current production pass we intentionally use ONE fixed appearance
+// per gender.  The four directional sheets are the only player assets used:
+//   images/Player/male/male_academy_default_<direction>.png
+//   images/Player/female/female_academy_default_<direction>.png
+// Female assets are allowed to remain absent for now; the game will show the
+// same clear development fallback until they are supplied.
 const KALEO_PLAYER_CONFIG = {
-    assetRoot: "images/Player",
-    worldFrame: { width: 48, height: 72, footOffset: 4 },
+    assetRoot: "../images/Player",
     male: {
-        default: { hair: "blond", eyes: "amber", outfit: "default" },
-        hair: [{ id: "blond", label: "Blond" }],
-        eyes: [{ id: "amber", label: "Amber" }],
-        outfits: [{ id: "default", label: "Academy" }]
+        default: { hair: "blond", eyes: "amber", outfit: "academy_default" },
+        worldFrame: { width: 48, height: 72, footOffset: 4 }
     },
     female: {
-        default: { hair: "brown", eyes: "brown", outfit: "default" },
-        hair: [{ id: "brown", label: "Brown" }],
-        eyes: [{ id: "brown", label: "Brown" }],
-        outfits: [{ id: "default", label: "Academy" }]
-    }
+        default: { hair: "brown", eyes: "brown", outfit: "academy_default" },
+        worldFrame: { width: 48, height: 72, footOffset: 4 }
+    },
+    worldFrame: { width: 48, height: 72, footOffset: 4 }
 };
-
-// Expose the config for any existing code that reads it from window.
 window.KALEO_PLAYER_CONFIG = KALEO_PLAYER_CONFIG;
 
 function getCharacterConfig() {
@@ -227,63 +223,38 @@ let appearanceReturnContext = null;
 
 function getPlayerVisualSelection() {
     const gender = gameState.gender === "girl" ? "female" : "male";
-    const config = getCharacterConfig();
-    const data = config[gender];
-    const defaults = data.default || {};
-    const choice = gameState.playerCustomization || {};
+    const data = getCharacterConfig()[gender];
     return {
         gender,
-        hair: choice.hair || defaults.hair,
-        eyes: choice.eyes || defaults.eyes,
-        outfit: choice.outfit || defaults.outfit
+        hair: data.default.hair,
+        eyes: data.default.eyes,
+        outfit: data.default.outfit
     };
 }
 
 function playerAssetKey(direction = "down") {
-    const c = getPlayerVisualSelection();
-    return `${c.gender}|${direction}|${c.hair}|${c.eyes}|${c.outfit}`;
+    const gender = gameState.gender === "girl" ? "female" : "male";
+    return `${gender}|${direction}`;
 }
 
-// Production player artwork is deliberately loaded as a single, complete
-// 256×96 sheet.  We do NOT fall back to old naming conventions or layered
-// prototype assets: doing that can silently mix an old sprite with a new one
-// (which is exactly what caused the hair/outfit bleed and wrong UP sprite).
-const PLAYER_ASSET_VERSION = "20261003-sprite-single-default-v1";
+const PLAYER_ASSET_VERSION = "20261003-fixed-male-sprites-v1";
 
 function imageCandidates(paths) {
     return [...new Set(paths.filter(Boolean))];
 }
 
 function getPlayerAssetRoots() {
-    const configured = String(getCharacterConfig()?.assetRoot || "images/player").replace(/\/$/, "");
-    // GitHub Pages is case-sensitive.  Keep the configured path first, then
-    // support the two folder-capitalisation variants used during migration.
-    return imageCandidates([
-        configured,
-        "images/player",
+    return [
+        "../images/Player",
+        "../images/player",
         "images/Player",
-        "Images/player",
-        "Images/Player"
-    ]);
+        "images/player"
+    ];
 }
 
 function combinedPlayerCandidates(direction, c) {
-    // CURRENT PRODUCTION MODE: one approved default sprite set per gender.
-    // IMPORTANT: these are the ACTUAL filenames in the repository.
-    //   male_academy_default_down.png
-    //   male_academy_default_left.png
-    //   male_academy_default_right.png
-    //   male_academy_default_up.png
-    // and the equivalent female_academy_default_* files.
-    // Do not fall back to the old hair/eyes/outfit naming convention.
-    const genderPrefix = c.gender === "female" ? "female" : "male";
-    const filename = `${genderPrefix}_academy_default_${direction}`;
-    return imageCandidates(
-        getPlayerAssetRoots().flatMap(root => [
-            `${root}/${c.gender}/${filename}.png`,
-            `${root}/${c.gender}/${filename}.PNG`
-        ])
-    );
+    const filename = `${c.gender}_academy_default_${direction}.png`;
+    return imageCandidates(getPlayerAssetRoots().map(root => `${root}/${c.gender}/${filename}`));
 }
 
 function addAssetVersion(src) {
@@ -351,7 +322,7 @@ function getPlayerAsset(direction = "down") {
             pending.state = "missing";
             console.error(
                 "Kaleo production player sprite missing:",
-                `${c.gender}/${c.gender === "female" ? "female" : "male"}_academy_default_${direction}.png`,
+                `${c.gender}/${direction}_${c.hair}_${c.eyes}_${c.outfit}.png`,
                 "Checked roots:",
                 getPlayerAssetRoots()
             );
@@ -470,23 +441,19 @@ function makeSpritePreview(path, className = "") {
 
 function playerAssetPath(direction = "down") {
     const c = getPlayerVisualSelection();
-    const genderPrefix = c.gender === "female" ? "female" : "male";
-    return `${getCharacterConfig().assetRoot}/${c.gender}/${genderPrefix}_academy_default_${direction}.png`;
+    return combinedPlayerCandidates(direction, c)[0];
 }
 
-function characterPreviewAsset(category, value) {
-    const c = getPlayerVisualSelection();
-    const genderPrefix = c.gender === "female" ? "female" : "male";
-    return `${getCharacterConfig().assetRoot}/${c.gender}/${genderPrefix}_academy_default_down.png`;
+function characterPreviewAsset() {
+    return combinedPlayerCandidates("down", getPlayerVisualSelection());
 }
 
 function renderCharacterCreation() {
     if (!characterCreationScreen) return;
 
-    const config = getCharacterConfig();
     const gender = gameState.gender === "girl" ? "female" : "male";
-    const data = config[gender];
-    const current = gameState.playerCustomization;
+    const label = gender === "female" ? "Female Trainer" : "Male Trainer";
+    const preview = combinedPlayerCandidates("down", getPlayerVisualSelection());
 
     characterCreationScreen.innerHTML = `
         <div class="cc-shell">
@@ -498,44 +465,30 @@ function renderCharacterCreation() {
                 </div>
                 <div class="cc-header-badge"><strong>01</strong><span>APPEARANCE</span></div>
             </div>
-
-            <div class="cc-body">
+            <div class="cc-body cc-body-simple">
                 <aside class="cc-steps">
-                    <div class="cc-step-item active"><b>1</b><span>Appearance<small>Customise your look</small></span></div>
+                    <div class="cc-step-item active"><b>1</b><span>Appearance<small>Choose your Trainer</small></span></div>
                     <div class="cc-step-item"><b>2</b><span>Name<small>Choose your name</small></span></div>
                     <div class="cc-step-item"><b>3</b><span>Begin<small>Start your adventure</small></span></div>
                 </aside>
-
                 <section class="cc-preview-panel">
                     <div class="cc-panel-title">Preview</div>
                     <div class="cc-preview-stage"><div id="cc-large-preview"></div></div>
                     <div class="cc-preview-caption">
-                        <strong>${gender === "female" ? "Female" : "Male"} Trainer</strong>
-                        <span>4-direction · 4-frame walking animation</span>
+                        <strong>${label}</strong>
+                        <span>4 directions · 4 walking frames</span>
                     </div>
                 </section>
-
-                <section class="cc-options-panel">
+                <section class="cc-options-panel cc-options-simple">
                     <div class="cc-gender-toggle">
                         <button type="button" data-gender="boy" class="${gender === "male" ? "selected" : ""}">♂&nbsp; Male</button>
                         <button type="button" data-gender="girl" class="${gender === "female" ? "selected" : ""}">♀&nbsp; Female</button>
                     </div>
-
-                    <div class="cc-option-section">
-                        <div class="cc-section-heading"><span>Hair Colour</span><small>Choose your hair</small></div>
-                        <div class="cc-option-grid" id="cc-hair-options"></div>
+                    <div class="cc-fixed-choice">
+                        <strong>Current appearance</strong>
+                        <span>${gender === "male" ? "Male · Academy Default" : "Female · Academy Default"}</span>
+                        <small>Additional hair, eye and outfit variations will be re-enabled once their final production sprites are ready.</small>
                     </div>
-
-                    <div class="cc-option-section">
-                        <div class="cc-section-heading"><span>Eye Colour</span><small>Choose your eyes</small></div>
-                        <div class="cc-option-grid" id="cc-eye-options"></div>
-                    </div>
-
-                    <div class="cc-option-section">
-                        <div class="cc-section-heading"><span>Outfit</span><small>Choose your style</small></div>
-                        <div class="cc-option-grid" id="cc-outfit-options"></div>
-                    </div>
-
                     <div class="cc-name-row">
                         <label for="cc-name">Character Name</label>
                         <div class="cc-name-input-wrap">
@@ -545,7 +498,6 @@ function renderCharacterCreation() {
                     </div>
                 </section>
             </div>
-
             <div class="cc-footer">
                 <span><i>◆</i> Your appearance will be used throughout the overworld.</span>
                 <button type="button" class="cc-continue" id="cc-continue">Continue <b>›</b></button>
@@ -555,51 +507,16 @@ function renderCharacterCreation() {
 
     characterCreationScreen.querySelectorAll("[data-gender]").forEach(button => {
         button.addEventListener("click", () => {
-            const nextGender = button.dataset.gender;
-            gameState.gender = nextGender;
-            gameState.playerCustomization = nextGender === "girl"
-                ? { hair: "brown", eyes: "brown", outfit: "default" }
-                : { hair: "blond", eyes: "amber", outfit: "default" };
+            gameState.gender = button.dataset.gender;
+            gameState.playerCustomization = gameState.gender === "girl"
+                ? { hair: "brown", eyes: "brown", outfit: "academy_default" }
+                : { hair: "blond", eyes: "amber", outfit: "academy_default" };
             renderCharacterCreation();
         });
-    });
-
-    const addOption = (containerId, category, item, previewPath) => {
-        const container = characterCreationScreen.querySelector(containerId);
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = `cc-option ${current[category] === item.id ? "selected" : ""}`;
-        button.appendChild(makeSpritePreview(previewPath));
-        const label = document.createElement("span");
-        label.textContent = item.label;
-        button.appendChild(label);
-        button.addEventListener("click", () => {
-            gameState.playerCustomization[category] = item.id;
-            renderCharacterCreation();
-        });
-        container.appendChild(button);
-    };
-
-    data.hair.forEach(item => {
-        const previewSelection = { gender, hair: item.id, eyes: current.eyes, outfit: current.outfit };
-        const path = combinedPlayerCandidates("down", previewSelection);
-        addOption("#cc-hair-options", "hair", item, path);
-    });
-
-    data.eyes.forEach(item => {
-        const previewSelection = { gender, hair: current.hair, eyes: item.id, outfit: current.outfit };
-        const path = combinedPlayerCandidates("down", previewSelection);
-        addOption("#cc-eye-options", "eyes", item, path);
-    });
-
-    data.outfits.forEach(item => {
-        const previewSelection = { gender, hair: current.hair, eyes: current.eyes, outfit: item.id };
-        const path = combinedPlayerCandidates("down", previewSelection);
-        addOption("#cc-outfit-options", "outfit", item, path);
     });
 
     characterCreationScreen.querySelector("#cc-large-preview").appendChild(
-        makeSpritePreview(combinedPlayerCandidates("down", getPlayerVisualSelection()), "cc-large-sprite")
+        makeSpritePreview(preview, "cc-large-sprite")
     );
 
     const nameInput = characterCreationScreen.querySelector("#cc-name");
